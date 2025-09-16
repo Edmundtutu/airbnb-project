@@ -1,20 +1,20 @@
 import api from './api';
-import { Shop, Product, Order, Review, Post, ApiResponse, PaginatedResponse } from '@/types';
+import { Property, Listing, Booking, Review, Post, ApiResponse, PaginatedResponse } from '@/types';
 import type { LaravelPaginatedResponse } from '@/types/api';
 
 const apiVersion = import.meta.env.VITE_API_VERSION;
 
-export const shopService = {
-  // ShopHandlers
-  async getShops(params?: {
+export const propertyService = {
+  // PropertyHandlers
+  async getProperties(params?: {
     lat?: number;
     lng?: number;
     radius?: number;
     search?: string;
     category?: string;
-    owner_id?: string | number;
+    host_id?: string | number;
     page?: number;
-  }): Promise<LaravelPaginatedResponse<Shop>> {
+  }): Promise<LaravelPaginatedResponse<Property>> {
     const formattedParams: any = {};
 
     // unified search param that backend groups with OR

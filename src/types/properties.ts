@@ -1,14 +1,14 @@
 import { AuthUser } from './auth';
-import { Product } from './products';
+import { Listing } from './listings';
 
 export interface Review {
   id: string;
   user_id: string;
   user: AuthUser;
-  product_id?: string;
-  product?: Product;
-  shop_id?: string;
-  shop?: Shop;
+  listing_id?: string;
+  listing?: Listing;
+  property_id?: string;
+  property?: Property;
   rating: number;
   comment?: string;
   images?: string[];
@@ -24,10 +24,10 @@ export interface Post {
   images: string[];
   captions?: string[];
   hashtags?: string[];
-  product_id?: string;
-  product?: Product;
-  shop_id?: string;
-  shop?: Shop;
+  listing_id?: string;
+  listing?: Listing;
+  property_id?: string;
+  property?: Property;
   likes_count: number;
   comments_count: number;
   liked_by_user: boolean;
@@ -50,7 +50,7 @@ export interface Comment {
   updated_at: string;
 }
 
-export interface Shop {
+export interface Property {
   id: string;
   name: string;
   description?: string;
@@ -61,8 +61,8 @@ export interface Shop {
   };
   avatar?: string;
   cover_image?: string;
-  owner_id: string;
-  owner?: AuthUser;
+  host_id: string;
+  host?: AuthUser;
   rating: number;
   total_reviews: number;
   phone?: string;
@@ -73,4 +73,10 @@ export interface Shop {
   created_at: string;
   updated_at: string;
   distance?: number;
+}
+
+// Legacy interface for backward compatibility
+export interface Shop extends Property {
+  owner_id: string;
+  owner?: AuthUser;
 }
