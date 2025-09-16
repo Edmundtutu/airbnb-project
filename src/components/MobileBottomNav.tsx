@@ -12,7 +12,7 @@ import {
   MessageCircle
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { useCart } from '@/context/CartContext';
+import { useCart } from '@/context/BookingContext';
 import { useChat } from '@/context/ChatContext';
 import { Badge } from '@/components/ui/badge';
 import { ConversationList } from '@/components/shared/ConversationList';

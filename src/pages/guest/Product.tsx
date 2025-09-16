@@ -16,7 +16,7 @@ import {
 import { Product, Review } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 import { productService } from '@/services/productService';
-import { useFavorites } from '@/context/FavoritesContext';
+import { useWishlist as useFavorites } from '@/context/WishlistContext';
 
 const ProductPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();

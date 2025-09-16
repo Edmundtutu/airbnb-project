@@ -1,11 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useFavorites } from '@/context/FavoritesContext';
+import { useWishlist as useFavorites } from '@/context/WishlistContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Heart } from 'lucide-react';
-import ProductCard from '@/components/customer/discover/ProductCard';
+import { ProductCard } from '@/components/guest/discover/ListingCard';
 
 const FavoritesPage: React.FC = () => {
   const { favoriteProducts, removeProductFromFavorites } = useFavorites();

@@ -7,7 +7,7 @@ import { Star, MapPin, Phone, ArrowLeft } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { shopService } from '@/services/shopService';
 import { Product, Shop } from '@/types';
-import { useCart } from '@/context/CartContext';
+import { useCart } from '@/context/BookingContext';
 import { useToast } from '@/hooks/use-toast';
 
 const ShopDetails: React.FC = () => {

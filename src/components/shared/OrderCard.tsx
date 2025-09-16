@@ -12,7 +12,7 @@ import {
   X,
   MessageCircle
 } from 'lucide-react';
-import CreatePostCard from '@/components/customer/profile/orders/CreatePostCard';
+import CreatePostCard from '@/components/guest/profile/orders/CreatePostCard';
 import { useImageCapture } from '@/hooks/useImageCapture';
 import CameraCapture from '@/components/features/CameraCapture';
 import { useToast } from '@/hooks/use-toast';
