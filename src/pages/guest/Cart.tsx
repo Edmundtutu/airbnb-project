@@ -22,7 +22,7 @@ import {
   Package,
   PackagePlus
 } from 'lucide-react';
-import { useCart } from '@/context/CartContext';
+import { useCart } from '@/context/BookingContext';
 import { useToast } from '@/hooks/use-toast';
 import { useMutation } from '@tanstack/react-query';
 import { createOrder } from '@/services/orderService';

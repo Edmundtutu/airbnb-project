@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Plus, Package } from 'lucide-react';
-import { DynamicInventoryFlow } from '@/components/vendor/inventory/DynamicInventoryFlow';
+import { DynamicInventoryFlow } from '@/components/host/inventory/DynamicInventoryFlow';
 import { useQuery } from '@tanstack/react-query';
 import inventoryService from '@/services/inventoryService';
 import { useAuth } from '@/context/AuthContext';

@@ -11,23 +11,23 @@ import VendorLayout from '@/layouts/VendorLayout';
 import Login from '@/pages/auth/Login';
 import Register from '@/pages/auth/Register';
 
-// Customer Pages
-import Home from '@/pages/customer/Home';
-import Discover from '@/pages/customer/Discover';
-import Product from '@/pages/customer/Product';
-import ShopMapPage from '@/pages/customer/ShopMapPage';
-import Cart from '@/pages/customer/Cart';
-import Profile from '@/pages/customer/Profile';
-import Favorites from '@/pages/customer/Favorites';
-import ShopDetails from '@/pages/shops/[shopId]';
+// Guest (renter) Pages
+import Home from '@/pages/guest/Home';
+import Discover from '@/pages/guest/Discover';
+import Product from '@/pages/guest/Product';
+import ShopMapPage from '@/pages/guest/ShopMapPage';
+import Cart from '@/pages/guest/Cart';
+import Profile from '@/pages/guest/Profile';
+import Favorites from '@/pages/guest/Favorites';
+import ShopDetails from '@/pages/properties/[shopId]';
 
 
-// Vendor Pages
-import VendorDashboard from '@/pages/vendor/Dashboard';
-import VendorInventory from '@/pages/vendor/Inventory';
-import VendorOrders from '@/pages/vendor/Orders';
-import VendorAnalytics from '@/pages/vendor/Analytics';
-import VendorProfile from '@/pages/vendor/Profile';
+// Host Pages
+import VendorDashboard from '@/pages/host/Dashboard';
+import VendorInventory from '@/pages/host/Inventory';
+import VendorOrders from '@/pages/host/Orders';
+import VendorAnalytics from '@/pages/host/Analytics';
+import VendorProfile from '@/pages/host/Profile';
 
 // Route Guards
 interface ProtectedRouteProps {
@@ -136,7 +136,7 @@ const AppRoutes: React.FC = () => {
       } />
 
 
-      {/* Vendor Routes */}
+      {/* Host Routes */}
       <Route path="/vendor/dashboard" element={
         <ProtectedRoute requiredRole={['vendor']} layout="vendor">
           <VendorDashboard />

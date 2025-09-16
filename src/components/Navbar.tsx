@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { User as UserType } from '@/types';
 import { useAuth } from '@/context/AuthContext';
-import { useCart } from '@/context/CartContext';
+import { useCart } from '@/context/BookingContext';
 import { useChat } from '@/context/ChatContext';
 import { ConversationList } from '@/components/shared/ConversationList';
 import { NotificationList } from '@/components/shared/NotificationList';

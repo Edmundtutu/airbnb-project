@@ -13,12 +13,12 @@ import {
   SlidersHorizontal
 } from 'lucide-react';
 import { Product } from '@/types';
-import { useCart } from '@/context/CartContext';
+import { useCart } from '@/context/BookingContext';
 import { useToast } from '@/hooks/use-toast';
  import { useQuery } from '@tanstack/react-query';
  import { productService } from '@/services/productService';
- import { useFavorites } from '@/context/FavoritesContext';
- import ProductCard from '@/components/customer/discover/ProductCard';
+ import { useFavorites } from '@/context/WishlistContext';
+ import { ProductCard } from '@/components/guest/discover/ListingCard';
 
 const Discover: React.FC = () => {
  const [searchParams] = useSearchParams();

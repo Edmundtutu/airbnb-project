@@ -241,3 +241,6 @@ export const propertyService = {
     await api.delete(`${apiVersion}/cart`);
   },
 };
+
+// Legacy alias for backward compatibility
+export const shopService = propertyService;
