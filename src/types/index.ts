@@ -3,6 +3,9 @@ export * from './auth';
 export * from './products';
 export * from './orders';
 export * from './shops';
+export * from './properties';
+export * from './listings';
+export * from './bookings';
 export * from './api';
 export * from './test-data';
 

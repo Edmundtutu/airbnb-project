@@ -44,9 +44,17 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('shops', ShopController::class)->only(['index', 'show']);
     Route::apiResource('shops', ShopController::class)->middleware('auth:sanctum')->except(['index', 'show']);
 
+    // Airbnb domain aliases (non-breaking): properties -> shops
+    Route::apiResource('properties', ShopController::class)->only(['index', 'show']);
+    Route::apiResource('properties', ShopController::class)->middleware('auth:sanctum')->except(['index', 'show']);
+
     // Product routes
     Route::apiResource('products', ProductController::class)->only(['index', 'show']);
     Route::apiResource('products', ProductController::class)->middleware('auth:sanctum')->except(['index', 'show']);
+
+    // Airbnb domain aliases: listings -> products
+    Route::apiResource('listings', ProductController::class)->only(['index', 'show']);
+    Route::apiResource('listings', ProductController::class)->middleware('auth:sanctum')->except(['index', 'show']);
 
     // Category routes
     Route::apiResource('categories', CategoryController::class)->only(['index', 'show']);
@@ -72,6 +80,8 @@ Route::prefix('v1')->group(function () {
         Route::patch('/vendor/orders/{order}/reject', [OrderController::class, 'rejectOrder']);
     });
     Route::apiResource('orders', OrderController::class);
+    // Airbnb domain aliases: bookings -> orders
+    Route::apiResource('bookings', OrderController::class);
 
     // Review routes
     Route::apiResource('reviews', ReviewController::class);
