@@ -6,14 +6,14 @@ use App\Http\Controllers\Api\V1\PostHandlers\LikeController;
 use App\Http\Controllers\Api\V1\PostHandlers\PostCommentController;
 use App\Http\Controllers\Api\V1\UserHandlers\AuthController;
 use App\Http\Controllers\Api\V1\PostHandlers\PostController;
-use App\Http\Controllers\Api\V1\OrderHandlers\OrderController;
-use App\Http\Controllers\Api\V1\OrderHandlers\ProductController;
-use App\Http\Controllers\Api\V1\ShopHandlers\Inventory\AddonController;
-use App\Http\Controllers\Api\V1\ShopHandlers\Inventory\CategoryController;
-use App\Http\Controllers\Api\V1\ShopHandlers\Inventory\InventoryController;
-use App\Http\Controllers\Api\V1\ShopHandlers\Inventory\ModificationController;
-use App\Http\Controllers\Api\V1\ShopHandlers\ReviewController;
-use App\Http\Controllers\Api\V1\ShopHandlers\ShopController;
+use App\Http\Controllers\Api\V1\BookingHandlers\BookingController;
+use App\Http\Controllers\Api\V1\BookingHandlers\ListingController;
+use App\Http\Controllers\Api\V1\PropertyHandlers\Inventory\AddonController;
+use App\Http\Controllers\Api\V1\PropertyHandlers\Inventory\CategoryController;
+use App\Http\Controllers\Api\V1\PropertyHandlers\Inventory\InventoryController;
+use App\Http\Controllers\Api\V1\PropertyHandlers\Inventory\ModificationController;
+use App\Http\Controllers\Api\V1\PropertyHandlers\ReviewController;
+use App\Http\Controllers\Api\V1\PropertyHandlers\PropertyController;
 use App\Http\Controllers\Api\V1\UserHandlers\FollowController;
 use App\Http\Controllers\Api\V1\ChatController;
 use Illuminate\Support\Facades\Route;
@@ -28,7 +28,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/user', [AuthController::class, 'user']);
 
         // Inventory react flow nodes and edges routes
-        Route::get('/inventory/{shop}/graph', [InventoryController::class, 'getGraph']);
+        Route::get('/inventory/{property}/graph', [InventoryController::class, 'getGraph']);
 
         Route::post('/inventory/nodes', [InventoryController::class, 'storeNode']);
         Route::patch('/inventory/nodes/{node}', [InventoryController::class, 'updateNode'])->middleware('can:update,node');
@@ -40,13 +40,13 @@ Route::prefix('v1')->group(function () {
         Route::patch('/nodes/{node}/position', [InventoryController::class, 'updateNodePosition'])->middleware('can:update,node');
     });
 
-    // Shop routes
-    Route::apiResource('shops', ShopController::class)->only(['index', 'show']);
-    Route::apiResource('shops', ShopController::class)->middleware('auth:sanctum')->except(['index', 'show']);
+    // Property routes
+    Route::apiResource('properties', PropertyController::class)->only(['index', 'show']);
+    Route::apiResource('properties', PropertyController::class)->middleware('auth:sanctum')->except(['index', 'show']);
 
-    // Product routes
-    Route::apiResource('products', ProductController::class)->only(['index', 'show']);
-    Route::apiResource('products', ProductController::class)->middleware('auth:sanctum')->except(['index', 'show']);
+    // Listing routes
+    Route::apiResource('listings', ListingController::class)->only(['index', 'show']);
+    Route::apiResource('listings', ListingController::class)->middleware('auth:sanctum')->except(['index', 'show']);
 
     // Category routes
     Route::apiResource('categories', CategoryController::class)->only(['index', 'show']);
@@ -67,11 +67,11 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('posts.comments', PostCommentController::class)->middleware('auth:sanctum');
 
     Route::middleware('auth:sanctum')->group(function () {
-        Route::get('/vendor/orders', [OrderController::class, 'vendorOrders']);
-        Route::patch('/vendor/orders/{order}/confirm', [OrderController::class, 'confirmOrder']);
-        Route::patch('/vendor/orders/{order}/reject', [OrderController::class, 'rejectOrder']);
+        Route::get('/host/bookings', [BookingController::class, 'hostBookings']);
+        Route::patch('/host/bookings/{booking}/confirm', [BookingController::class, 'confirmBooking']);
+        Route::patch('/host/bookings/{booking}/reject', [BookingController::class, 'rejectBooking']);
     });
-    Route::apiResource('orders', OrderController::class);
+    Route::apiResource('bookings', BookingController::class);
 
     // Review routes
     Route::apiResource('reviews', ReviewController::class);
@@ -99,7 +99,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/chat/conversations/{conversationId}/messages', [ChatController::class, 'getMessages']);
         Route::patch('/chat/conversations/{conversationId}/read', [ChatController::class, 'markAsRead']);
         Route::get('/chat/conversations/user', [ChatController::class, 'getUserConversations']);
-        Route::get('/chat/conversations/shop', [ChatController::class, 'getShopConversations']);
+        Route::get('/chat/conversations/property', [ChatController::class, 'getPropertyConversations']);
         Route::post('/chat/typing/start', [ChatController::class, 'startTyping']);
         Route::post('/chat/typing/stop', [ChatController::class, 'stopTyping']);
         Route::post('/chat/presence', [ChatController::class, 'updatePresence']);

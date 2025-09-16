@@ -13,7 +13,7 @@ class Addon extends Model
     use HasFactory, HasUlids, SoftDeletes;
 
     protected $fillable = [
-        'product_id',
+        'listing_id',
         'name',
         'price',
     ];
@@ -22,9 +22,9 @@ class Addon extends Model
         'price' => 'decimal:2',
     ];
 
-    public function product(): BelongsTo
+    public function listing(): BelongsTo
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Listing::class);
     }
 }
 

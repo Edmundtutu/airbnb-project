@@ -1,7 +1,7 @@
 <?php
 namespace App\Models;
 
-use App\Models\Shop;
+use App\Models\Property;
 use App\Models\InventoryNode;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -13,7 +13,7 @@ class InventoryNodeEdge extends Model
     use HasFactory, HasUlids, SoftDeletes;
 
     protected $fillable = [
-        'shop_id',
+        'property_id',
         'source_node_id', 
         'target_node_id', 
         'label',
@@ -24,9 +24,9 @@ class InventoryNodeEdge extends Model
         'metadata' => 'array'
     ];
 
-    public function shop()
+    public function property()
     {
-        return $this->belongsTo(Shop::class, 'shop_id');
+        return $this->belongsTo(Property::class, 'property_id');
     }
 
     public function sourceNode()

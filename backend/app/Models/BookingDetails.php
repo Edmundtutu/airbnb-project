@@ -7,28 +7,28 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class OrderItem extends Model
+class BookingDetails extends Model
 {
     use HasFactory, HasUlids;
 
     protected $fillable = [
-        'order_id',
-        'product_id',
-        'quantity',
-        'price',
+        'booking_id',
+        'listing_id',
+        'nights',
+        'price_per_night',
     ];
 
     protected $casts = [
-        'price' => 'decimal:2',
+        'price_per_night' => 'decimal:2',
     ];
 
-    public function order(): BelongsTo
+    public function booking(): BelongsTo
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(Booking::class);
     }
 
-    public function product(): BelongsTo
+    public function listing(): BelongsTo
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Listing::class);
     }
 }

@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Models\Shop;
-use App\Models\Product;
+use App\Models\Property;
+use App\Models\Listing;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -14,18 +14,18 @@ class Category extends Model
     use HasFactory, HasUlids, SoftDeletes;
 
     protected $fillable = [
-        'shop_id',
+        'property_id',
         'name',
         'description',
     ];
 
-    public function products()
+    public function listings()
     {
-        return $this->belongsToMany(Product::class, 'category_product');
+        return $this->belongsToMany(Listing::class, 'category_listing');
     }
     
-    public function shop()
+    public function property()
     {
-        return $this->belongsTo(Shop::class, 'shop_id');
+        return $this->belongsTo(Property::class, 'property_id');
     }
 }

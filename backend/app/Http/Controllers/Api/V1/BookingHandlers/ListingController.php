@@ -1,27 +1,27 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1\OrderHandlers;
+namespace App\Http\Controllers\Api\V1\BookingHandlers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Filters\V1\ProductFilter;
-use App\Http\Requests\Api\V1\StoreProductRequest;
-use App\Http\Requests\Api\V1\UpdateProductRequest;
-use App\Http\Resources\Api\V1\ProductResource;
-use App\Models\Product;
-use App\Models\Shop;
+use App\Http\Filters\V1\ListingFilter;
+use App\Http\Requests\Api\V1\StoreListingRequest;
+use App\Http\Requests\Api\V1\UpdateListingRequest;
+use App\Http\Resources\Api\V1\ListingResource;
+use App\Models\Listing;
+use App\Models\Property;
 use Illuminate\Http\Request;
 
-class ProductController extends Controller
+class ListingController extends Controller
 {
     public function index(Request $request)
     {
         // Instantiate the filter
-        $filter = new ProductFilter();
+        $filter = new ListingFilter();
         // Transform the request parameters into filter conditions
         $filterItems = $filter->transform($request);
 
         // Start building the query
-        $query = Product::query();
+        $query = Listing::query();
 
         // Separate search filters and other filters
         $searchFilters = [];
@@ -46,59 +46,59 @@ class ProductController extends Controller
             });
         }
 
-        // Apply eager loading for the shop and reviews relationships
-        $query->with(['shop', 'reviews']);
+        // Apply eager loading for the property and reviews relationships
+        $query->with(['property', 'reviews']);
 
         // Pagination (default 10 per page)
         $perPage = (int) ($request->query('per_page', 10));
-        $products = $query->paginate($perPage)->appends($request->query());
+        $listings = $query->paginate($perPage)->appends($request->query());
 
-        return ProductResource::collection($products);
+        return ListingResource::collection($listings);
     }
 
-    public function store(StoreProductRequest $request)
+    public function store(StoreListingRequest $request)
     {
         $validated = $request->validated();
-        $shop = Shop::findOrFail($validated['shop_id']);
+        $property = Property::findOrFail($validated['property_id']);
 
-        $this->authorize('create', [Product::class, $shop]);
+        $this->authorize('create', [Listing::class, $property]);
 
         $categoryIds = $validated['category_ids'] ?? [];
         unset($validated['category_ids']);
 
-        $product = Product::create($validated);
+        $listing = Listing::create($validated);
         if (!empty($categoryIds)) {
-            $product->categories()->sync($categoryIds);
+            $listing->categories()->sync($categoryIds);
         }
 
-        return new ProductResource($product);
+        return new ListingResource($listing);
     }
 
-    public function show(Product $product)
+    public function show(Listing $listing)
     {
-        return new ProductResource($product->load(['shop', 'reviews']));
+        return new ListingResource($listing->load(['property', 'reviews']));
     }
 
-    public function update(UpdateProductRequest $request, Product $product)
+    public function update(UpdateListingRequest $request, Listing $listing)
     {
-        $this->authorize('update', $product);
+        $this->authorize('update', $listing);
 
         $validated = $request->validated();
         $categoryIds = $validated['category_ids'] ?? null;
         unset($validated['category_ids']);
-        $product->update($validated);
+        $listing->update($validated);
         if (is_array($categoryIds)) {
-            $product->categories()->sync($categoryIds);
+            $listing->categories()->sync($categoryIds);
         }
 
-        return new ProductResource($product);
+        return new ListingResource($listing);
     }
 
-    public function destroy(Product $product)
+    public function destroy(Listing $listing)
     {
-        $this->authorize('delete', $product);
+        $this->authorize('delete', $listing);
 
-        $product->delete();
+        $listing->delete();
 
         return response()->noContent();
     }

@@ -18,8 +18,8 @@ class Post extends Model
         'user_id',
         'content',
         'images',
-        'product_id',
-        'shop_id',
+        'listing_id',
+        'property_id',
     ];
 
     protected $casts = [
@@ -31,14 +31,14 @@ class Post extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function product(): BelongsTo
+    public function listing(): BelongsTo
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Listing::class);
     }
 
-    public function shop(): BelongsTo
+    public function property(): BelongsTo
     {
-        return $this->belongsTo(Shop::class);
+        return $this->belongsTo(Property::class);
     }
 
     public function comments(): MorphMany

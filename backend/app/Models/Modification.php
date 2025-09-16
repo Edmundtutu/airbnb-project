@@ -13,7 +13,7 @@ class Modification extends Model
     use HasFactory, HasUlids, SoftDeletes;
 
     protected $fillable = [
-        'product_id',
+        'listing_id',
         'name',
         'cost',
     ];
@@ -22,9 +22,9 @@ class Modification extends Model
         'cost' => 'decimal:2',
     ];
 
-    public function product(): BelongsTo
+    public function listing(): BelongsTo
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Listing::class);
     }
 }
 

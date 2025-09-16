@@ -9,36 +9,39 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Order extends Model
+class Booking extends Model
 {
     use HasFactory, HasUlids, SoftDeletes;
 
     protected $fillable = [
-        'user_id',
-        'shop_id',
+        'guest_id',
+        'property_id',
         'total',
         'status',
-        'delivery_type',
-        'delivery_address',
+        'check_in_date',
+        'check_out_date',
+        'guest_count',
         'notes',
     ];
 
     protected $casts = [
         'total' => 'decimal:2',
+        'check_in_date' => 'date',
+        'check_out_date' => 'date',
     ];
 
-    public function user(): BelongsTo
+    public function guest(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'guest_id');
     }
 
-    public function shop(): BelongsTo
+    public function property(): BelongsTo
     {
-        return $this->belongsTo(Shop::class);
+        return $this->belongsTo(Property::class);
     }
 
-    public function items(): HasMany
+    public function details(): HasMany
     {
-        return $this->hasMany(OrderItem::class);
+        return $this->hasMany(BookingDetails::class);
     }
 }
