@@ -9,9 +9,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Conversation extends Model
 {
     protected $fillable = [
-        'order_id',
+        'booking_id',
         'user_id',
-        'shop_id',
+        'property_id',
         'status',
         'last_message_at',
     ];
@@ -20,9 +20,9 @@ class Conversation extends Model
         'last_message_at' => 'datetime',
     ];
 
-    public function order(): BelongsTo
+    public function booking(): BelongsTo
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(Booking::class);
     }
 
     public function user(): BelongsTo
@@ -30,9 +30,9 @@ class Conversation extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function shop(): BelongsTo
+    public function property(): BelongsTo
     {
-        return $this->belongsTo(Shop::class);
+        return $this->belongsTo(Property::class);
     }
 
     public function messages(): HasMany

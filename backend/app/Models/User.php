@@ -62,9 +62,9 @@ class User extends Authenticatable
         ];
     }
 
-    public function shops(): HasMany
+    public function properties(): HasMany
     {
-        return $this->hasMany(Shop::class, 'owner_id');
+        return $this->hasMany(Property::class, 'host_id');
     }
 
     public function posts(): HasMany
@@ -72,9 +72,9 @@ class User extends Authenticatable
         return $this->hasMany(Post::class);
     }
 
-    public function orders(): HasMany
+    public function bookings(): HasMany
     {
-        return $this->hasMany(Order::class);
+        return $this->hasMany(Booking::class, 'guest_id');
     }
 
     public function reviews(): HasMany
@@ -119,12 +119,22 @@ class User extends Authenticatable
             ->exists();
     }
 
+    public function isHost():bool
+    {
+        return $this->role == 'host';
+    }
+    public function isGuest():bool
+    {
+        return $this->role == 'guest';
+    }
+    
+    // Legacy methods for backward compatibility
     public function isVendor():bool
     {
-        return $this->role == 'vendor';
+        return $this->role == 'host';
     }
     public function isCustomer():bool
     {
-        return $this->role == 'customer';
+        return $this->role == 'guest';
     }
 }

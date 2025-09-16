@@ -31,7 +31,7 @@ class Message extends Model
         if ($this->sender_type === 'user') {
             return $this->belongsTo(User::class, 'sender_id');
         }
-        return $this->belongsTo(Shop::class, 'sender_id');
+        return $this->belongsTo(Property::class, 'sender_id');
     }
 
     public function isFromUser(): bool
@@ -39,8 +39,14 @@ class Message extends Model
         return $this->sender_type === 'user';
     }
 
+    public function isFromProperty(): bool
+    {
+        return $this->sender_type === 'property';
+    }
+    
+    // Legacy method for backward compatibility
     public function isFromShop(): bool
     {
-        return $this->sender_type === 'shop';
+        return $this->sender_type === 'property';
     }
 }

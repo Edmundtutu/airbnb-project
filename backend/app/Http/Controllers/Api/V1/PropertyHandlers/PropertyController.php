@@ -1,24 +1,24 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1\ShopHandlers;
+namespace App\Http\Controllers\Api\V1\PropertyHandlers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Filters\V1\ShopFilter;
-use App\Http\Requests\Api\V1\StoreShopRequest;
-use App\Http\Requests\Api\V1\UpdateShopRequest;
-use App\Http\Resources\Api\V1\ShopResource;
-use App\Models\Shop;
+use App\Http\Filters\V1\PropertyFilter;
+use App\Http\Requests\Api\V1\StorePropertyRequest;
+use App\Http\Requests\Api\V1\UpdatePropertyRequest;
+use App\Http\Resources\Api\V1\PropertyResource;
+use App\Models\Property;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class ShopController extends Controller
+class PropertyController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $query = Shop::query();
+        $query = Property::query();
 
         // Text search across multiple columns using a single 'search' param
         if ($request->filled('search')) {
@@ -44,7 +44,7 @@ class ShopController extends Controller
         }
 
         // Structured filters via ApiFilter
-        $filter = new ShopFilter();
+        $filter = new PropertyFilter();
         foreach ($filter->transform($request) as $clause) {
             [$column, $op, $value] = $clause;
             switch ($op) {
@@ -79,52 +79,52 @@ class ShopController extends Controller
 
         $query->with('reviews'); // Eager load reviews for rating/total reviews
 
-        return ShopResource::collection($query->paginate());
+        return PropertyResource::collection($query->paginate());
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreShopRequest $request)
+    public function store(StorePropertyRequest $request)
     {
         $validated = $request->validated();
-        $validated['owner_id'] = Auth::id();
+        $validated['host_id'] = Auth::id();
 
-        $shop = Shop::create($validated);
+        $property = Property::create($validated);
 
-        return new ShopResource($shop);
+        return new PropertyResource($property);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Shop $shop)
+    public function show(Property $property)
     {
         // Ensure reviews are loaded so rating/total_reviews are populated
-        $shop->load('reviews');
-        return new ShopResource($shop);
+        $property->load('reviews');
+        return new PropertyResource($property);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateShopRequest $request, Shop $shop)
+    public function update(UpdatePropertyRequest $request, Property $property)
     {
-        $this->authorize('update', $shop);
+        $this->authorize('update', $property);
 
-        $shop->update($request->validated());
+        $property->update($request->validated());
 
-        return new ShopResource($shop);
+        return new PropertyResource($property);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Shop $shop)
+    public function destroy(Property $property)
     {
-        $this->authorize('delete', $shop);
+        $this->authorize('delete', $property);
 
-        $shop->delete();
+        $property->delete();
 
         return response()->noContent();
     }

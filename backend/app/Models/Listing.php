@@ -11,30 +11,30 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Product extends Model
+class Listing extends Model
 {
     use HasFactory, HasUlids, SoftDeletes;
 
     protected $fillable = [
-        'shop_id',
+        'property_id',
         'name',
         'description',
-        'price',
+        'price_per_night',
         'images',
         'category',
-        'stock',
+        'max_guests',
         'tags',
     ];
 
     protected $casts = [
-        'price' => 'decimal:2',
+        'price_per_night' => 'decimal:2',
         'images' => 'json',
         'tags' => 'json',
     ];
 
-    public function shop(): BelongsTo
+    public function property(): BelongsTo
     {
-        return $this->belongsTo(Shop::class);
+        return $this->belongsTo(Property::class);
     }
 
     public function reviews(): MorphMany
@@ -54,6 +54,6 @@ class Product extends Model
 
     public function categories()
     {
-        return $this->belongsToMany(Category::class, 'category_product');
+        return $this->belongsToMany(Category::class, 'category_listing');
     }
 }

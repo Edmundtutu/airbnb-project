@@ -14,12 +14,12 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
-class Shop extends Model
+class Property extends Model
 {
     use HasFactory, HasUlids, SoftDeletes;
 
     protected $fillable = [
-        'owner_id',
+        'host_id',
         'name',
         'description',
         'address',
@@ -40,19 +40,19 @@ class Shop extends Model
         'verified' => 'boolean',
     ];
 
-    public function owner(): BelongsTo
+    public function host(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'owner_id');
+        return $this->belongsTo(User::class, 'host_id');
     }
 
-    public function products(): HasMany
+    public function listings(): HasMany
     {
-        return $this->hasMany(Product::class);
+        return $this->hasMany(Listing::class);
     }
 
-    public function orders(): HasMany
+    public function bookings(): HasMany
     {
-        return $this->hasMany(Order::class);
+        return $this->hasMany(Booking::class);
     }
 
     public function reviews(): MorphMany
@@ -67,12 +67,12 @@ class Shop extends Model
 
     public function categories(): HasMany
     {
-        return $this->hasMany(Category::class, 'shop_id');
+        return $this->hasMany(Category::class, 'property_id');
     }
 
     public function inventoryNodes(): HasMany
     {
-        return $this->hasMany(InventoryNode::class, 'shop_id');
+        return $this->hasMany(InventoryNode::class, 'property_id');
     }
 
     public function inventoryNodeEdges(): HasMany
