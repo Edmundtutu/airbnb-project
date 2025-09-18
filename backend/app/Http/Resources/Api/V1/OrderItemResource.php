@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Http\Resources\Api\V1\ProductResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @deprecated Use BookingDetailResource instead
+ */
 class OrderItemResource extends JsonResource
 {
     /**
