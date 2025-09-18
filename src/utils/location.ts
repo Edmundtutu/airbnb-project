@@ -51,21 +51,26 @@ export const isWithinRadius = (
 };
 
 /**
- * Get shops within radius sorted by distance
+ * Get properties within radius sorted by distance
  */
-export const getShopsWithinRadius = <T extends { location: Location }>(
+export const getPropertiesWithinRadius = <T extends { location: Location }>(
   userLocation: Location,
-  shops: T[],
+  properties: T[],
   radiusKm: number = 10
 ): (T & { distance: number })[] => {
-  return shops
-    .map(shop => ({
-      ...shop,
-      distance: calculateDistance(userLocation, shop.location)
+  return properties
+    .map(property => ({
+      ...property,
+      distance: calculateDistance(userLocation, property.location)
     }))
-    .filter(shop => shop.distance <= radiusKm)
+    .filter(property => property.distance <= radiusKm)
     .sort((a, b) => a.distance - b.distance);
 };
+
+/**
+ * Get shops within radius sorted by distance (legacy alias)
+ */
+export const getShopsWithinRadius = getPropertiesWithinRadius;
 
 /**
  * Reverse geocoding simulation (in real app, use Google Maps API)

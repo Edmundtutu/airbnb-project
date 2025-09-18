@@ -5,10 +5,7 @@ namespace App\Http\Resources\Api\V1;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/**
- * @deprecated Use PropertyResource instead
- */
-class ShopResource extends JsonResource
+class PropertyResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -19,7 +16,7 @@ class ShopResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'owner_id' => $this->owner_id,
+            'host_id' => $this->host_id,
             'name' => $this->name,
             'description' => $this->description,
             'address' => $this->address,
@@ -31,8 +28,11 @@ class ShopResource extends JsonResource
             'hours' => $this->hours,
             'verified' => $this->verified,
             'distance' => $this->when(isset($this->distance), (float) $this->distance),
- 'rating' => $this->whenLoaded('reviews', fn () => round($this->reviews->avg('rating'), 1), 0),
- 'total_reviews' => $this->whenLoaded('reviews', fn () => $this->reviews->count(), 0),
+            'rating' => $this->whenLoaded('reviews', fn () => round($this->reviews->avg('rating'), 1), 0),
+            'total_reviews' => $this->whenLoaded('reviews', fn () => $this->reviews->count(), 0),
+            'total_listings' => $this->whenLoaded('listings', fn () => $this->listings->count(), 0),
+            'host' => new UserResource($this->whenLoaded('host')),
+            'listings' => ListingResource::collection($this->whenLoaded('listings')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

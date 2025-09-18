@@ -9,6 +9,9 @@ interface GetListingsParams {
   check_out?: string;
   guests?: number;
   property_id?: string;
+  min_price?: number;
+  max_price?: number;
+  amenities?: string[];
 }
 
 const apiVersion = import.meta.env.VITE_API_VERSION;
@@ -48,6 +51,18 @@ export const listingService = {
       formattedParams['property_id'] = params.property_id;
     }
 
+    if (params?.min_price) {
+      formattedParams['min_price'] = params.min_price;
+    }
+
+    if (params?.max_price) {
+      formattedParams['max_price'] = params.max_price;
+    }
+
+    if (params?.amenities && params.amenities.length > 0) {
+      formattedParams['amenities'] = params.amenities.join(',');
+    }
+
     const response = await api.get(`${apiVersion}/listings`, { params: formattedParams });
     const payload = response.data;
     if (payload && payload.meta) {
@@ -75,6 +90,20 @@ export const listingService = {
     return (response.data as any).data ?? (response.data as any);
   },
 
+  async createListing(data: Partial<Listing>): Promise<Listing> {
+    const response = await api.post<ApiResponse<Listing>>(`${apiVersion}/listings`, data);
+    return response.data.data;
+  },
+
+  async updateListing(id: string, data: Partial<Listing>): Promise<Listing> {
+    const response = await api.put<ApiResponse<Listing>>(`${apiVersion}/listings/${id}`, data);
+    return response.data.data;
+  },
+
+  async deleteListing(id: string): Promise<void> {
+    await api.delete(`${apiVersion}/listings/${id}`);
+  },
+
   async attachCategories(listingId: string, categoryIds: string[]): Promise<Listing> {
     const response = await api.put<ApiResponse<Listing>>(`${apiVersion}/listings/${listingId}`, {
       category_ids: categoryIds,
@@ -93,11 +122,48 @@ export const listingService = {
     return response.data ?? [];
   },
 
-  async checkAvailability(listingId: string, checkIn: string, checkOut: string, guests: number): Promise<{ available: boolean; price_per_night: number; total_price: number }> {
+  async checkAvailability(listingId: string, checkIn: string, checkOut: string, guests: number): Promise<{ 
+    available: boolean; 
+    price_per_night: number; 
+    total_price: number;
+    total_nights: number;
+    cleaning_fee?: number;
+    service_fee?: number;
+  }> {
     const response = await api.get(`${apiVersion}/listings/${listingId}/availability`, {
       params: { check_in: checkIn, check_out: checkOut, guests },
     });
     return response.data;
+  },
+
+  async getListingsByProperty(propertyId: string): Promise<Listing[]> {
+    const response = await api.get(`${apiVersion}/listings`, {
+      params: { property_id: propertyId },
+    });
+    if ((response.data as any)?.data) {
+      return (response.data as any).data;
+    }
+    return response.data ?? [];
+  },
+
+  async getFeaturedListings(limit?: number): Promise<Listing[]> {
+    const response = await api.get(`${apiVersion}/listings/featured`, {
+      params: { limit },
+    });
+    if ((response.data as any)?.data) {
+      return (response.data as any).data;
+    }
+    return response.data ?? [];
+  },
+
+  async getNearbyListings(lat: number, lng: number, radius: number = 10): Promise<Listing[]> {
+    const response = await api.get(`${apiVersion}/listings/nearby`, {
+      params: { lat, lng, radius },
+    });
+    if ((response.data as any)?.data) {
+      return (response.data as any).data;
+    }
+    return response.data ?? [];
   },
 };
 

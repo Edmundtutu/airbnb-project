@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Http\Resources\Api\V1\ShopResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @deprecated Use ListingResource instead
+ */
 class ProductResource extends JsonResource
 {
     /**
