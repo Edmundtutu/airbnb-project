@@ -20,7 +20,7 @@ return [
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
-        env('DEV_FRONTEND_URL', 'http://localhost:3000'),
+        env('FRONTEND_URL', 'http://localhost:3000'),
         env('STAGE_FRONTEND_URL', 'https://stage.domain.com'),
         env('PROD_FRONTEND_URL', 'https://foody.lockfreed.com'),
     ],
