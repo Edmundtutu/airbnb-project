@@ -12,39 +12,39 @@ interface QuickChatAction {
 
 interface QuickChatActionsProps {
   onActionSelect: (action: QuickChatAction) => void;
-  orderStatus?: string;
-  userRole?: 'customer' | 'vendor';
+  bookingStatus?: string;
+  userRole?: 'guest' | 'host';
 }
 
 export const QuickChatActions: React.FC<QuickChatActionsProps> = ({
   onActionSelect,
-  orderStatus = 'pending',
-  userRole = 'customer'
+  bookingStatus = 'pending',
+  userRole = 'guest'
 }) => {
   const getQuickActions = (): QuickChatAction[] => {
-    if (userRole === 'customer') {
+    if (userRole === 'guest') {
       return [
         {
           id: 'status',
-          text: 'What\'s the status of my order?',
+          text: 'What\'s the status of my booking?',
           icon: <Package className="h-3 w-3" />,
           type: 'question'
         },
         {
-          id: 'delivery',
-          text: 'When will it be delivered?',
+          id: 'checkin',
+          text: 'What time can I check in?',
           icon: <Clock className="h-3 w-3" />,
           type: 'question'
         },
         {
           id: 'modify',
-          text: 'Can I modify my order?',
+          text: 'Can I modify my booking?',
           icon: <MessageCircle className="h-3 w-3" />,
           type: 'question'
         },
         {
           id: 'issue',
-          text: 'I have an issue with my order',
+          text: 'I have an issue with my booking',
           icon: <MessageCircle className="h-3 w-3" />,
           type: 'issue'
         }
@@ -53,25 +53,25 @@ export const QuickChatActions: React.FC<QuickChatActionsProps> = ({
       return [
         {
           id: 'confirm',
-          text: 'Order confirmed and being prepared',
+          text: 'Booking confirmed and property is ready',
           icon: <Package className="h-3 w-3" />,
           type: 'update'
         },
         {
           id: 'ready',
-          text: 'Order is ready for pickup/delivery',
+          text: 'Property is ready for check-in',
           icon: <Package className="h-3 w-3" />,
           type: 'update'
         },
         {
           id: 'delay',
-          text: 'There will be a slight delay',
+          text: 'Check-in may be delayed',
           icon: <Clock className="h-3 w-3" />,
           type: 'update'
         },
         {
           id: 'question',
-          text: 'I have a question about your order',
+          text: 'I have a question about your booking',
           icon: <MessageCircle className="h-3 w-3" />,
           type: 'question'
         }

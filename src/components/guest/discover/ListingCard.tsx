@@ -67,12 +67,12 @@ const ListingCard: React.FC<ListingCardProps> = ({
     const checkIn = new Date();
     const checkOut = new Date(checkIn.getTime() + 24 * 60 * 60 * 1000); // Next day
     addItem(actualListing, 1, actualListing.property, checkIn, checkOut, 1);
-    toast({ title: 'Added to booking', description: `${actualListing.name} has been added to your booking` });
+    toast({ title: 'Added to bookings', description: `${actualListing.name} has been added to your bookings` });
   };
 
   // Legacy method for backward compatibility
   const handleToggleFavorite = handleToggleWishlist;
-  const handleAddToCart = handleBookListing;
+  const handleAddToBookings = handleBookListing;
 
   return (
     <Card className={`group hover:shadow-lg transition-shadow ${className ?? ''}`}>

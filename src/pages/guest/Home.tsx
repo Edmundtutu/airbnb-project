@@ -49,13 +49,13 @@ const Home: React.FC = () => {
         <TextCarousel
           className="text-muted-foreground text-sm lg:text-base"
           texts={[
-            'Share your shopping experience',
-            'Nearby Resturants Have nice food!! Read the Post',
-            'What is your location today',
-            'Where will you go for shopping',
-            'Join your friends for a bite',
-            'Pictures of your purchase will guide a friend',
-            'Enjoy your experience with friends',
+            'Share your travel experience',
+            'Nearby properties have amazing stays! Read the reviews',
+            'Where are you traveling today?',
+            'Where will you stay next?',
+            'Join your friends for an adventure',
+            'Pictures of your stay will inspire others',
+            'Enjoy your travel experience with friends',
           ]}
           interval={4000}
           transitionDuration={300}
@@ -90,9 +90,9 @@ const Home: React.FC = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button asChild>
-                <Link to="/discover">Discover Products</Link>
+                <Link to="/discover">Discover Stays</Link>
               </Button>
-              {/* Creation moved to OrderHandlers tab; remove CTA from Home */}
+              {/* Creation moved to Bookings tab; remove CTA from Home */}
             </div>
           </CardContent>
         </Card>

@@ -14,12 +14,12 @@ import { QuickChatActions } from './QuickChatActions';
 import type { Order } from '@/types/orders';
 
 interface ChatDialogProps {
-  order: Order;
+  booking: Booking;
   isOpen: boolean;
   onClose: () => void;
 }
 
-export const ChatDialog: React.FC<ChatDialogProps> = ({ order, isOpen, onClose }) => {
+export const ChatDialog: React.FC<ChatDialogProps> = ({ booking, isOpen, onClose }) => {
   const { user } = useAuth();
   
   // Safely get chat context with error handling
@@ -61,18 +61,18 @@ export const ChatDialog: React.FC<ChatDialogProps> = ({ order, isOpen, onClose }
   useEffect(() => {
     const init = async () => {
       console.log('🔄 ChatDialog initialization started');
-      console.log('📊 Dialog state:', { isOpen, orderId: order?.id });
+      console.log('📊 Dialog state:', { isOpen, bookingId: booking?.id });
       
-      if (!isOpen || !order?.id) {
-        console.log('⏭️ Skipping initialization - dialog not open or no order ID');
+      if (!isOpen || !booking?.id) {
+        console.log('⏭️ Skipping initialization - dialog not open or no booking ID');
         return;
       }
       
       try {
-        console.log('🔍 Ensuring conversation for order:', order.id);
+        console.log('🔍 Ensuring conversation for booking:', booking.id);
         console.log('🔧 ensureConversationForOrder function:', typeof ensureConversationForOrder);
         
-        const conversation = await ensureConversationForOrder(String(order.id));
+        const conversation = await ensureConversationForOrder(String(booking.id));
         console.log('💬 Conversation result:', conversation);
         
         console.log('🎯 Setting active conversation');
@@ -95,7 +95,7 @@ export const ChatDialog: React.FC<ChatDialogProps> = ({ order, isOpen, onClose }
       }
     };
     init();
-  }, [isOpen, order?.id, ensureConversationForOrder, setActiveConversation, updatePresence]);
+  }, [isOpen, booking?.id, ensureConversationForOrder, setActiveConversation, updatePresence]);
 
   // Set user as offline when closing chat
   useEffect(() => {
@@ -207,18 +207,18 @@ export const ChatDialog: React.FC<ChatDialogProps> = ({ order, isOpen, onClose }
           <DialogTitle className="flex items-center gap-2">
             <div className="flex items-center gap-2">
               <Package className="h-4 w-4" />
-              <Badge variant="outline">Order #{order.id}</Badge>
+              <Badge variant="outline">Booking #{booking.id}</Badge>
             </div>
             <div className="flex items-center gap-2">
-              {user?.role === 'customer' ? (
+              {user?.role === 'guest' ? (
                 <>
-                  <Store className="h-4 w-4" />
-                  <span>{order.shop?.name || 'Shop'}</span>
+                  <Home className="h-4 w-4" />
+                  <span>{booking.property?.name || 'Property'}</span>
                 </>
               ) : (
                 <>
                   <User className="h-4 w-4" />
-                  <span>{order.user?.name || 'Customer'}</span>
+                  <span>{booking.guest?.name || 'Guest'}</span>
                 </>
               )}
             </div>
@@ -229,7 +229,7 @@ export const ChatDialog: React.FC<ChatDialogProps> = ({ order, isOpen, onClose }
           </DialogTitle>
           <DialogDescription className="flex items-center justify-between">
             <span>
-              Communicate about your order details and any questions you may have.
+              Communicate about your booking details and any questions you may have.
             </span>
             {typingUsers.length > 0 && (
               <span className="text-blue-600 text-sm">
@@ -324,8 +324,8 @@ export const ChatDialog: React.FC<ChatDialogProps> = ({ order, isOpen, onClose }
           {!chatError && messages.length < 3 && (
             <QuickChatActions 
               onActionSelect={handleQuickAction}
-              orderStatus={order.status}
-              userRole={(user?.role === 'guest' ? 'customer' : user?.role) as 'customer' | 'vendor'}
+              bookingStatus={booking.status}
+              userRole={user?.role as 'guest' | 'host'}
             />
           )}
 

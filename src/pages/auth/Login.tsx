@@ -49,7 +49,7 @@ const Login: React.FC = () => {
       <CardHeader className="text-center">
         <CardTitle>Welcome Back</CardTitle>
         <CardDescription>
-          Sign in to your account to continue shopping
+          Sign in to your account to continue exploring stays
         </CardDescription>
       </CardHeader>
       <CardContent>

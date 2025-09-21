@@ -32,14 +32,14 @@ const Discover: React.FC = () => {
 
   const categories = [
     'All',
-    'Electronics',
-    'Fashion',
-    'Food',
-    'Books',
-    'Sports',
-    'Beauty',
-    'Furniture',
-    'Accessories'
+    'Villa',
+    'Apartment',
+    'Cottage',
+    'Homestay',
+    'Lodge',
+    'Resort',
+    'Hotel',
+    'Cabin'
   ];
 
   const { data: productsResponse, isLoading, error } = useQuery({
@@ -88,7 +88,7 @@ const Discover: React.FC = () => {
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
           <Input
-            placeholder="Search for products, brands, or shops..."
+            placeholder="Search for stays, locations, or properties..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10 md:pl-12 h-10 md:h-12 text-sm md:text-base"
@@ -114,7 +114,7 @@ const Discover: React.FC = () => {
       {/* Results Count */}
       <div className="flex items-center justify-between">
         <p className="text-xs md:text-sm text-muted-foreground">
-          {totalProducts} products found
+          {totalListings} stays found
         </p>
       </div>
 
@@ -125,16 +125,16 @@ const Discover: React.FC = () => {
         </div>
       )}
 
-      {/* Products Grid - Responsive with better large screen handling */}
+      {/* Listings Grid - Responsive with better large screen handling */}
       {!isLoading && (
         <>
-          {productsToDisplay.length === 0 ? (
+          {listingsToDisplay.length === 0 ? (
             <Card>
               <CardContent className="p-6 md:p-8 text-center">
                 <div className="w-12 h-12 md:w-16 md:h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
                   <Search className="h-6 w-6 md:h-8 md:w-8 text-muted-foreground" />
                 </div>
-                <h3 className="text-lg font-medium mb-2">No products found</h3>
+                <h3 className="text-lg font-medium mb-2">No stays found</h3>
                 <p className="text-muted-foreground mb-4 text-sm md:text-base">
                   Try adjusting your search terms or browse different categories
                 </p>
@@ -148,8 +148,8 @@ const Discover: React.FC = () => {
             </Card>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-6 max-w-7xl mx-auto">
-              {productsToDisplay.map((product) => (
-                <ProductCard key={product.id} product={product} />
+              {listingsToDisplay.map((listing) => (
+                <ListingCard key={listing.id} listing={listing} />
               ))}
             </div>
           )}

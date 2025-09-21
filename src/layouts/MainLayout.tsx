@@ -50,10 +50,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                       <h3 className="font-semibold mb-3">Quick Actions</h3>
                       <div className="space-y-2">
                         <button className="w-full text-left p-2 rounded hover:bg-accent text-sm">
-                          🛍️ Browse Products
+                          🏠 Browse Stays
                         </button>
                         <button className="w-full text-left p-2 rounded hover:bg-accent text-sm">
-                          🗺️ Find Shops Near Me
+                          🗺️ Find Properties Near Me
                         </button>
                         <button className="w-full text-left p-2 rounded hover:bg-accent text-sm">
                           ❤️ View Favorites
@@ -67,20 +67,20 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                       <div className="space-y-3">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                            📱
+                            🏠
                           </div>
                           <div className="flex-1">
-                            <p className="text-sm font-medium">Electronics</p>
-                            <p className="text-xs text-muted-foreground">Hot deals</p>
+                            <p className="text-sm font-medium">Villas</p>
+                            <p className="text-xs text-muted-foreground">Luxury stays</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                            👕
+                            🏢
                           </div>
                           <div className="flex-1">
-                            <p className="text-sm font-medium">Fashion</p>
-                            <p className="text-xs text-muted-foreground">New arrivals</p>
+                            <p className="text-sm font-medium">Apartments</p>
+                            <p className="text-xs text-muted-foreground">City stays</p>
                           </div>
                         </div>
                       </div>

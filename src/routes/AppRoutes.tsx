@@ -14,26 +14,26 @@ import Register from '@/pages/auth/Register';
 // Guest (renter) Pages
 import Home from '@/pages/guest/Home';
 import Discover from '@/pages/guest/Discover';
-import Product from '@/pages/guest/Product';
-import ShopMapPage from '@/pages/guest/ShopMapPage';
-import Cart from '@/pages/guest/Cart';
+import Listing from '@/pages/guest/Listing';
+import PropertyMapPage from '@/pages/guest/PropertyMapPage';
+import Bookings from '@/pages/guest/Bookings';
 import Profile from '@/pages/guest/Profile';
 import Favorites from '@/pages/guest/Favorites';
-import ShopDetails from '@/pages/properties/[shopId]';
+import PropertyDetails from '@/pages/properties/[propertyId]';
 
 
 // Host Pages
-import VendorDashboard from '@/pages/host/Dashboard';
-import VendorInventory from '@/pages/host/Inventory';
-import VendorOrders from '@/pages/host/Orders';
-import VendorAnalytics from '@/pages/host/Analytics';
-import VendorProfile from '@/pages/host/Profile';
+import HostDashboard from '@/pages/host/Dashboard';
+import HostListings from '@/pages/host/Listings';
+import HostBookings from '@/pages/host/Bookings';
+import HostAnalytics from '@/pages/host/Analytics';
+import HostProfile from '@/pages/host/Profile';
 
 // Route Guards
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRole?: string[];
-  layout: 'main' | 'vendor';
+  requiredRole?: ('guest' | 'host' | 'admin')[];
+  layout: 'main' | 'host';
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
@@ -59,7 +59,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/" replace />;
   }
 
-  const Layout = layout === 'vendor' ? VendorLayout : MainLayout;
+  const Layout = layout === 'host' ? HostLayout : MainLayout;
   return <Layout>{children}</Layout>;
 };
 
@@ -107,64 +107,64 @@ const AppRoutes: React.FC = () => {
           <Discover />
         </MainLayout>
       } />
-      <Route path="/product/:id" element={
+      <Route path="/listing/:id" element={
         <MainLayout>
-          <Product />
+          <Listing />
         </MainLayout>
       } />
       <Route path="/map" element={
         <MainLayout>
-          <ShopMapPage   />
+          <PropertyMapPage />
         </MainLayout>
       } />
       
-      {/* Protected Customer Routes */}
-      <Route path="/cart" element={
-        <ProtectedRoute requiredRole={['customer']} layout="main">
-          <Cart />
+      {/* Protected Guest Routes */}
+      <Route path="/bookings" element={
+        <ProtectedRoute requiredRole={['guest']} layout="main">
+          <Bookings />
         </ProtectedRoute>
       } />
       <Route path="/profile" element={
-        <ProtectedRoute requiredRole={['customer']} layout="main">
+        <ProtectedRoute requiredRole={['guest']} layout="main">
           <Profile />
         </ProtectedRoute>
       } />
       <Route path="/favorites" element={
-        <ProtectedRoute requiredRole={['customer']} layout="main">
+        <ProtectedRoute requiredRole={['guest']} layout="main">
           <Favorites />
         </ProtectedRoute>
       } />
 
 
       {/* Host Routes */}
-      <Route path="/vendor/dashboard" element={
-        <ProtectedRoute requiredRole={['vendor']} layout="vendor">
-          <VendorDashboard />
+      <Route path="/host/dashboard" element={
+        <ProtectedRoute requiredRole={['host']} layout="host">
+          <HostDashboard />
         </ProtectedRoute>
       } />
-      <Route path="/vendor/inventory" element={
-        <ProtectedRoute requiredRole={['vendor']} layout="vendor">
-          <VendorInventory />
+      <Route path="/host/listings" element={
+        <ProtectedRoute requiredRole={['host']} layout="host">
+          <HostListings />
         </ProtectedRoute>
       } />
-      <Route path="/vendor/orders" element={
-        <ProtectedRoute requiredRole={['vendor']} layout="vendor">
-          <VendorOrders />
+      <Route path="/host/bookings" element={
+        <ProtectedRoute requiredRole={['host']} layout="host">
+          <HostBookings />
         </ProtectedRoute>
       } />
-      <Route path="/vendor/analytics" element={
-        <ProtectedRoute requiredRole={['vendor']} layout="vendor">
-          <VendorAnalytics />
+      <Route path="/host/analytics" element={
+        <ProtectedRoute requiredRole={['host']} layout="host">
+          <HostAnalytics />
         </ProtectedRoute>
       } />
-      <Route path="/vendor/profile" element={
-        <ProtectedRoute requiredRole={['vendor']} layout="vendor">
-          <VendorProfile />
+      <Route path="/host/profile" element={
+        <ProtectedRoute requiredRole={['host']} layout="host">
+          <HostProfile />
         </ProtectedRoute>
       } />
 
-      {/* Shop Details Route */}
-      <Route path="/shops/:shopId" element={<ShopDetails />} />
+      {/* Property Details Route */}
+      <Route path="/properties/:propertyId" element={<PropertyDetails />} />
 
       {/* Catch all route */}
       <Route path="*" element={<Navigate to="/" replace />} />

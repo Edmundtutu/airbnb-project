@@ -89,7 +89,7 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
         <div className="flex items-center justify-between h-14 lg:h-16">
           {/* Logo - Always visible */}
           <Link to="/" className="text-lg sm:text-xl font-bold text-primary flex-shrink-0">
-            Foody
+            StayFinder
           </Link>
 
           {/* Search Bar - Desktop and tablet */}
@@ -98,7 +98,7 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search products, shops..."
+                  placeholder="Search stays, properties..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10 bg-muted/50 border-0 focus:bg-background h-9 lg:h-10"
@@ -146,13 +146,13 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
                     </Button>
                   </Link>
 
-                  <Link to="/cart" className="relative">
+                  <Link to="/bookings" className="relative">
                     <Button variant="ghost" size="icon">
-                      <ShoppingCart className="h-5 w-5" />
+                      <Calendar className="h-5 w-5" />
                     </Button>
-                    {cartItemCount > 0 && (
+                    {bookingItemCount > 0 && (
                       <Badge className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center text-xs p-0">
-                        {cartItemCount > 99 ? '99+' : cartItemCount}
+                        {bookingItemCount > 99 ? '99+' : bookingItemCount}
                       </Badge>
                     )}
                   </Link>
@@ -210,13 +210,13 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
               </Button>
               
               {user.role === 'customer' && (
-                <Link to="/cart" className="relative">
+                <Link to="/bookings" className="relative">
                   <Button variant="ghost" size="icon" className="h-9 w-9">
-                    <ShoppingCart className="h-4 w-4" />
+                    <Calendar className="h-4 w-4" />
                   </Button>
-                  {cartItemCount > 0 && (
+                  {bookingItemCount > 0 && (
                     <Badge className="absolute -top-1 -right-1 h-3 w-3 flex items-center justify-center text-xs p-0">
-                      {cartItemCount > 99 ? '99+' : cartItemCount}
+                      {bookingItemCount > 99 ? '99+' : bookingItemCount}
                     </Badge>
                   )}
                 </Link>
@@ -240,7 +240,7 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search products, shops..."
+                placeholder="Search stays, properties..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 bg-muted/50 border-0 h-9"

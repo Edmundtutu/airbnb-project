@@ -67,7 +67,7 @@ const MobileBottomNav: React.FC = () => {
     setSelectedConversation(null);
   };
 
-  const customerNavItems: NavItem[] = [
+  const guestNavItems: NavItem[] = [
     { name: 'Home', href: '/', icon: Home },
     { name: 'Discover', href: '/discover', icon: Search },
     { name: 'Map', href: '/map', icon: MapPin },
@@ -75,15 +75,15 @@ const MobileBottomNav: React.FC = () => {
     { name: 'Profile', href: '/profile', icon: User },
   ];
 
-  const vendorNavItems: NavItem[] = [
-    { name: 'Dashboard', href: '/vendor/dashboard', icon: BarChart3 },
-    { name: 'Inventory', href: '/vendor/Inventory', icon: Package },
-    { name: 'Orders', href: '/vendor/orders', icon: ShoppingCart },
+  const hostNavItems: NavItem[] = [
+    { name: 'Dashboard', href: '/host/dashboard', icon: BarChart3 },
+    { name: 'Listings', href: '/host/listings', icon: Home },
+    { name: 'Bookings', href: '/host/bookings', icon: Calendar },
     { name: 'Chat', icon: MessageCircle, badge: totalUnreadMessages, onClick: () => setConversationListOpen(true) },
-    { name: 'Profile', href: '/vendor/profile', icon: Store },
+    { name: 'Profile', href: '/host/profile', icon: Building },
   ];
 
-  const navItems = user.role === 'vendor' ? vendorNavItems : customerNavItems;
+  const navItems = user.role === 'host' ? hostNavItems : guestNavItems;
 
   const isActivePath = (path: string) => {
     if (path === '/') {

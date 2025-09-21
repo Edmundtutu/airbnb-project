@@ -8,13 +8,13 @@ const QuickStatsGrid: React.FC = () => {
       <StatsCard
         icon={<TrendingUp className="h-5 w-5 lg:h-6 lg:w-6 text-white" />}
         title="Trending"
-        subtitle="Hot deals"
+        subtitle="Popular stays"
         gradientFrom="from-blue-500"
         gradientTo="to-blue-600"
       />
       <StatsCard
-        icon={<Store className="h-5 w-5 lg:h-6 lg:w-6 text-white" />}
-        title="Shops"
+        icon={<Home className="h-5 w-5 lg:h-6 lg:w-6 text-white" />}
+        title="Properties"
         subtitle="Near you"
         gradientFrom="from-green-500"
         gradientTo="to-green-600"

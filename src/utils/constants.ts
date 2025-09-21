@@ -1,24 +1,23 @@
 // App constants
-export const APP_NAME = 'Shopify PWA';
+export const APP_NAME = 'StayFinder';
 export const API_BASE_URL = '/api';
 
 export const ROUTES = {
   HOME: '/',
   LOGIN: '/login',
   REGISTER: '/register',
-  EXPLORE: '/explore',
-  PRODUCT: '/product/:id',
-  SHOP: '/shop/:id',
-  CART: '/cart',
-  ORDERS: '/orders',
+  DISCOVER: '/discover',
+  LISTING: '/listing/:id',
+  PROPERTY: '/property/:id',
+  BOOKINGS: '/bookings',
   PROFILE: '/profile',
-  VENDOR_DASHBOARD: '/vendor/dashboard',
+  HOST_DASHBOARD: '/host/dashboard',
 } as const;
 
 export const USER_ROLES = {
   GUEST: 'guest',
-  CUSTOMER: 'customer',
-  VENDOR: 'vendor',
+  HOST: 'host',
+  ADMIN: 'admin',
 } as const;
 
 export const INFLUENCER_THRESHOLD = 1000; // followers needed to be considered influencer

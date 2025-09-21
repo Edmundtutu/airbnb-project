@@ -4,11 +4,11 @@ import DesktopSidebar from '@/components/DesktopSidebar';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import Navbar from '@/components/Navbar';
 
-interface VendorLayoutProps {
+interface HostLayoutProps {
   children: React.ReactNode;
 }
 
-const VendorLayout: React.FC<VendorLayoutProps> = ({ children }) => {
+const HostLayout: React.FC<HostLayoutProps> = ({ children }) => {
   const { user } = useAuth();
 
   return (
@@ -33,4 +33,4 @@ const VendorLayout: React.FC<VendorLayoutProps> = ({ children }) => {
   );
 };
 
-export default VendorLayout;
+export default HostLayout;

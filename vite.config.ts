@@ -13,9 +13,9 @@ export default defineConfig(({ mode }) => ({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
-        name: 'Foody',
-        short_name: 'Foody',
-        description: 'Social commerce',
+        name: 'StayFinder',
+        short_name: 'StayFinder',
+        description: 'Find your perfect stay',
         theme_color: '#00000000',
         icons: [
           {

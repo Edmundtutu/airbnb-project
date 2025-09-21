@@ -10,24 +10,25 @@ import {
   ShoppingBag,
   Heart,
   Settings,
-  Package
+  Package,
+  Home
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { Review, Product } from '@/types';
-import OrderHistory from '@/components/guest/profile/orders/OrderHistory';
+import { Review, Listing } from '@/types';
+import BookingHistory from '@/components/guest/profile/bookings/BookingHistory';
 import { useWishlist as useFavorites } from '@/context/WishlistContext';
 
 const Profile: React.FC = () => {
   const { user } = useAuth();
-  // OrderHandlers are fetched via react-query in OrderHistory component
+  // BookingHandlers are fetched via react-query in BookingHistory component
   const [reviews, setReviews] = useState<Review[]>([]);
-  const { favoriteProducts, removeProductFromFavorites } = useFavorites();
+  const { favoriteListings, removeListingFromFavorites } = useFavorites();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // TODO: Fetch user data from API (orders, reviews). Favorites are client-side
+    // TODO: Fetch user data from API (bookings, reviews). Favorites are client-side
     setIsLoading(false);
-    // orders handled separately
+    // bookings handled separately
     setReviews([]);
   }, []);
 
@@ -82,23 +83,23 @@ const Profile: React.FC = () => {
       </Card>
 
       {/* Tabs */}
-      <Tabs defaultValue="orders" className="space-y-4 sm:space-y-6">
+      <Tabs defaultValue="bookings" className="space-y-4 sm:space-y-6">
         <TabsList className="grid w-full grid-cols-4 h-auto">
-          <TabsTrigger value="orders" className="text-xs sm:text-sm px-2 py-2">Orders</TabsTrigger>
+          <TabsTrigger value="bookings" className="text-xs sm:text-sm px-2 py-2">Bookings</TabsTrigger>
           <TabsTrigger value="reviews" className="text-xs sm:text-sm px-2 py-2">Reviews</TabsTrigger>
           <TabsTrigger value="favorites" className="text-xs sm:text-sm px-2 py-2">Favorites</TabsTrigger>
           <TabsTrigger value="settings" className="text-xs sm:text-sm px-2 py-2">Settings</TabsTrigger>
         </TabsList>
 
-        {/* OrderHandlers Tab */}
-        <TabsContent value="orders" className="space-y-4">
+        {/* Bookings Tab */}
+        <TabsContent value="bookings" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>My Orders</CardTitle>
-              <CardDescription>View your past orders and their status.</CardDescription>
+              <CardTitle>My Bookings</CardTitle>
+              <CardDescription>View your past bookings and their status.</CardDescription>
             </CardHeader>
             <CardContent>
-              <OrderHistory />
+              <BookingHistory />
             </CardContent>
           </Card>
         </TabsContent>
@@ -116,7 +117,7 @@ const Profile: React.FC = () => {
                 <Star className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-medium mb-2">No reviews yet</h3>
                 <p className="text-muted-foreground">
-                  Start reviewing products to help other shoppers
+                  Start reviewing stays to help other travelers
                 </p>
               </CardContent>
             </Card>
@@ -132,7 +133,7 @@ const Profile: React.FC = () => {
                         </div>
                         <div>
                           <h3 className="font-medium">
-                            {review.product?.name || review.shop?.name}
+                            {review.listing?.name || review.property?.name}
                           </h3>
                           <p className="text-sm text-muted-foreground">
                             {new Date(review.created_at).toLocaleDateString()}
@@ -163,34 +164,34 @@ const Profile: React.FC = () => {
         {/* Favorites Tab */}
         <TabsContent value="favorites" className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold">Favorite Products</h2>
-            <p className="text-muted-foreground">{favoriteProducts.length} items</p>
+            <h2 className="text-xl font-semibold">Favorite Stays</h2>
+            <p className="text-muted-foreground">{favoriteListings.length} items</p>
           </div>
 
-          {favoriteProducts.length === 0 ? (
+          {favoriteListings.length === 0 ? (
             <Card>
               <CardContent className="p-8 text-center">
                 <Heart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-medium mb-2">No favorites yet</h3>
                 <p className="text-muted-foreground">
-                  Save products you love to find them easily later
+                  Save stays you love to find them easily later
                 </p>
               </CardContent>
             </Card>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-              {favoriteProducts.map((item: Product) => (
+              {favoriteListings.map((item: Listing) => (
                 <Card key={item.id}>
                   <CardContent className="p-4">
                     <div className="aspect-square bg-muted rounded-lg flex items-center justify-center mb-4">
-                      <Package className="h-8 w-8 text-muted-foreground" />
+                      <Home className="h-8 w-8 text-muted-foreground" />
                     </div>
                     <h3 className="font-medium mb-2">{item.name}</h3>
-                    <p className="text-sm text-muted-foreground mb-2">{item.shop?.name}</p>
+                    <p className="text-sm text-muted-foreground mb-2">{item.property?.name}</p>
                     <div className="flex items-center justify-between">
-                      <span className="font-bold">UGX {item.price.toLocaleString()}</span>
-                      <Button size="sm" variant="outline" onClick={() => removeProductFromFavorites(item.id)}>
-                        Add to Cart
+                      <span className="font-bold">UGX {item.price_per_night.toLocaleString()}/night</span>
+                      <Button size="sm" variant="outline" onClick={() => removeListingFromFavorites(item.id)}>
+                        Book Now
                       </Button>
                     </div>
                   </CardContent>
@@ -242,9 +243,9 @@ const Profile: React.FC = () => {
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-medium">Email Notifications</h4>
+                  <h4 className="font-medium">Booking Notifications</h4>
                   <p className="text-sm text-muted-foreground">
-                    Receive updates about your orders and new products
+                    Receive updates about your bookings and new stays
                   </p>
                 </div>
                 <Button variant="outline">Manage</Button>

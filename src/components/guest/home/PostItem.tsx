@@ -235,52 +235,52 @@ const PostItem: React.FC<PostItemProps> = ({
           </div>
         )}
 
-        {/* Product Card with enhanced responsive design */}
-        {post.product && (
-          <Link to={`/product/${post.product.id}`} className="block">
+        {/* Listing Card with enhanced responsive design */}
+        {post.listing && (
+          <Link to={`/listing/${post.listing.id}`} className="block">
             <Card className="mb-4 hover:shadow-md transition-all duration-200 border-l-4 border-l-primary group">
               <CardContent className="p-3 sm:p-4">
                 <div className="flex gap-3 sm:gap-4">
                   <div className="w-14 h-14 sm:w-20 sm:h-20 bg-muted rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
-                    {post.product.images?.[0] ? (
+                    {post.listing.images?.[0] ? (
                       <img
-                        src={post.product.images[0]}
-                        alt={post.product.name}
+                        src={post.listing.images[0]}
+                        alt={post.listing.name}
                         className="w-full h-full object-cover rounded-md"
                         loading="lazy"
                       />
                     ) : (
-                      <Package className="h-6 w-6 sm:h-10 sm:w-10 text-muted-foreground" />
+                      <Home className="h-6 w-6 sm:h-10 sm:w-10 text-muted-foreground" />
                     )}
                   </div>
                   
                   <div className="flex-1 min-w-0">
                     <h4 className="font-semibold text-sm sm:text-base line-clamp-1 group-hover:text-primary transition-colors">
-                      {post.product.name}
+                      {post.listing.name}
                     </h4>
                     
-                    {post.product.shop?.name && (
+                    {post.listing.property?.name && (
                       <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1 mb-2">
-                        {post.product.shop.name}
+                        {post.listing.property.name}
                       </p>
                     )}
                     
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-3 min-w-0">
-                        {post.product.rating !== undefined && (
+                        {post.listing.rating !== undefined && (
                           <div className="flex items-center gap-1 flex-shrink-0">
                             <Star className="h-3 w-3 sm:h-4 sm:w-4 fill-yellow-400 text-yellow-400" />
                             <span className="text-xs sm:text-sm font-medium">
-                              {post.product.rating}
+                              {post.listing.rating}
                             </span>
                           </div>
                         )}
                       </div>
                       
-                      {post.product.price !== undefined && (
+                      {post.listing.price_per_night !== undefined && (
                         <div className="text-right flex-shrink-0">
                           <span className="text-sm sm:text-lg font-bold text-primary">
-                            UGX {post.product.price.toLocaleString()}
+                            UGX {post.listing.price_per_night.toLocaleString()}/night
                           </span>
                         </div>
                       )}

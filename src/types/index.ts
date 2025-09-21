@@ -13,10 +13,5 @@ export type { Listing } from './listings';
 export type { Booking } from './bookings';
 export type { Post, Comment } from './properties';
 
-// Legacy exports for backward compatibility
-export * from './listings'; // This will include Product interface
-export * from './bookings'; // This will include Order interface
-export * from './properties'; // This will include Shop interface
-
 // Influencer threshold constant
 export const INFLUENCER_THRESHOLD = 1000;

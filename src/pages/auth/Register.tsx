@@ -70,7 +70,7 @@ const Register: React.FC = () => {
       <CardHeader className="text-center">
         <CardTitle>Create Account</CardTitle>
         <CardDescription>
-          Join our community and start discovering amazing products
+          Join our community and start discovering amazing stays
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -177,17 +177,17 @@ const Register: React.FC = () => {
 
           <div className="space-y-3">
             <Label>Account Type</Label>
-            <RadioGroup value={formData.role} onValueChange={handleRoleChange}>
+            <RadioGroup value={formData.role} onValueChange={(value: 'guest' | 'host') => setFormData(prev => ({ ...prev, role: value }))}>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="customer" id="customer" />
-                <Label htmlFor="customer" className="font-normal">
-                  Customer - Browse and buy products
+                <RadioGroupItem value="guest" id="guest" />
+                <Label htmlFor="guest" className="font-normal">
+                  Guest - Find and book stays
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="vendor" id="vendor" />
-                <Label htmlFor="vendor" className="font-normal">
-                  Vendor - Sell your products
+                <RadioGroupItem value="host" id="host" />
+                <Label htmlFor="host" className="font-normal">
+                  Host - List your property
                 </Label>
               </div>
             </RadioGroup>
