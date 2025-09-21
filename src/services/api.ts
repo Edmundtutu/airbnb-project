@@ -1,8 +1,8 @@
 import axios from 'axios';
 import type { AxiosRequestHeaders } from 'axios';
-
+const ngrokUrl:string = "https://6d98a979a6b0.ngrok-free.app" 
 const api = axios.create({
-  baseURL:  import.meta.env.VITE_API_BASE_URL || https://6d98a979a6b0.ngrok-free.app, 
+  baseURL:  import.meta.env.VITE_API_BASE_URL || ngrokUrl, 
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
