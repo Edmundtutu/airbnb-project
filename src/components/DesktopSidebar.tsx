@@ -3,18 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { 
-  Home, 
-  Search, 
-  MapPin, 
-  Calendar, 
-  User,
-  Heart,
-  Building,
-  BarChart3,
-  LogOut,
-  Settings
-} from 'lucide-react';
+import { Chrome as Home, Search, MapPin, Calendar, User, Heart, Building, ChartBar as BarChart3, LogOut, Settings } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 interface NavItem {

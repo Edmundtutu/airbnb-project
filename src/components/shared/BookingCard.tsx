@@ -2,21 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { Booking } from '@/types/bookings';
-import {
-  MapPin,
-  User as UserIcon,
-  Home as PropertyIcon,
-  ChevronDown,
-  ChevronUp,
-  Check,
-  X,
-  MessageCircle,
-  Calendar,
-  Users,
-  Bed,
-  Bath,
-  Clock
-} from 'lucide-react';
+import { MapPin, User as UserIcon, Chrome as PropertyIcon, ChevronDown, ChevronUp, Check, X, MessageCircle, Calendar, Users, Bed, Bath, Clock } from 'lucide-react';
 import CreatePostCard from '@/components/guest/profile/orders/CreatePostCard';
 import { useImageCapture } from '@/hooks/useImageCapture';
 import CameraCapture from '@/components/features/CameraCapture';

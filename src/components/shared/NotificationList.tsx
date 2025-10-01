@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Bell, MessageCircle, Clock, User, Store, Package, AlertTriangle } from 'lucide-react';
+import { Bell, MessageCircle, Clock, User, Store, Package, TriangleAlert as AlertTriangle } from 'lucide-react';
 import { useChat } from '@/context/ChatContext';
 import { useAuth } from '@/context/AuthContext';
 import type { Conversation, Message } from '@/services/chatService';

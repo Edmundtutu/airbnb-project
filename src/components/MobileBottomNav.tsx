@@ -1,15 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  Home, 
-  Search, 
-  MapPin, 
-  Calendar, 
-  User,
-  Building,
-  BarChart3,
-  MessageCircle
-} from 'lucide-react';
+import { Chrome as Home, Search, MapPin, Calendar, User, Building, ChartBar as BarChart3, MessageCircle } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useBooking } from '@/context/BookingContext';
 import { useChat } from '@/context/ChatContext';

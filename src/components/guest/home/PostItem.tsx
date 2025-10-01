@@ -6,18 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from '@/components/ui/carousel';
-import {
-  Heart,
-  MessageCircle,
-  Share,
-  Star,
-  MapPin,
-  Package,
-  MoreHorizontal,
-  ChevronUp,
-  ChevronDown,
-  ExternalLink,
-} from 'lucide-react';
+import { Heart, MessageCircle, Share, Star, MapPin, Package, MoveHorizontal as MoreHorizontal, ChevronUp, ChevronDown, ExternalLink } from 'lucide-react';
 import { postService } from '@/services/postService';
 import { Post } from '@/types';
 import CommentSection from './CommentSection';
