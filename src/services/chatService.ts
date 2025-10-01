@@ -5,24 +5,24 @@ const apiVersion = import.meta.env.VITE_API_VERSION;
 
 export interface Conversation {
   id: number;
-  order_id: string;
+  booking_id: string;
   user_id: string;
-  shop_id: string;
+  property_id: string;
   status: 'active' | 'archived';
   last_message_at: string;
   created_at: string;
   updated_at: string;
   messages?: Message[];
-  order?: any;
+  booking?: any;
   user?: any;
-  shop?: any;
+  property?: any;
 }
 
 export interface Message {
   id: number;
   conversation_id: number;
   sender_id: string;
-  sender_type: 'user' | 'shop';
+  sender_type: 'user' | 'property';
   content: string;
   message_type: 'text' | 'image' | 'audio';
   media_url?: string;
@@ -40,10 +40,10 @@ export interface SendMessagePayload {
 }
 
 export interface GetConversationPayload {
-  order_id: string;
+  booking_id: string;
 }
 
-// Get or create conversation for an order
+// Get or create conversation for a booking
 export const getConversation = async (payload: GetConversationPayload): Promise<Conversation> => {
   console.log('🌐 API getConversation called with payload:', payload);
   console.log('🔗 API URL:', `${apiVersion}/chat/conversation`);
@@ -133,9 +133,9 @@ export const getUserConversations = async (): Promise<Conversation[]> => {
   return conversations;
 };
 
-// Get shop's conversations
-export const getShopConversations = async (): Promise<Conversation[]> => {
-  const response = await api.get<ApiResponse<any>>(`${apiVersion}/chat/conversations/shop`);
+// Get property's conversations
+export const getPropertyConversations = async (): Promise<Conversation[]> => {
+  const response = await api.get<ApiResponse<any>>(`${apiVersion}/chat/conversations/property`);
   const payload: any = (response as any).data;
   const root = payload?.data ?? payload;
   const conversations = Array.isArray(root)
@@ -174,3 +174,6 @@ export const updatePresence = async (conversationId: number, status: 'online' | 
   });
   return response.data;
 };
+
+// Legacy aliases for backward compatibility
+export const getShopConversations = getPropertyConversations;

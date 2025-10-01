@@ -11,7 +11,7 @@ import { useChat } from '@/context/ChatContext';
 import { useAuth } from '@/context/AuthContext';
 import { ChatStatusIndicator } from './ChatStatusIndicator';
 import { QuickChatActions } from './QuickChatActions';
-import type { Order } from '@/types/orders';
+import type { Booking } from '@/types/bookings';
 
 interface ChatDialogProps {
   booking: Booking;
@@ -38,7 +38,7 @@ export const ChatDialog: React.FC<ChatDialogProps> = ({ booking, isOpen, onClose
     messages = [], 
     sendMessage = async () => {}, 
     setActiveConversation = () => {},
-    ensureConversationForOrder = async () => null,
+    ensureConversationForBooking = async () => null,
     isLoading = false,
     startTyping = async () => {},
     stopTyping = async () => {},
@@ -70,9 +70,9 @@ export const ChatDialog: React.FC<ChatDialogProps> = ({ booking, isOpen, onClose
       
       try {
         console.log('🔍 Ensuring conversation for booking:', booking.id);
-        console.log('🔧 ensureConversationForOrder function:', typeof ensureConversationForOrder);
+        console.log('🔧 ensureConversationForBooking function:', typeof ensureConversationForBooking);
         
-        const conversation = await ensureConversationForOrder(String(booking.id));
+        const conversation = await ensureConversationForBooking(String(booking.id));
         console.log('💬 Conversation result:', conversation);
         
         console.log('🎯 Setting active conversation');
@@ -83,7 +83,7 @@ export const ChatDialog: React.FC<ChatDialogProps> = ({ booking, isOpen, onClose
           console.log('🟢 Setting user presence to online for conversation:', conversation.id);
           updatePresence(conversation.id, 'online');
         } else {
-          console.log('⚠️ No conversation returned from ensureConversationForOrder');
+          console.log('⚠️ No conversation returned from ensureConversationForBooking');
         }
       } catch (e) {
         console.error('❌ Failed to init conversation:', e);
@@ -95,7 +95,7 @@ export const ChatDialog: React.FC<ChatDialogProps> = ({ booking, isOpen, onClose
       }
     };
     init();
-  }, [isOpen, booking?.id, ensureConversationForOrder, setActiveConversation, updatePresence]);
+  }, [isOpen, booking?.id, ensureConversationForBooking, setActiveConversation, updatePresence]);
 
   // Set user as offline when closing chat
   useEffect(() => {
@@ -206,7 +206,7 @@ export const ChatDialog: React.FC<ChatDialogProps> = ({ booking, isOpen, onClose
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <div className="flex items-center gap-2">
-              <Package className="h-4 w-4" />
+              <Calendar className="h-4 w-4" />
               <Badge variant="outline">Booking #{booking.id}</Badge>
             </div>
             <div className="flex items-center gap-2">

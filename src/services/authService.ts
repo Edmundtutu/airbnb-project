@@ -12,7 +12,7 @@ interface RegisterData {
   email: string;
   password: string;
   password_confirmation: string;
-  role?: 'customer' | 'vendor';
+  role?: 'guest' | 'host';
 }
 
 export const authService = {

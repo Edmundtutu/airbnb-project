@@ -27,7 +27,7 @@ export const QuickChatActions: React.FC<QuickChatActionsProps> = ({
         {
           id: 'status',
           text: 'What\'s the status of my booking?',
-          icon: <Package className="h-3 w-3" />,
+          icon: <Calendar className="h-3 w-3" />,
           type: 'question'
         },
         {
@@ -54,13 +54,13 @@ export const QuickChatActions: React.FC<QuickChatActionsProps> = ({
         {
           id: 'confirm',
           text: 'Booking confirmed and property is ready',
-          icon: <Package className="h-3 w-3" />,
+          icon: <Calendar className="h-3 w-3" />,
           type: 'update'
         },
         {
           id: 'ready',
           text: 'Property is ready for check-in',
-          icon: <Package className="h-3 w-3" />,
+          icon: <Calendar className="h-3 w-3" />,
           type: 'update'
         },
         {

@@ -137,9 +137,9 @@ export const bookingService = {
 
 // Legacy aliases for backward compatibility
 export const createOrder = bookingService.createBooking;
-export const getOrders = bookingService.getBookings;
-export const getOrder = bookingService.getBooking;
-export const cancelOrder = bookingService.cancelBooking;
-export const getVendorOrders = bookingService.getHostBookings;
-export const confirmOrder = bookingService.confirmBooking;
-export const rejectOrder = bookingService.rejectBooking;
+export const getBookings = bookingService.getBookings;
+export const getBooking = bookingService.getBooking;
+export const cancelBooking = bookingService.cancelBooking;
+export const getHostBookings = bookingService.getHostBookings;
+export const confirmBooking = bookingService.confirmBooking;
+export const rejectBooking = bookingService.rejectBooking;

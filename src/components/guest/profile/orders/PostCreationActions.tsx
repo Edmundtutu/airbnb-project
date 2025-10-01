@@ -59,7 +59,7 @@ const PostCreationActions: React.FC<PostCreationActionsProps> = ({
             className="text-[10px] sm:text-xs lg:text-sm h-7 sm:h-8 px-2 sm:px-3 hidden sm:flex"
           >
             <MapPin className="h-3 w-3 lg:h-4 lg:w-4 mr-2" />
-            Tag Shop
+            Tag Property
           </Button>
         </div>
 
@@ -84,7 +84,7 @@ const PostCreationActions: React.FC<PostCreationActionsProps> = ({
         </div>
       </div>
 
-      {/* Mobile-only Tag Shop button */}
+      {/* Mobile-only Tag Property button */}
       <div className="mt-2 sm:hidden">
         <Button 
           variant="outline" 
@@ -92,7 +92,7 @@ const PostCreationActions: React.FC<PostCreationActionsProps> = ({
           className="text-[10px] h-6 px-2 w-full"
         >
           <MapPin className="h-2.5 w-2.5 mr-1" />
-          Tag Shop
+          Tag Property
         </Button>
       </div>
 

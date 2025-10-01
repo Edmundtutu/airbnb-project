@@ -17,7 +17,7 @@ import {
   Bath,
   Clock
 } from 'lucide-react';
-import CreatePostCard from '@/components/guest/profile/bookings/CreatePostCard';
+import CreatePostCard from '@/components/guest/profile/orders/CreatePostCard';
 import { useImageCapture } from '@/hooks/useImageCapture';
 import CameraCapture from '@/components/features/CameraCapture';
 import { useToast } from '@/hooks/use-toast';
@@ -85,7 +85,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
   const { toast } = useToast();
   const { getUnreadCount } = useChat();
   const createdAt = new Date(booking.created_at);
-  const { dateRange, nights } = formatDateRange(booking.check_in, booking.check_out);
+  const { dateRange, nights } = formatDateRange(booking.check_in_date, booking.check_out_date);
 
   // Check if booking is in a state that allows confirm/reject actions
   const canPerformActions = booking.status === 'pending';
@@ -176,7 +176,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
               {booking.status.replace('_', ' ')}
             </Badge>
             <p className="text-xs sm:text-sm md:text-base font-bold mt-0.5 leading-tight">
-              {formatUGX(booking.total_price)}
+              {formatUGX(booking.total)}
             </p>
           </div>
         </div>
@@ -187,7 +187,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
           {context === 'guest' ? (
             <>
               <PropertyIcon className="h-2.5 w-2.5 sm:h-3 sm:w-3 md:h-4 md:w-4 flex-shrink-0" />
-              <span className="truncate flex-1 min-w-0">{booking.listing?.property?.name ?? 'Property'}</span>
+              <span className="truncate flex-1 min-w-0">{booking.property?.name ?? 'Property'}</span>
             </>
           ) : (
             <>
@@ -197,14 +197,14 @@ export const BookingCard: React.FC<BookingCardProps> = ({
           )}
           <span className="mx-0.5 sm:mx-1 flex-shrink-0 text-[8px] sm:text-[10px]">•</span>
           <Users className="h-2.5 w-2.5 sm:h-3 sm:w-3 md:h-4 md:w-4 flex-shrink-0" />
-          <span className="flex-shrink-0">{booking.guests} guests</span>
+          <span className="flex-shrink-0">{booking.guest_count} guests</span>
         </div>
 
         {/* Listing Details */}
         <div className="space-y-1 sm:space-y-1.5 flex-1 mb-2 min-w-0">
           <div className="flex items-center justify-between text-[10px] sm:text-xs gap-1 sm:gap-2 min-w-0">
             <span className="truncate flex-1 min-w-0 leading-tight font-medium">
-              {booking.listing?.name ?? 'Listing'}
+              {booking.details?.[0]?.listing?.name ?? 'Listing'}
             </span>
           </div>
           
@@ -220,31 +220,31 @@ export const BookingCard: React.FC<BookingCardProps> = ({
               <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3 flex-shrink-0" />
               <span>{nights} nights</span>
             </div>
-            {booking.listing?.bedrooms && (
+            {booking.details?.[0]?.listing?.bedrooms && (
               <>
                 <span>•</span>
                 <div className="flex items-center gap-1">
                   <Bed className="h-2.5 w-2.5 sm:h-3 sm:w-3 flex-shrink-0" />
-                  <span>{booking.listing.bedrooms} bed</span>
+                  <span>{booking.details[0].listing.bedrooms} bed</span>
                 </div>
               </>
             )}
-            {booking.listing?.bathrooms && (
+            {booking.details?.[0]?.listing?.bathrooms && (
               <>
                 <span>•</span>
                 <div className="flex items-center gap-1">
                   <Bath className="h-2.5 w-2.5 sm:h-3 sm:w-3 flex-shrink-0" />
-                  <span>{booking.listing.bathrooms} bath</span>
+                  <span>{booking.details[0].listing.bathrooms} bath</span>
                 </div>
               </>
             )}
           </div>
 
           {/* Location */}
-          {booking.listing?.property?.location && (
+          {booking.property?.location && (
             <div className="flex items-center gap-1 text-[10px] sm:text-xs text-muted-foreground">
               <MapPin className="h-2.5 w-2.5 sm:h-3 sm:w-3 flex-shrink-0" />
-              <span className="truncate flex-1">{booking.listing.property.location.address}</span>
+              <span className="truncate flex-1">{booking.property.location.address}</span>
             </div>
           )}
         </div>
@@ -254,15 +254,15 @@ export const BookingCard: React.FC<BookingCardProps> = ({
             {nights} nights
           </Badge>
           <Badge variant="outline" className="text-[9px] sm:text-xs px-1 py-0.5 leading-tight">
-            {booking.guests} guests
+            {booking.guest_count} guests
           </Badge>
-          {booking.special_requests && (
+          {booking.notes && (
             <Badge
               variant="outline"
               className="truncate max-w-[4rem] sm:max-w-[6rem] md:max-w-[8rem] text-[9px] sm:text-xs px-1 py-0.5 leading-tight"
-              title={booking.special_requests}
+              title={booking.notes}
             >
-              Special Request
+              Note
             </Badge>
           )}
         </div>
@@ -315,8 +315,8 @@ export const BookingCard: React.FC<BookingCardProps> = ({
                     <CreatePostCard
                       imageCapture={imageCapture}
                       createContext={{ 
-                        propertyId: booking.listing?.property_id, 
-                        listingId: booking.listing_id,
+                        propertyId: booking.property_id, 
+                        listingId: booking.details?.[0]?.listing_id,
                         bookingId: booking.id 
                       }}
                       forceExpanded={true}

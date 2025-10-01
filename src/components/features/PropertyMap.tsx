@@ -199,7 +199,7 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
     return () => window.removeEventListener('resize', checkMobile);
   }, [requestLocation]);
 
-  // Show tooltip on marker click
+  // Show tooltip on property marker click
   const handlePropertyMarkerClick = (property: Property, event: any) => {
     setSelectedProperty(property);
     // Get marker position relative to map container

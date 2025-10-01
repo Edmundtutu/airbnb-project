@@ -25,13 +25,13 @@ import { useAuth } from '@/context/AuthContext';
 import { ChatStatusIndicator } from './ChatStatusIndicator';
 import { QuickChatActions } from './QuickChatActions';
 import { cn } from '@/lib/utils';
-import type { Order } from '@/types/orders';
+import type { Booking } from '@/types/bookings';
 import type { Conversation, Message } from '@/services/chatService';
 
 type ChatMode = 'desktop' | 'tablet' | 'mobile';
 
 interface ResponsiveChatDialogProps {
-  order: Order;
+  booking: Booking;
   conversation: Conversation | null;
   isOpen: boolean;
   isMinimized?: boolean;
@@ -51,7 +51,7 @@ interface ResponsiveChatDialogProps {
 }
 
 export const ResponsiveChatDialog: React.FC<ResponsiveChatDialogProps> = ({
-  order,
+  booking,
   conversation,
   isOpen,
   isMinimized = false,
@@ -152,19 +152,19 @@ export const ResponsiveChatDialog: React.FC<ResponsiveChatDialogProps> = ({
                 <ArrowLeft className="h-4 w-4" />
               </Button>
               <div className="flex items-center gap-2">
-                <Package className="h-4 w-4" />
-                <Badge variant="outline">Order #{order.id}</Badge>
+                <Calendar className="h-4 w-4" />
+                <Badge variant="outline">Booking #{booking.id}</Badge>
               </div>
               <div className="flex items-center gap-2">
-                {user?.role === 'customer' ? (
+                {user?.role === 'guest' ? (
                   <>
-                    <Store className="h-4 w-4" />
-                    <span className="font-medium">{order.shop?.name || 'Shop'}</span>
+                    <Home className="h-4 w-4" />
+                    <span className="font-medium">{booking.property?.name || 'Property'}</span>
                   </>
                 ) : (
                   <>
                     <User className="h-4 w-4" />
-                    <span className="font-medium">{order.user?.name || 'Customer'}</span>
+                    <span className="font-medium">{booking.guest?.name || 'Guest'}</span>
                   </>
                 )}
               </div>
@@ -246,8 +246,8 @@ export const ResponsiveChatDialog: React.FC<ResponsiveChatDialogProps> = ({
               <div className="px-4 pb-2">
                 <QuickChatActions 
                   onActionSelect={(action) => setMessageText(action.text)}
-                  orderStatus={order.status}
-                  userRole={(user?.role === 'guest' ? 'customer' : user?.role) as 'customer' | 'vendor'}
+                  bookingStatus={booking.status}
+                  userRole={user?.role as 'guest' | 'host'}
                 />
               </div>
             )}
@@ -308,12 +308,12 @@ export const ResponsiveChatDialog: React.FC<ResponsiveChatDialogProps> = ({
         {/* Desktop Header */}
         <div className="flex items-center justify-between p-3 border-b bg-muted/50 rounded-t-lg">
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            <Package className="h-3 w-3 flex-shrink-0" />
-            <Badge variant="outline" className="text-xs">#{order.id}</Badge>
+            <Calendar className="h-3 w-3 flex-shrink-0" />
+            <Badge variant="outline" className="text-xs">#{booking.id}</Badge>
             <span className="text-xs truncate">
-              {user?.role === 'customer' 
-                ? (order.shop?.name || 'Shop')
-                : (order.user?.name || 'Customer')
+              {user?.role === 'guest' 
+                ? (booking.property?.name || 'Property')
+                : (booking.guest?.name || 'Guest')
               }
             </span>
           </div>
@@ -438,19 +438,19 @@ export const ResponsiveChatDialog: React.FC<ResponsiveChatDialogProps> = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <div className="flex items-center gap-2">
-              <Package className="h-4 w-4" />
-              <Badge variant="outline">Order #{order.id}</Badge>
+              <Calendar className="h-4 w-4" />
+              <Badge variant="outline">Booking #{booking.id}</Badge>
             </div>
             <div className="flex items-center gap-2">
-              {user?.role === 'customer' ? (
+              {user?.role === 'guest' ? (
                 <>
-                  <Store className="h-4 w-4" />
-                  <span>{order.shop?.name || 'Shop'}</span>
+                  <Home className="h-4 w-4" />
+                  <span>{booking.property?.name || 'Property'}</span>
                 </>
               ) : (
                 <>
                   <User className="h-4 w-4" />
-                  <span>{order.user?.name || 'Customer'}</span>
+                  <span>{booking.guest?.name || 'Guest'}</span>
                 </>
               )}
             </div>

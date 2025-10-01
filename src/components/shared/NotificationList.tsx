@@ -62,7 +62,7 @@ export const NotificationList: React.FC<NotificationListProps> = ({
       unreadMessages.forEach((message) => {
         const senderName = message.sender_type === 'user' 
           ? conversation.user?.name || 'Customer'
-          : conversation.shop?.name || 'Shop';
+          : conversation.property?.name || 'Property';
 
         notifications.push({
           id: `msg-${message.id}`,
@@ -112,8 +112,8 @@ export const NotificationList: React.FC<NotificationListProps> = ({
     switch (notification.type) {
       case 'message':
         return <MessageCircle className="h-4 w-4" />;
-      case 'order_update':
-        return <Package className="h-4 w-4" />;
+      case 'booking_update':
+        return <Calendar className="h-4 w-4" />;
       default:
         return <Bell className="h-4 w-4" />;
     }
@@ -133,7 +133,7 @@ export const NotificationList: React.FC<NotificationListProps> = ({
             )}
           </DialogTitle>
           <DialogDescription>
-            Stay updated with your latest messages and order updates
+            Stay updated with your latest messages and booking updates
           </DialogDescription>
         </DialogHeader>
 
@@ -193,7 +193,7 @@ export const NotificationList: React.FC<NotificationListProps> = ({
                       </div>
                       {notification.conversation && (
                         <div className="text-xs text-muted-foreground mt-1">
-                          Order #{notification.conversation.order_id}
+                          Booking #{notification.conversation.booking_id}
                         </div>
                       )}
                     </div>

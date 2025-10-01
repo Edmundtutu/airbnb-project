@@ -1,20 +1,20 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import type { Conversation } from '@/services/chatService';
-import type { Order } from '@/types/orders';
+import type { Booking } from '@/types/bookings';
 
 interface OpenChat {
   conversation: Conversation;
-  order: Order;
+  booking: Booking;
   isMinimized: boolean;
   position: { x: number; y: number };
 }
 
 interface MultiChatContextType {
   openChats: Map<string, OpenChat>;
-  openChat: (conversation: Conversation, order: Order) => void;
-  closeChat: (orderId: string) => void;
-  minimizeChat: (orderId: string) => void;
-  maximizeChat: (orderId: string) => void;
+  openChat: (conversation: Conversation, booking: Booking) => void;
+  closeChat: (bookingId: string) => void;
+  minimizeChat: (bookingId: string) => void;
+  maximizeChat: (bookingId: string) => void;
   isConversationListOpen: boolean;
   setIsConversationListOpen: (open: boolean) => void;
 }
@@ -33,16 +33,16 @@ export const MultiChatProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [openChats, setOpenChats] = useState<Map<string, OpenChat>>(new Map());
   const [isConversationListOpen, setIsConversationListOpen] = useState(false);
 
-  const openChat = useCallback((conversation: Conversation, order: Order) => {
-    const orderId = String(order.id);
+  const openChat = useCallback((conversation: Conversation, booking: Booking) => {
+    const bookingId = String(booking.id);
     
     setOpenChats(prev => {
       const newChats = new Map(prev);
       
-      if (newChats.has(orderId)) {
+      if (newChats.has(bookingId)) {
         // If chat is already open, just maximize it
-        const existingChat = newChats.get(orderId)!;
-        newChats.set(orderId, { ...existingChat, isMinimized: false });
+        const existingChat = newChats.get(bookingId)!;
+        newChats.set(bookingId, { ...existingChat, isMinimized: false });
       } else {
         // Calculate position for new chat (stagger them)
         const chatCount = newChats.size;
@@ -50,9 +50,9 @@ export const MultiChatProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         const baseY = 20;
         const offset = chatCount * 50; // Stagger by 50px each
         
-        newChats.set(orderId, {
+        newChats.set(bookingId, {
           conversation,
-          order,
+          booking,
           isMinimized: false,
           position: { x: baseX + offset, y: baseY + offset }
         });
@@ -65,31 +65,31 @@ export const MultiChatProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setIsConversationListOpen(false);
   }, []);
 
-  const closeChat = useCallback((orderId: string) => {
+  const closeChat = useCallback((bookingId: string) => {
     setOpenChats(prev => {
       const newChats = new Map(prev);
-      newChats.delete(orderId);
+      newChats.delete(bookingId);
       return newChats;
     });
   }, []);
 
-  const minimizeChat = useCallback((orderId: string) => {
+  const minimizeChat = useCallback((bookingId: string) => {
     setOpenChats(prev => {
       const newChats = new Map(prev);
-      const chat = newChats.get(orderId);
+      const chat = newChats.get(bookingId);
       if (chat) {
-        newChats.set(orderId, { ...chat, isMinimized: true });
+        newChats.set(bookingId, { ...chat, isMinimized: true });
       }
       return newChats;
     });
   }, []);
 
-  const maximizeChat = useCallback((orderId: string) => {
+  const maximizeChat = useCallback((bookingId: string) => {
     setOpenChats(prev => {
       const newChats = new Map(prev);
-      const chat = newChats.get(orderId);
+      const chat = newChats.get(bookingId);
       if (chat) {
-        newChats.set(orderId, { ...chat, isMinimized: false });
+        newChats.set(bookingId, { ...chat, isMinimized: false });
       }
       return newChats;
     });

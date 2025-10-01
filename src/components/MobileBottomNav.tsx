@@ -4,15 +4,14 @@ import {
   Home, 
   Search, 
   MapPin, 
-  ShoppingCart, 
+  Calendar, 
   User,
-  Store,
-  Package,
+  Building,
   BarChart3,
   MessageCircle
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { useCart } from '@/context/BookingContext';
+import { useBooking } from '@/context/BookingContext';
 import { useChat } from '@/context/ChatContext';
 import { Badge } from '@/components/ui/badge';
 import { ConversationList } from '@/components/shared/ConversationList';
@@ -30,7 +29,7 @@ interface NavItem {
 
 const MobileBottomNav: React.FC = () => {
   const { user } = useAuth();
-  const { getItemCount } = useCart();
+  const { getItemCount } = useBooking();
   const location = useLocation();
   const [conversationListOpen, setConversationListOpen] = useState(false);
   const [chatDialogOpen, setChatDialogOpen] = useState(false);
@@ -38,7 +37,7 @@ const MobileBottomNav: React.FC = () => {
 
   if (!user) return null;
 
-  const cartItemCount = getItemCount();
+  const bookingItemCount = getItemCount();
 
   // Safely get chat context with fallback
   let conversations: Conversation[] = [];
@@ -165,7 +164,7 @@ const MobileBottomNav: React.FC = () => {
       {selectedConversation && chatDialogOpen && (
         <ErrorBoundary>
           <ChatDialog
-            order={selectedConversation.order}
+            booking={selectedConversation.booking}
             isOpen={chatDialogOpen}
             onClose={handleChatDialogClose}
           />

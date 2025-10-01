@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { 
   Search, 
-  ShoppingCart, 
+  Calendar, 
   User, 
   Heart, 
   Menu,
@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { User as UserType } from '@/types';
 import { useAuth } from '@/context/AuthContext';
-import { useCart } from '@/context/BookingContext';
+import { useBooking } from '@/context/BookingContext';
 import { useChat } from '@/context/ChatContext';
 import { ConversationList } from '@/components/shared/ConversationList';
 import { NotificationList } from '@/components/shared/NotificationList';
@@ -30,7 +30,7 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ user }) => {
   const { logout } = useAuth();
-  const { getItemCount } = useCart();
+  const { getItemCount } = useBooking();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -39,7 +39,7 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
   const [chatDialogOpen, setChatDialogOpen] = useState(false);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
 
-  const cartItemCount = getItemCount();
+  const bookingItemCount = getItemCount();
 
   // Safely get chat context with fallback
   let conversations: Conversation[] = [];
@@ -138,7 +138,7 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
                 )}
               </Button>
 
-              {user.role === 'customer' && (
+              {user.role === 'guest' && (
                 <>
                   <Link to="/favorites">
                     <Button variant="ghost" size="icon">
@@ -209,7 +209,7 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
                 )}
               </Button>
               
-              {user.role === 'customer' && (
+              {user.role === 'guest' && (
                 <Link to="/bookings" className="relative">
                   <Button variant="ghost" size="icon" className="h-9 w-9">
                     <Calendar className="h-4 w-4" />
@@ -298,7 +298,7 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
       {selectedConversation && chatDialogOpen && (
         <ErrorBoundary>
           <ChatDialog
-            order={selectedConversation.order}
+            booking={selectedConversation.booking}
             isOpen={chatDialogOpen}
             onClose={handleChatDialogClose}
           />

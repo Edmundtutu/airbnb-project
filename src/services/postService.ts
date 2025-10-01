@@ -7,8 +7,9 @@ import { Post, ApiResponse } from '@/types';
 interface CreatePostData {
   content: string;
   images?: (File | string)[];
-  productId?: string;
-  shopId?: string;
+  listingId?: string;
+  propertyId?: string;
+  bookingId?: string;
 }
 
 /**
@@ -72,14 +73,17 @@ export const postService = {
       });
     }
 
-    if (postData.productId) {
-      formData.append('product_id', postData.productId);
+    if (postData.listingId) {
+      formData.append('listing_id', postData.listingId);
     }
 
-    if (postData.shopId) {
-      formData.append('shop_id', postData.shopId);
+    if (postData.propertyId) {
+      formData.append('property_id', postData.propertyId);
+    }
     }
 
+    if (postData.bookingId) {
+      formData.append('booking_id', postData.bookingId);
     const response = await api.post<ApiResponse<Post>>(`${apiVersion}/posts`, formData, { 
       headers: { 'Content-Type': 'multipart/form-data' } 
     });

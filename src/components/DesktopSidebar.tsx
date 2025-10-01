@@ -7,11 +7,10 @@ import {
   Home, 
   Search, 
   MapPin, 
-  ShoppingCart, 
+  Calendar, 
   User,
   Heart,
-  Store,
-  Package,
+  Building,
   BarChart3,
   LogOut,
   Settings

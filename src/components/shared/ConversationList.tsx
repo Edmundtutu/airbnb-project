@@ -64,10 +64,10 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   };
 
   const getConversationTitle = (conversation: Conversation) => {
-    if (user?.role === 'vendor') {
+    if (user?.role === 'host') {
       return conversation.user?.name || 'Customer';
     } else {
-      return conversation.shop?.name || 'Shop';
+      return conversation.property?.name || 'Property';
     }
   };
 
@@ -81,7 +81,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
       return `${names} ${typing.length === 1 ? 'is' : 'are'} typing...`;
     }
     if (latest) {
-      const prefix = latest.sender_type === 'user' ? 'You: ' : '';
+      const prefix = latest.sender_type === 'user' ? 'You: ' : 'Host: ';
       return `${prefix}${latest.content}`;
     }
     return 'No messages yet';
@@ -89,27 +89,26 @@ export const ConversationList: React.FC<ConversationListProps> = ({
 
   const handleConversationClick = async (conversation: Conversation) => {
     try {
-      // Create a mock order object from conversation data
-      const order = {
-        id: parseInt(conversation.order_id),
+      // Create a mock booking object from conversation data
+      const booking = {
+        id: parseInt(conversation.booking_id),
         user_id: conversation.user_id,
-        shop_id: conversation.shop_id,
+        property_id: conversation.property_id,
         total: 0,
-        delivery_address: '',
-        delivery_lat: 0,
-        delivery_lng: 0,
-        phone_number: '',
+        check_in_date: '',
+        check_out_date: '',
+        guest_count: 1,
         notes: '',
         status: 'pending' as const,
         created_at: conversation.created_at,
         updated_at: conversation.updated_at,
-        shop: conversation.shop,
+        property: conversation.property,
         user: conversation.user,
-        items: [],
+        details: [],
       };
       
       // Use the multi-chat context to open the chat
-      openChat(conversation, order);
+      openChat(conversation, booking);
       
       // Call the optional callback
       if (onSelectConversation) {
@@ -158,7 +157,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                   <MessageCircle className="h-12 w-12 text-muted-foreground mb-4" />
                   <div className="text-muted-foreground">No conversations yet</div>
                   <div className="text-sm text-muted-foreground">
-                    Start a conversation by placing an order
+                    Start a conversation by making a booking
                   </div>
                 </div>
               ) : (
@@ -179,10 +178,10 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                       <div className="flex items-start gap-3 w-full">
                         <Avatar className="h-10 w-10 flex-shrink-0">
                           <AvatarFallback className="bg-primary text-primary-foreground">
-                            {user?.role === 'vendor' ? (
+                            {user?.role === 'host' ? (
                               <User className="h-5 w-5" />
                             ) : (
-                              <Store className="h-5 w-5" />
+                              <Home className="h-5 w-5" />
                             )}
                           </AvatarFallback>
                         </Avatar>
@@ -198,8 +197,8 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                             )}
                           </div>
                           <div className="flex items-center gap-2 text-xs text-muted-foreground truncate mb-1">
-                            <Package className="h-3 w-3" />
-                            <span>Order #{conversation.order_id}</span>
+                            <Calendar className="h-3 w-3" />
+                            <span>Booking #{conversation.booking_id}</span>
                             <ChatStatusIndicator 
                               status="offline" 
                               lastSeen={conversation.last_message_at}
@@ -265,7 +264,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                 <MessageCircle className="h-12 w-12 text-muted-foreground mb-4" />
                 <div className="text-muted-foreground">No conversations yet</div>
                 <div className="text-sm text-muted-foreground">
-                  Start a conversation by placing an order
+                  Start a conversation by making a booking
                 </div>
               </div>
             ) : (
@@ -286,10 +285,10 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                     <div className="flex items-start gap-3 w-full">
                       <Avatar className="h-10 w-10 flex-shrink-0">
                         <AvatarFallback className="bg-primary text-primary-foreground">
-                          {user?.role === 'vendor' ? (
+                          {user?.role === 'host' ? (
                             <User className="h-5 w-5" />
                           ) : (
-                            <Store className="h-5 w-5" />
+                            <Home className="h-5 w-5" />
                           )}
                         </AvatarFallback>
                       </Avatar>
@@ -305,8 +304,8 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                           )}
                         </div>
                         <div className="flex items-center gap-2 text-xs text-muted-foreground truncate mb-1">
-                          <Package className="h-3 w-3" />
-                          <span>Order #{conversation.order_id}</span>
+                          <Calendar className="h-3 w-3" />
+                          <span>Booking #{conversation.booking_id}</span>
                           <ChatStatusIndicator
                             status={online.length > 0 ? 'online' : 'offline'}
                             lastSeen={conversation.last_message_at}

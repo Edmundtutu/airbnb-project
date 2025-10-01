@@ -11,6 +11,10 @@ export interface Listing {
   property_id: string;
   property: Property;
   max_guests: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  amenities?: string[];
+  house_rules?: string[];
   rating: number;
   total_reviews: number;
   tags: string[];
