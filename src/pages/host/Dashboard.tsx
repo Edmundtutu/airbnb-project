@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart3, TrendingUp, Calendar, Home } from 'lucide-react';
+import { ChartBar as BarChart3, TrendingUp, Calendar, Chrome as Home } from 'lucide-react';
 
 const HostDashboard: React.FC = () => {
   return (
