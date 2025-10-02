@@ -12,18 +12,18 @@ import {
   ShoppingCart,
   SlidersHorizontal
 } from 'lucide-react';
-import { Product } from '@/types';
-import { useCart } from '@/context/BookingContext';
+import { Listing } from '@/types';
+import { useBooking } from '@/context/BookingContext';
 import { useToast } from '@/hooks/use-toast';
  import { useQuery } from '@tanstack/react-query';
- import { productService } from '@/services/productService';
- import { useFavorites } from '@/context/WishlistContext';
- import { ProductCard } from '@/components/guest/discover/ListingCard';
+ import { listingService } from '@/services/listingService';
+ import { useWishlist } from '@/context/WishlistContext';
+ import { ListingCard } from '@/components/guest/discover/ListingCard';
 
 const Discover: React.FC = () => {
  const [searchParams] = useSearchParams();
- const { addItem } = useCart();
- const { toggleProductFavorite, isProductFavorited } = useFavorites();
+ const { addItem } = useBooking();
+ const { toggleListingWishlist, isListingWishlisted } = useWishlist();
  const { toast } = useToast();
 
  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
@@ -42,9 +42,9 @@ const Discover: React.FC = () => {
     'Cabin'
   ];
 
-  const { data: productsResponse, isLoading, error } = useQuery({
-    queryKey: ['products', searchQuery, selectedCategory, page],
-    queryFn: () => productService.getProducts({ search: searchQuery, category: selectedCategory, page }),
+  const { data: listingsResponse, isLoading, error } = useQuery({
+    queryKey: ['listings', searchQuery, selectedCategory, page],
+    queryFn: () => listingService.getListings({ search: searchQuery, category: selectedCategory, page }),
     staleTime: 30_000,
   });
 
@@ -53,31 +53,33 @@ const Discover: React.FC = () => {
     // Search is handled by the useEffect above
   };
 
-  const handleAddToCart = (product: Product) => {
-    addItem(product, 1, product.shop);
+  const handleBookListing = (listing: Listing) => {
+    const checkIn = new Date();
+    const checkOut = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    addItem(listing, 1, listing.property, checkIn, checkOut, 1);
     toast({
-      title: "Added to cart",
-      description: `${product.name} has been added to your cart`,
+      title: "Added to bookings",
+      description: `${listing.name} has been added to your bookings`,
     });
   };
 
-  const handleToggleFavorite = (product: Product) => {
-    const wasFavorited = isProductFavorited(product.id);
-    toggleProductFavorite(product);
+  const handleToggleWishlist = (listing: Listing) => {
+    const wasWishlisted = isListingWishlisted(listing.id);
+    toggleListingWishlist(listing);
     toast({
-      title: wasFavorited ? 'Removed from favorites' : 'Added to favorites',
-      description: wasFavorited ? 'Product removed from your favorites' : 'Product added to your favorites',
+      title: wasWishlisted ? 'Removed from wishlist' : 'Added to wishlist',
+      description: wasWishlisted ? 'Listing removed from your wishlist' : 'Listing added to your wishlist',
     });
   };
 
   // Determine products to display
-  const productsToDisplay: Product[] = (productsResponse as any)?.data || [];
-  const totalProducts = (productsResponse as any)?.total ?? 0;
-  const currentPage = (productsResponse as any)?.current_page ?? 1;
-  const lastPage = (productsResponse as any)?.last_page ?? 1;
+  const listingsToDisplay: Listing[] = (listingsResponse as any)?.data || [];
+  const totalListings = (listingsResponse as any)?.total ?? 0;
+  const currentPage = (listingsResponse as any)?.current_page ?? 1;
+  const lastPage = (listingsResponse as any)?.last_page ?? 1;
 
   if (error) {
-    return <div className="text-center text-red-500">Error loading products.</div>;
+    return <div className="text-center text-red-500">Error loading listings.</div>;
   }
 
   return (

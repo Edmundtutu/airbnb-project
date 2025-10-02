@@ -80,10 +80,10 @@ export const postService = {
     if (postData.propertyId) {
       formData.append('property_id', postData.propertyId);
     }
-    }
 
     if (postData.bookingId) {
       formData.append('booking_id', postData.bookingId);
+    }
     const response = await api.post<ApiResponse<Post>>(`${apiVersion}/posts`, formData, { 
       headers: { 'Content-Type': 'multipart/form-data' } 
     });
