@@ -135,7 +135,7 @@ export const bookingService = {
   },
 };
 
-export const createBooking = createOrder;
+export const createBooking = bookingService.createBooking;
 export const createOrder = bookingService.createBooking;
 export const getBookings = bookingService.getBookings;
 export const getBooking = bookingService.getBooking;
