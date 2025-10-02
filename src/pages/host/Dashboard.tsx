@@ -1,8 +1,8 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart3, TrendingUp, Package, ShoppingCart } from 'lucide-react';
+import { BarChart3, TrendingUp, Calendar, Home } from 'lucide-react';
 
-const VendorDashboard: React.FC = () => {
+const HostDashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">Host Dashboard</h1>
@@ -50,5 +50,3 @@ const VendorDashboard: React.FC = () => {
     </div>
   );
 };
-
-export default HostDashboard;
