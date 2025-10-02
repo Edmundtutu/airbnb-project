@@ -182,7 +182,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
   );
 };
 
-export default ListingCard;
+export { ListingCard };
 
 // Legacy export for backward compatibility
 export { ListingCard as ProductCard };
