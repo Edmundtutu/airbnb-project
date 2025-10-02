@@ -1,6 +1,6 @@
 import React from 'react';
 import StatsCard from './StatsCard';
-import { TrendingUp, Home, Users, Heart } from 'lucide-react';
+import { TrendingUp, Chrome as Home, Users, Heart } from 'lucide-react';
 
 const QuickStatsGrid: React.FC = () => {
   return (
