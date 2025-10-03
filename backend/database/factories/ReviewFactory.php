@@ -2,7 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Models\Product;
+use App\Models\Listing;
+use App\Models\Property;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -18,10 +19,10 @@ class ReviewFactory extends Factory
      */
     public function definition(): array
     {
-                // Reviews can be for products or shops (polymorphic)
+                // Reviews can be for listings or properties (polymorphic)
         $reviewableType = $this->faker->randomElement([
-            Product::class,
-            \App\Models\Shop::class,
+            Listing::class,
+            Property::class,
         ]);
 
         $reviewable = $reviewableType::inRandomOrder()->first();

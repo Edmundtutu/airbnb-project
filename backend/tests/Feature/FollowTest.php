@@ -1,22 +1,22 @@
 <?php
 
 use App\Models\User;
-use App\Models\Shop;
+use App\Models\Property;
 use App\Models\Follow;
 
 beforeEach(function () {
     $this->seed();
-    $this->customer = User::factory()->customer()->create();
-    $this->vendor = User::factory()->vendor()->create();
-    $this->shop = Shop::factory()->create(['owner_id' => $this->vendor->id]);
-    $this->otherUser = User::factory()->customer()->create();
+    $this->guest = User::factory()->guest()->create();
+    $this->host = User::factory()->host()->create();
+    $this->property = Property::factory()->create(['host_id' => $this->host->id]);
+    $this->otherUser = User::factory()->guest()->create();
 });
 
 describe('Follow API', function () {
     it('allows users to follow other users', function () {
-        $response = $this->actingAs($this->customer)
+        $response = $this->actingAs($this->guest)
             ->postJson('/api/v1/follows', [
-                'user_id' => $this->vendor->id,
+                'user_id' => $this->host->id,
             ]);
 
         $response->assertStatus(201)
@@ -25,16 +25,16 @@ describe('Follow API', function () {
             ]);
 
         $this->assertDatabaseHas('follows', [
-            'user_id' => $this->customer->id,
-            'followable_id' => $this->vendor->id,
+            'user_id' => $this->guest->id,
+            'followable_id' => $this->host->id,
             'followable_type' => User::class,
         ]);
     });
 
     it('prevents users from following themselves', function () {
-        $response = $this->actingAs($this->customer)
+        $response = $this->actingAs($this->guest)
             ->postJson('/api/v1/follows', [
-                'user_id' => $this->customer->id,
+                'user_id' => $this->guest->id,
             ]);
 
         $response->assertStatus(422)
@@ -44,14 +44,14 @@ describe('Follow API', function () {
     it('prevents duplicate follows', function () {
         // First follow
         Follow::factory()->create([
-            'user_id' => $this->customer->id,
-            'followable_id' => $this->vendor->id,
+            'user_id' => $this->guest->id,
+            'followable_id' => $this->host->id,
             'followable_type' => User::class,
         ]);
 
-        $response = $this->actingAs($this->customer)
+        $response = $this->actingAs($this->guest)
             ->postJson('/api/v1/follows', [
-                'user_id' => $this->vendor->id,
+                'user_id' => $this->host->id,
             ]);
 
         $response->assertStatus(409)
@@ -62,13 +62,13 @@ describe('Follow API', function () {
 
     it('allows users to unfollow other users', function () {
         $follow = Follow::factory()->create([
-            'user_id' => $this->customer->id,
-            'followable_id' => $this->vendor->id,
+            'user_id' => $this->guest->id,
+            'followable_id' => $this->host->id,
             'followable_type' => User::class,
         ]);
 
-        $response = $this->actingAs($this->customer)
-            ->deleteJson("/api/v1/follows/{$this->vendor->id}");
+        $response = $this->actingAs($this->guest)
+            ->deleteJson("/api/v1/follows/{$this->host->id}");
 
         $response->assertStatus(200)
             ->assertJson([
@@ -81,8 +81,8 @@ describe('Follow API', function () {
     });
 
     it('returns 404 when trying to unfollow non-followed user', function () {
-        $response = $this->actingAs($this->customer)
-            ->deleteJson("/api/v1/follows/{$this->vendor->id}");
+        $response = $this->actingAs($this->guest)
+            ->deleteJson("/api/v1/follows/{$this->host->id}");
 
         $response->assertStatus(404)
             ->assertJson([
@@ -97,18 +97,18 @@ describe('Follow API', function () {
 
         Follow::factory()->create([
             'user_id' => $follower1->id,
-            'followable_id' => $this->vendor->id,
+            'followable_id' => $this->host->id,
             'followable_type' => User::class,
         ]);
 
         Follow::factory()->create([
             'user_id' => $follower2->id,
-            'followable_id' => $this->vendor->id,
+            'followable_id' => $this->host->id,
             'followable_type' => User::class,
         ]);
 
-        $response = $this->actingAs($this->customer)
-            ->getJson("/api/v1/users/{$this->vendor->id}/followers");
+        $response = $this->actingAs($this->guest)
+            ->getJson("/api/v1/users/{$this->host->id}/followers");
 
         $response->assertStatus(200)
             ->assertJsonStructure([
@@ -139,19 +139,19 @@ describe('Follow API', function () {
         $user2 = User::factory()->create();
 
         Follow::factory()->create([
-            'user_id' => $this->customer->id,
+            'user_id' => $this->guest->id,
             'followable_id' => $user1->id,
             'followable_type' => User::class,
         ]);
 
         Follow::factory()->create([
-            'user_id' => $this->customer->id,
+            'user_id' => $this->guest->id,
             'followable_id' => $user2->id,
             'followable_type' => User::class,
         ]);
 
-        $response = $this->actingAs($this->customer)
-            ->getJson("/api/v1/users/{$this->customer->id}/following");
+        $response = $this->actingAs($this->guest)
+            ->getJson("/api/v1/users/{$this->guest->id}/following");
 
         $response->assertStatus(200)
             ->assertJsonStructure([
@@ -178,32 +178,32 @@ describe('Follow API', function () {
 
     it('requires authentication for following', function () {
         $response = $this->postJson('/api/v1/follows', [
-            'user_id' => $this->vendor->id,
+            'user_id' => $this->host->id,
         ]);
 
         $response->assertStatus(401);
     });
 
     it('requires authentication for unfollowing', function () {
-        $response = $this->deleteJson("/api/v1/follows/{$this->vendor->id}");
+        $response = $this->deleteJson("/api/v1/follows/{$this->host->id}");
 
         $response->assertStatus(401);
     });
 
     it('requires authentication for viewing followers', function () {
-        $response = $this->getJson("/api/v1/users/{$this->vendor->id}/followers");
+        $response = $this->getJson("/api/v1/users/{$this->host->id}/followers");
 
         $response->assertStatus(401);
     });
 
     it('requires authentication for viewing following', function () {
-        $response = $this->getJson("/api/v1/users/{$this->customer->id}/following");
+        $response = $this->getJson("/api/v1/users/{$this->guest->id}/following");
 
         $response->assertStatus(401);
     });
 
     it('validates required fields for following', function () {
-        $response = $this->actingAs($this->customer)
+        $response = $this->actingAs($this->guest)
             ->postJson('/api/v1/follows', []);
 
         $response->assertStatus(422)
@@ -211,7 +211,7 @@ describe('Follow API', function () {
     });
 
     it('validates that user_id exists', function () {
-        $response = $this->actingAs($this->customer)
+        $response = $this->actingAs($this->guest)
             ->postJson('/api/v1/follows', [
                 'user_id' => '999999',
             ]);
@@ -221,14 +221,14 @@ describe('Follow API', function () {
     });
 
     it('returns 404 for non-existent user in followers endpoint', function () {
-        $response = $this->actingAs($this->customer)
+        $response = $this->actingAs($this->guest)
             ->getJson('/api/v1/users/999999/followers');
 
         $response->assertStatus(404);
     });
 
     it('returns 404 for non-existent user in following endpoint', function () {
-        $response = $this->actingAs($this->customer)
+        $response = $this->actingAs($this->guest)
             ->getJson('/api/v1/users/999999/following');
 
         $response->assertStatus(404);
@@ -241,13 +241,13 @@ describe('Follow API', function () {
         foreach ($followers as $follower) {
             Follow::factory()->create([
                 'user_id' => $follower->id,
-                'followable_id' => $this->vendor->id,
+                'followable_id' => $this->host->id,
                 'followable_type' => User::class,
             ]);
         }
 
-        $response = $this->actingAs($this->customer)
-            ->getJson("/api/v1/users/{$this->vendor->id}/followers");
+        $response = $this->actingAs($this->guest)
+            ->getJson("/api/v1/users/{$this->host->id}/followers");
 
         $response->assertStatus(200);
         
@@ -263,14 +263,14 @@ describe('Follow API', function () {
         
         foreach ($usersToFollow as $userToFollow) {
             Follow::factory()->create([
-                'user_id' => $this->customer->id,
+                'user_id' => $this->guest->id,
                 'followable_id' => $userToFollow->id,
                 'followable_type' => User::class,
             ]);
         }
 
-        $response = $this->actingAs($this->customer)
-            ->getJson("/api/v1/users/{$this->customer->id}/following");
+        $response = $this->actingAs($this->guest)
+            ->getJson("/api/v1/users/{$this->guest->id}/following");
 
         $response->assertStatus(200);
         

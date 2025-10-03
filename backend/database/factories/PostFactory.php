@@ -32,8 +32,8 @@ class PostFactory extends Factory
             'user_id' => User::factory(),
             'content' => $this->faker->realText(300),
             'images' => $images,
-            'product_id' => $this->faker->optional(0.3)->passthrough(null), // Will be set in seeder if needed
-            'shop_id' => $this->faker->optional(0.2)->passthrough(null), // Will be set in seeder if needed
+            'listing_id' => $this->faker->optional(0.3)->passthrough(null), // Will be set in seeder if needed
+            'property_id' => $this->faker->optional(0.2)->passthrough(null), // Will be set in seeder if needed
         ];
     }
 }

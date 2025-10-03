@@ -26,6 +26,7 @@ class PropertyResource extends JsonResource
             'cover_image' => $this->cover_image,
             'phone' => $this->phone,
             'hours' => $this->hours,
+            'category' => $this->category,
             'verified' => $this->verified,
             'distance' => $this->when(isset($this->distance), (float) $this->distance),
             'rating' => $this->whenLoaded('reviews', fn () => round($this->reviews->avg('rating'), 1), 0),

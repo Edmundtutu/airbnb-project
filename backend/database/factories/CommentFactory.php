@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Post;
-use App\Models\Product;
+use App\Models\Listing;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -21,7 +21,7 @@ class CommentFactory extends Factory
     {
                 $commentableType = $this->faker->randomElement([
             Post::class,
-            Product::class,
+            Listing::class,
         ]);
 
         $commentable = $commentableType::inRandomOrder()->first();

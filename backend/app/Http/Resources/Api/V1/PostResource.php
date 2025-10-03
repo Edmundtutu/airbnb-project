@@ -20,7 +20,7 @@ class PostResource extends JsonResource
         return [
             'id' => $this->id,
             'user' => new UserResource($this->user),
-            'product' => ProductResource::make($this->whenLoaded('product')),
+            'listing' => ListingResource::make($this->whenLoaded('listing')),
             'content' => $this->content,
             'images' => $this->images,
             'likes_count' => $this->whenLoaded('likes', fn () => $this->likes->count(), 0),

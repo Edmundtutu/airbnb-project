@@ -15,7 +15,7 @@ class PostController extends Controller
 {
     public function index()
     {
-        return PostResource::collection(Post::with(['user', 'product.shop', 'likes', 'comments'])->latest()->paginate(10));
+        return PostResource::collection(Post::with(['user', 'listing.property', 'likes', 'comments'])->latest()->paginate(10));
     }
 
     public function store(StorePostRequest $request)

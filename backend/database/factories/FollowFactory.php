@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Shop;
+use App\Models\Property;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -20,10 +20,10 @@ class FollowFactory extends Factory
     {
                 $user = User::inRandomOrder()->first();
         
-        // Users can follow other users or shops
+        // Users can follow other users or properties
         $followableType = $this->faker->randomElement([
             User::class,
-            Shop::class,
+            Property::class,
         ]);
 
         $followable = $followableType::inRandomOrder()->first();
