@@ -1,4 +1,4 @@
-# StayFinder - Short-Term Rental Platform
+# Buzz - Short-Term Rental Platform
 
 ## Feature Checklist: Short-Term Rental PWA (Airbnb-style)
 
@@ -12,7 +12,7 @@
   * Role-based auth (`guest`, `host`) with protected routes and context (`AuthContext`, `authService`, `AppRoutes.tsx`).
 * \[\~] **Real-time social feed with stay discovery**
 
-  * Feed includes property highlights, reviews, and experiences for discovery (`propertyService`, `Home`, `Discover`, `Property`, `Profile`), but real-time (websocket) updates are not yet implemented.
+  * Feed includes property highlights, reviews, and experiences for discovery (`propertyService`, `Feed`, `Discover`, `Property`, `Profile`), but real-time (websocket) updates are not yet implemented.
 * [x] **Interactive map showing nearby rentals and availability**
 
   * `PropertyMap` uses `react-leaflet` and geolocation to show available properties and the user's location.

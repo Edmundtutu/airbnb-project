@@ -1,18 +1,21 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 
 // Layouts
 import AuthLayout from '@/layouts/AuthLayout';
 import MainLayout from '@/layouts/MainLayout';
-import VendorLayout from '@/layouts/VendorLayout';
+import HostLayout from '@/layouts/HostLayout';
+
+// Lazy-loaded Right Panels
+const FeedsPanel = lazy(() => import('@/layouts/FeedsPanel'));
 
 // Auth Pages
 import Login from '@/pages/auth/Login';
 import Register from '@/pages/auth/Register';
 
 // Guest (renter) Pages
-import Home from '@/pages/guest/Home';
+import Feed from '@/pages/guest/Feed';
 import Discover from '@/pages/guest/Discover';
 import Listing from '@/pages/guest/Listing';
 import PropertyMapPage from '@/pages/guest/PropertyMapPage';
@@ -99,12 +102,16 @@ const AppRoutes: React.FC = () => {
       {/* Public Routes - Allow guests */}
       <Route path="/" element={
         <MainLayout>
-          <Home />
+          <Discover />
         </MainLayout>
       } />
-      <Route path="/discover" element={
-        <MainLayout>
-          <Discover />
+      <Route path="/feed" element={
+        <MainLayout rightPanel={
+          <Suspense fallback={<div className="animate-pulse h-32 bg-muted rounded-lg" />}>
+            <FeedsPanel />
+          </Suspense>
+        }>
+          <Feed />
         </MainLayout>
       } />
       <Route path="/listing/:id" element={

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Chrome as Home, Search, MapPin, Calendar, User, Building, ChartBar as BarChart3, MessageCircle } from 'lucide-react';
+import { Chrome as Home, Search, MapPin, Calendar, User, Building, ChartBar as BarChart3, MessageCircle, Rss } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useBooking } from '@/context/BookingContext';
 import { useChat } from '@/context/ChatContext';
@@ -58,9 +58,9 @@ const MobileBottomNav: React.FC = () => {
   };
 
   const guestNavItems: NavItem[] = [
-    { name: 'Home', href: '/', icon: Home },
-    { name: 'Discover', href: '/discover', icon: Search },
+    { name: 'Feed', href: '/feed', icon: Rss },
     { name: 'Map', href: '/map', icon: MapPin },
+    { name: 'Discover', href: '/', icon: Home },
     { name: 'Chat', icon: MessageCircle, badge: totalUnreadMessages, onClick: () => setConversationListOpen(true) },
     { name: 'Profile', href: '/profile', icon: User },
   ];

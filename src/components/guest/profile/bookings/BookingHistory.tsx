@@ -2,15 +2,17 @@ import React, { useMemo, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getBookings } from '@/services/bookingService';
 import { Booking } from '@/types/bookings';
+import { PaginatedResponse } from '@/types/api';
 import { Skeleton } from '@/components/ui/skeleton';
 import BookingCard from '@/components/shared/BookingCard';
 
 const BookingHistory: React.FC = () => {
-  const { data: bookings, isLoading, isError } = useQuery<Booking[]>({
+  const { data: bookingsResponse, isLoading, isError } = useQuery({
     queryKey: ['bookings'],
-    queryFn: getBookings,
+    queryFn: () => getBookings({}),
   });
 
+  const bookings = (bookingsResponse as PaginatedResponse<Booking>)?.data ?? [];
   const [activeBookingId, setActiveBookingId] = useState<number | null>(null);
   const expandPostRef = useRef<() => void>(() => {});
 
@@ -19,7 +21,7 @@ const BookingHistory: React.FC = () => {
     expandPostRef.current?.();
   };
 
-  const activeBooking = useMemo(() => bookings?.find(b => b.id === activeBookingId) ?? null, [bookings, activeBookingId]);
+  const activeBooking = useMemo(() => bookings.find(b => b.id === activeBookingId) ?? null, [bookings, activeBookingId]);
 
   if (isLoading) {
     return (

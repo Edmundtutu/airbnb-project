@@ -4,9 +4,12 @@
 
 @layer base {
   html {
-    font-family: "Rubik", system-ui, sans-serif;
+    font-family: "Nunito Sans", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
   }
-  
+
   body {
     margin: 0;
     padding: 0;
@@ -21,28 +24,28 @@
 }
 
 @layer components {
-  .text-h1 { 
-    @apply text-4xl font-bold; 
+  .text-h1 {
+    @apply text-4xl font-bold;
   }
-  
-  .text-h2 { 
-    @apply text-3xl font-semibold; 
+
+  .text-h2 {
+    @apply text-3xl font-semibold;
   }
-  
-  .text-h3 { 
-    @apply text-2xl font-semibold; 
+
+  .text-h3 {
+    @apply text-2xl font-semibold;
   }
-  
-  .text-body { 
-    @apply text-base leading-relaxed; 
+
+  .text-body {
+    @apply text-base leading-relaxed;
   }
-  
-  .text-small { 
-    @apply text-sm leading-tight; 
+
+  .text-small {
+    @apply text-sm leading-tight;
   }
-  
-  .text-caption { 
-    @apply text-xs leading-tight; 
+
+  .text-caption {
+    @apply text-xs leading-tight;
   }
 
   /* Hide scrollbar globally - keep content scrollable */
@@ -50,7 +53,7 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  
+
   *::-webkit-scrollbar {
     display: none;
   }
@@ -60,7 +63,7 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  
+
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
@@ -88,85 +91,99 @@
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */
-
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 222 84% 15%; /* Dark gray for better readability with Montserrat */
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 222 84% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 222 84% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 357 85% 56%; /* Imperial red - EE2F39 */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 8 88% 56%; /* Cinnabar red */
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 222 84% 97%;
+    --muted-foreground: 222 84% 55%; /* Lighter gray for muted text */
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 222 84% 97%;
+    --accent-foreground: 222 84% 15%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 222 84% 90%;
+    --input: 222 84% 90%;
+    --ring: 357 85% 56%;
 
     --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 222 84% 98%;
+    --sidebar-foreground: 222 84% 15%;
+    --sidebar-primary: 357 85% 56%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 222 84% 95%;
+    --sidebar-accent-foreground: 222 84% 15%;
+    --sidebar-border: 222 84% 90%;
+    --sidebar-ring: 357 85% 56%;
+
+    /* Text color variables for Montserrat */
+    --text-primary: 222 84% 15%;
+    --text-secondary: 222 84% 35%;
+    --text-tertiary: 222 84% 55%;
+    --text-muted: 222 84% 65%;
+    --text-inverse: 0 0% 100%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 222 84% 5%;
+    --foreground: 222 84% 98%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 222 84% 5%;
+    --card-foreground: 222 84% 98%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 222 84% 5%;
+    --popover-foreground: 222 84% 98%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 357 85% 56%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 8 88% 56%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 222 84% 15%;
+    --muted-foreground: 222 84% 70%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 222 84% 15%;
+    --accent-foreground: 222 84% 98%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --border: 222 84% 20%;
+    --input: 222 84% 20%;
+    --ring: 357 85% 56%;
+
+    --sidebar-background: 222 84% 8%;
+    --sidebar-foreground: 222 84% 98%;
+    --sidebar-primary: 357 85% 56%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 222 84% 12%;
+    --sidebar-accent-foreground: 222 84% 98%;
+    --sidebar-border: 222 84% 15%;
+    --sidebar-ring: 357 85% 56%;
+
+    /* Dark mode text colors */
+    --text-primary: 222 84% 98%;
+    --text-secondary: 222 84% 80%;
+    --text-tertiary: 222 84% 65%;
+    --text-muted: 222 84% 55%;
+    --text-inverse: 222 84% 15%;
   }
 }
 
@@ -177,6 +194,7 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1; /* Better typography */
   }
 
   /* Smooth scrolling */
@@ -199,5 +217,85 @@ All colors MUST be HSL.
     .min-h-screen {
       min-height: 100dvh;
     }
+  }
+
+  /* Improved readability for Montserrat */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Better text rendering for Montserrat */
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+}
+
+@layer utilities {
+  /* Text color utilities */
+  .text-primary {
+    color: hsl(var(--text-primary));
+  }
+
+  .text-secondary {
+    color: hsl(var(--text-secondary));
+  }
+
+  .text-tertiary {
+    color: hsl(var(--text-tertiary));
+  }
+
+  .text-muted {
+    color: hsl(var(--text-muted));
+  }
+
+  .text-inverse {
+    color: hsl(var(--text-inverse));
+  }
+
+  /* Red-dominant gradients */
+  .gradient-red-dominant {
+    background: linear-gradient(135deg, hsl(357, 85%, 56%), hsl(8, 88%, 56%), hsl(17, 93%, 55%));
+  }
+
+  .gradient-warm-red {
+    background: linear-gradient(135deg, #ee2f39, #f2482e, #f76022, #fb7917, #ff910c);
+  }
+
+  .text-gradient-red {
+    background: linear-gradient(135deg, hsl(357, 85%, 56%), hsl(8, 88%, 56%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Montserrat-specific font weights */
+  .font-thin {
+    font-weight: 100;
+  }
+  .font-extralight {
+    font-weight: 200;
+  }
+  .font-light {
+    font-weight: 300;
+  }
+  .font-normal {
+    font-weight: 400;
+  }
+  .font-medium {
+    font-weight: 500;
+  }
+  .font-semibold {
+    font-weight: 600;
+  }
+  .font-bold {
+    font-weight: 700;
+  }
+  .font-extrabold {
+    font-weight: 800;
+  }
+  .font-black {
+    font-weight: 900;
   }
 }

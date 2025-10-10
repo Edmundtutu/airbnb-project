@@ -6,6 +6,7 @@ interface WishlistContextType {
   toggleListingWishlist: (listing: Listing) => void;
   isListingWishlisted: (listingId: string) => boolean;
   clearWishlist: () => void;
+  removeListingFromFavorites: (listingId: string) => void;
 }
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
@@ -40,6 +41,10 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
     });
   };
+  
+  const removeListingFromFavorites = (listingId: string) => {
+    setWishlistedListings(prev => prev.filter(item => item.id !== listingId));
+  };
 
   const isListingWishlisted = (listingId: string): boolean => {
     return wishlistedListings.some(listing => listing.id === listingId);
@@ -54,6 +59,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       wishlistedListings,
       toggleListingWishlist,
       isListingWishlisted,
+      removeListingFromFavorites,
       clearWishlist,
     }}>
       {children}

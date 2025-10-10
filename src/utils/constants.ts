@@ -1,9 +1,9 @@
 // App constants
-export const APP_NAME = 'StayFinder';
+export const APP_NAME = 'Buzz';
 export const API_BASE_URL = '/api';
 
 export const ROUTES = {
-  HOME: '/',
+  FEED: '/',
   LOGIN: '/login',
   REGISTER: '/register',
   DISCOVER: '/discover',

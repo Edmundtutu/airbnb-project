@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 import Navbar from '@/components/Navbar';
 import DesktopSidebar from '@/components/DesktopSidebar';
 import MobileBottomNav from '@/components/MobileBottomNav';
@@ -6,96 +6,75 @@ import { useAuth } from '@/context/AuthContext';
 
 interface MainLayoutProps {
   children: React.ReactNode;
+  rightPanel?: ReactNode;
 }
 
-const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
+// Context to manage right sidebar visibility and content
+interface RightSidebarContextType {
+  rightPanel: ReactNode | null;
+  setRightPanel: (panel: ReactNode | null) => void;
+}
+
+const RightSidebarContext = createContext<RightSidebarContextType>({
+  rightPanel: null,
+  setRightPanel: () => {},
+});
+
+export const useRightSidebar = () => useContext(RightSidebarContext);
+
+const MainLayout: React.FC<MainLayoutProps> = ({ children, rightPanel: initialRightPanel }) => {
   const { user } = useAuth();
+  const [rightPanel, setRightPanel] = useState<ReactNode | null>(initialRightPanel || null);
+
+  // Use the rightPanel from props if provided, otherwise use state
+  const activeRightPanel = initialRightPanel !== undefined ? initialRightPanel : rightPanel;
 
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
-      <Navbar user={user} />
-      
-      <div className="flex min-h-screen">
-        {/* Desktop Sidebar - Fixed left sidebar like Facebook */}
-        {user && <DesktopSidebar />}
+    <RightSidebarContext.Provider value={{ rightPanel: activeRightPanel, setRightPanel }}>
+      <div className="min-h-screen bg-background overflow-x-hidden">
+        <Navbar user={user} />
         
-        {/* Main Content Area - Centered like Facebook feed */}
-        <main className={`
-          flex-1 min-h-screen w-full
-          ${user ? 'lg:ml-64 xl:ml-72' : ''} 
-          ${user ? 'pb-16 lg:pb-0' : 'pb-0'}
-        `}>
-          {/* Content Container - Centered with max width like Facebook */}
-          <div className={`
-            w-full mx-auto px-2 sm:px-4 py-4 lg:py-6
-            ${user ? 'max-w-full sm:max-w-2xl lg:max-w-4xl xl:max-w-5xl' : 'max-w-6xl'}
+        <div className="flex min-h-screen">
+          {/* Desktop Sidebar - Fixed left sidebar */}
+          {user && <DesktopSidebar />}
+          
+          {/* Main Content Area - Flexible width based on sidebars */}
+          <main className={`
+            flex-1 min-h-screen w-full
+            ${user ? 'lg:ml-64 xl:ml-72' : ''} 
+            ${user ? 'pb-16 lg:pb-0' : 'pb-0'}
           `}>
-            {/* Facebook-like centered feed layout */}
+            {/* Content Container - Adaptive width */}
             <div className={`
-              ${user ? 'lg:grid lg:grid-cols-12 lg:gap-6' : ''}
+              w-full mx-auto px-2 sm:px-4 py-4 lg:py-6
+              ${user && activeRightPanel ? 'max-w-full sm:max-w-2xl lg:max-w-4xl xl:max-w-5xl' : user ? 'max-w-full' : 'max-w-6xl'}
             `}>
-              {/* Main Feed Area */}
+              {/* Layout with optional right panel */}
               <div className={`
-                ${user ? 'lg:col-span-8 xl:col-span-7' : ''}
+                ${user && activeRightPanel ? 'lg:grid lg:grid-cols-12 lg:gap-6' : ''}
               `}>
-                {children}
-              </div>
-              
-              {/* Right Sidebar - Desktop only, like Facebook's right panel */}
-              {user && (
-                <div className="hidden lg:block lg:col-span-4 xl:col-span-5">
-                  <div className="sticky top-20 space-y-4">
-                    {/* Quick Actions */}
-                    <div className="bg-card rounded-lg p-4 border">
-                      <h3 className="font-semibold mb-3">Quick Actions</h3>
-                      <div className="space-y-2">
-                        <button className="w-full text-left p-2 rounded hover:bg-accent text-sm">
-                          🏠 Browse Stays
-                        </button>
-                        <button className="w-full text-left p-2 rounded hover:bg-accent text-sm">
-                          🗺️ Find Properties Near Me
-                        </button>
-                        <button className="w-full text-left p-2 rounded hover:bg-accent text-sm">
-                          ❤️ View Favorites
-                        </button>
-                      </div>
-                    </div>
-                    
-                    {/* Trending */}
-                    <div className="bg-card rounded-lg p-4 border">
-                      <h3 className="font-semibold mb-3">Trending Now</h3>
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                            🏠
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-sm font-medium">Villas</p>
-                            <p className="text-xs text-muted-foreground">Luxury stays</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                            🏢
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-sm font-medium">Apartments</p>
-                            <p className="text-xs text-muted-foreground">City stays</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                {/* Main Content Area */}
+                <div className={`
+                  ${user && activeRightPanel ? 'lg:col-span-8 xl:col-span-7' : ''}
+                `}>
+                  {children}
                 </div>
-              )}
+                
+                {/* Dynamic Right Panel - Desktop only */}
+                {user && activeRightPanel && (
+                  <div className="hidden lg:block lg:col-span-4 xl:col-span-5">
+                    {activeRightPanel}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        </main>
-      </div>
+          </main>
+        </div>
 
-      {/* Mobile Bottom Navigation - Only on mobile like Facebook */}
-      {user && <MobileBottomNav />}
-    </div>
+        {/* Mobile Bottom Navigation */}
+        {user && <MobileBottomNav />}
+      </div>
+    </RightSidebarContext.Provider>
   );
 };
 

@@ -1,5 +1,5 @@
 import api from './api';
-import { Listing, ApiResponse } from '@/types';
+import { Listing, ApiResponse, Review } from '@/types';
 
 interface GetListingsParams {
   search?: string;
@@ -51,5 +51,10 @@ export const listingService = {
 
   async deleteListing(id: string): Promise<void> {
     await api.delete(`${apiVersion}/listings/${id}`);
+  },
+
+  async getListingReviews(id: string): Promise<Review[]> {
+    const response = await api.get<ApiResponse<Review[]>>(`${apiVersion}/listings/${id}/reviews`);
+    return response.data.data;
   },
 };

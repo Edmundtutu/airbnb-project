@@ -13,8 +13,8 @@ export default defineConfig(({ mode }) => ({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
-        name: 'StayFinder',
-        short_name: 'StayFinder',
+        name: 'Buzz',
+        short_name: 'Buzz',
         description: 'Find your perfect stay',
         theme_color: '#00000000',
         icons: [

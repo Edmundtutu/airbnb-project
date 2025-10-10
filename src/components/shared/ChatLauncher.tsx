@@ -36,8 +36,8 @@ export const ChatLauncher: React.FC = () => {
 
   return (
     <>
-      {/* Floating Chat Launcher Button */}
-      <div className="fixed bottom-4 right-4 z-50">
+      {/* Floating Chat Launcher Button * for now lets first disable this float button/}
+      {/* <div className="fixed bottom-4 right-4 z-50">
         <Button
           onClick={handleToggleConversationList}
           className={cn(
@@ -57,7 +57,7 @@ export const ChatLauncher: React.FC = () => {
             </Badge>
           )}
         </Button>
-      </div>
+      </div> */}
 
       {/* Conversation List */}
       <ConversationList

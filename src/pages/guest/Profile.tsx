@@ -22,7 +22,7 @@ const Profile: React.FC = () => {
   const { user } = useAuth();
   // BookingHandlers are fetched via react-query in BookingHistory component
   const [reviews, setReviews] = useState<Review[]>([]);
-  const { favoriteListings, removeListingFromFavorites } = useFavorites();
+  const { wishlistedListings, removeListingFromFavorites } = useFavorites();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -69,7 +69,7 @@ const Profile: React.FC = () => {
                   {user?.verified ? 'Verified' : 'Unverified'}
                 </Badge>
                 <Badge variant="outline" className="text-xs">
-                  {user?.role === 'customer' ? 
+                  {user?.role === 'guest' ? 
                     (user?.isInfluencer ? 'Influencer' : 'Customer') : 'Vendor'}
                 </Badge>
               </div>
@@ -165,10 +165,10 @@ const Profile: React.FC = () => {
         <TabsContent value="favorites" className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold">Favorite Stays</h2>
-            <p className="text-muted-foreground">{favoriteListings.length} items</p>
+            <p className="text-muted-foreground">{wishlistedListings.length} items</p>
           </div>
 
-          {favoriteListings.length === 0 ? (
+          {wishlistedListings.length === 0 ? (
             <Card>
               <CardContent className="p-8 text-center">
                 <Heart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
@@ -180,7 +180,7 @@ const Profile: React.FC = () => {
             </Card>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-              {favoriteListings.map((item: Listing) => (
+              {wishlistedListings.map((item: Listing) => (
                 <Card key={item.id}>
                   <CardContent className="p-4">
                     <div className="aspect-square bg-muted rounded-lg flex items-center justify-center mb-4">

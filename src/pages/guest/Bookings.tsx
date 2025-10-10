@@ -102,7 +102,7 @@ const Bookings: React.FC = () => {
               Start exploring to add stays to your bookings
             </p>
             <Button asChild>
-              <Link to="/discover">Start Exploring</Link>
+              <Link to="/">Start Exploring</Link>
             </Button>
           </CardContent>
         </Card>
@@ -223,7 +223,7 @@ const Bookings: React.FC = () => {
               Clear Bookings
             </Button>
             <Button variant="outline" asChild>
-              <Link to="/discover">Continue Exploring</Link>
+              <Link to="/">Continue Exploring</Link>
             </Button>
           </div>
         </div>

@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Chrome as Home, Search, MapPin, Calendar, User, Heart, Building, ChartBar as BarChart3, LogOut, Settings } from 'lucide-react';
+import { Chrome as Home, Search, MapPin, Calendar, User, Heart, Building, ChartBar as BarChart3, LogOut, Settings, Rss } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 interface NavItem {
@@ -20,8 +20,8 @@ const DesktopSidebar: React.FC = () => {
   if (!user) return null;
 
   const guestNavItems: NavItem[] = [
-    { name: 'Home', href: '/', icon: Home },
-    { name: 'Discover', href: '/discover', icon: Search },
+    { name: 'Discover', href: '/', icon: Home },
+    { name: 'Feed', href: '/feed', icon: Rss },
     { name: 'Map', href: '/map', icon: MapPin },
     { name: 'Favorites', href: '/favorites', icon: Heart },
     { name: 'Bookings', href: '/bookings', icon: Calendar, badge: 0 },
@@ -50,7 +50,7 @@ const DesktopSidebar: React.FC = () => {
       {/* Logo */}
       <div className="p-4 xl:p-6 border-b">
         <Link to="/" className="text-xl xl:text-2xl font-bold text-primary">
-          StayFinder
+          Buzz
         </Link>
       </div>
 

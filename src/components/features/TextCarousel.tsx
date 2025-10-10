@@ -38,14 +38,29 @@ export const TextCarousel: React.FC<TextCarouselProps> = ({
     }
 
     return (
-        <div
-            className={`transition-opacity duration-${transitionDuration} ${isVisible ? 'opacity-100' : 'opacity-0'
-                } ${className}`}
-            style={{
-                transitionDuration: `${transitionDuration}ms`,
-            }}
-        >
-            {texts[currentIndex]}
-        </div>
+        <>
+            <div
+                className={`transition-opacity duration-${transitionDuration} ${isVisible ? 'opacity-100' : 'opacity-0'
+                    } ${className}`}
+                style={{
+                    transitionDuration: `${transitionDuration}ms`,
+                }}
+                >
+                    <div className= 'text-center'>
+                        {texts[currentIndex]}
+                    </div>
+            </div>
+            <div className="flex justify-center mt-3 space-x-2">
+                {texts.map((_, index) => (
+                <button
+                    key={index}
+                    onClick={() => setCurrentIndex(index)}
+                    className={`w-2 h-2 rounded-full transition-colors ${
+                    index === currentIndex ? 'bg-blue-500' : 'bg-gray-300'
+                    }`}
+                />
+                ))}
+            </div>
+        </>
     );
 };

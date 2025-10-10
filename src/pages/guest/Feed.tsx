@@ -4,15 +4,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/context/AuthContext';
 import { useQuery } from '@tanstack/react-query';
-import PostItem from '@/components/guest/home/PostItem';
+import PostItem from '@/components/guest/feed/PostItem';
 import { postService } from '@/services/postService';
-import QuickStatsGrid from '@/components/guest/home/QuickStatsGrid';
+import QuickStatsGrid from '@/components/guest/feed/QuickStatsGrid';
 import CameraCapture from '@/components/features/CameraCapture';
 import { useImageCapture } from '@/hooks/useImageCapture';
 import { MessageCircle } from 'lucide-react';
 import {TextCarousel} from '@/components/features/TextCarousel';
 
-const Home: React.FC = () => {
+const Feed: React.FC = () => {
   const { user } = useAuth();
   const imageCapture = useImageCapture();
 
@@ -42,39 +42,48 @@ const Home: React.FC = () => {
   return (
     <div className="space-y-4 lg:space-y-6">
       {/* Welcome Header - Facebook-style */}
-      <div className="text-center py-4 lg:py-6">
-        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2">
-          Hey, {user?.name}!
-        </h1>
-        <TextCarousel
-          className="text-muted-foreground text-sm lg:text-base"
-          texts={[
-            'Share your travel experience',
-            'Nearby properties have amazing stays! Read the reviews',
-            'Where are you traveling today?',
-            'Where will you stay next?',
-            'Join your friends for an adventure',
-            'Pictures of your stay will inspire others',
-            'Enjoy your travel experience with friends',
-          ]}
-          interval={4000}
-          transitionDuration={300}
-        />
+
+      <div className="bg-white shadow-sm sticky top-0 z-10">
+        <div className="px-4 py-4">
+          <div className="flex items-center space-x-4">
+            <div className="flex-shrink-0">
+              {user?.avatar ? (
+                <img
+                  src={user.avatar}
+                  alt="Avatar"
+                  className="w-12 h-12 rounded-full border-2 border-gray-200 object-cover"
+                />
+              ) : (
+                <div className="w-12 h-12 rounded-full border-2 border-gray-200 bg-gray-100 flex items-center justify-center">
+                  <span className="text-xl font-semibold text-gray-600">
+                    {user?.name?.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              )}
+            </div>
+            <TextCarousel
+              className="flex-1 text-muted-foreground text-sm"
+              texts={[
+                'Share your travel experience',
+                'Nearby properties have amazing stays! Read the reviews',
+                'Where are you traveling today?',
+                'Where will you stay next?',
+                'Join your friends for an adventure',
+                'Pictures of your stay will inspire others',
+                'Enjoy your travel experience with friends',
+                ]}
+              interval={4000}
+              transitionDuration={300}
+            />
+          </div>
+        </div>
+        <div className="border-b border-gray-200"></div>
+        <QuickStatsGrid />
       </div>
 
-      <QuickStatsGrid />
-
       {/* Post creation removed per new requirement: must be initiated from OrderHandlers */}
-
-      {/* Full-Page Camera Modal */}
-      {imageCapture.showCameraModal && (
-        <div className="fixed inset-0 z-50 bg-background">
-          <CameraCapture 
-            onCapture={handleCameraCapture}
-            onClose={handleCameraClose}
-          />
-        </div>
-      )}
+          
+      
 
       {/* Feed */}
       {/* Use postsData directly from useQuery */}
@@ -90,7 +99,7 @@ const Home: React.FC = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button asChild>
-                <Link to="/discover">Discover Stays</Link>
+                <Link to="/">Discover Stays</Link>
               </Button>
               {/* Creation moved to Bookings tab; remove CTA from Home */}
             </div>
@@ -103,8 +112,18 @@ const Home: React.FC = () => {
           ))}
         </div>
       )}
+
+      {/* Full-Page Camera Modal */}
+      {imageCapture.showCameraModal && (
+        <div className="fixed inset-0 z-50 bg-background">
+          <CameraCapture 
+            onCapture={handleCameraCapture}
+            onClose={handleCameraClose}
+          />
+        </div>
+      )}
     </div>
   );
 };
 
-export default Home;
+export default Feed;

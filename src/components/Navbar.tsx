@@ -69,7 +69,7 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      window.location.href = `/discover?search=${encodeURIComponent(searchQuery)}`;
+      window.location.href = `/?search=${encodeURIComponent(searchQuery)}`;
     }
   };
 
@@ -84,12 +84,12 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
   };
 
   return (
-    <nav className="bg-card/95 backdrop-blur-sm border-b sticky top-0 z-40">
+  <nav className="bg-gradient-to-br from-red-imperial via-red-cinnabar via-orange-giants to-orange-safety backdrop-blur-sm">
       <div className="mx-auto px-3 sm:px-4 lg:px-6">
         <div className="flex items-center justify-between h-14 lg:h-16">
           {/* Logo - Always visible */}
           <Link to="/" className="text-lg sm:text-xl font-bold text-primary flex-shrink-0">
-            StayFinder
+            Buzz
           </Link>
 
           {/* Search Bar - Desktop and tablet */}
