@@ -144,95 +144,104 @@ const ListingPage: React.FC = () => {
       {/* Mobile-optimized layout */}
       <div className="lg:grid lg:grid-cols-2 lg:gap-8 lg:space-y-0">
         
-        {/* Image Gallery - Mobile Enhanced */}
-        <div className="lg:space-y-4">
-          <div className="relative aspect-[4/3] bg-muted overflow-hidden lg:rounded-lg">
-            {listing.images?.[currentImageIndex] ? (
-              <>
-                <img 
-                  src={listing.images[currentImageIndex]} 
-                  alt={listing.name} 
-                  className="w-full h-full object-cover" 
-                />
-                
-                {/* Image Navigation */}
-                {listing.images.length > 1 && (
-                  <>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white h-8 w-8"
-                      onClick={prevImage}
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white h-8 w-8"
-                      onClick={nextImage}
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                    
-                    {/* Image Indicators */}
-                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-                      {listing.images.map((_, index) => (
-                        <div
-                          key={index}
-                          className={`h-1.5 w-1.5 rounded-full transition-all ${
-                            index === currentImageIndex 
-                              ? 'bg-white scale-125' 
-                              : 'bg-white/60'
-                          }`}
-                        />
-                      ))}
-                    </div>
-                  </>
-                )}
-              </>
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-6xl">🏠</div>
-            )}
-            
-            {/* Floating Action Buttons */}
-            <div className="absolute top-4 right-4 flex gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="bg-white/90 hover:bg-white h-8 w-8 shadow-md"
-                onClick={handleToggleWishlist}
-              >
-                <Heart className={`h-4 w-4 ${
-                  isListingWishlisted(listing.id) ? 'fill-current text-red-500' : ''
-                }`} />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="bg-white/90 hover:bg-white h-8 w-8 shadow-md"
-              >
-                <Share className="h-4 w-4" />
-              </Button>
+        {/* Left Column: Image Gallery + Description */}
+        <div className="lg:space-y-6">
+          {/* Image Gallery */}
+          <div className="lg:space-y-4">
+            <div className="relative aspect-[4/3] bg-muted overflow-hidden lg:rounded-lg">
+              {listing.images?.[currentImageIndex] ? (
+                <>
+                  <img 
+                    src={listing.images[currentImageIndex]} 
+                    alt={listing.name} 
+                    className="w-full h-full object-cover" 
+                  />
+                  
+                  {/* Image Navigation */}
+                  {listing.images.length > 1 && (
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white h-8 w-8"
+                        onClick={prevImage}
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white h-8 w-8"
+                        onClick={nextImage}
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                      
+                      {/* Image Indicators */}
+                      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                        {listing.images.map((_, index) => (
+                          <div
+                            key={index}
+                            className={`h-1.5 w-1.5 rounded-full transition-all ${
+                              index === currentImageIndex 
+                                ? 'bg-white scale-125' 
+                                : 'bg-white/60'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-6xl">🏠</div>
+              )}
+              
+              {/* Floating Action Buttons */}
+              <div className="absolute top-4 right-4 flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="bg-white/90 hover:bg-white h-8 w-8 shadow-md"
+                  onClick={handleToggleWishlist}
+                >
+                  <Heart className={`h-4 w-4 ${
+                    isListingWishlisted(listing.id) ? 'fill-current text-red-500' : ''
+                  }`} />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="bg-white/90 hover:bg-white h-8 w-8 shadow-md"
+                >
+                  <Share className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
+
+            {/* Image Thumbnails - Hidden on mobile, shown on desktop */}
+            {listing.images?.length > 1 && (
+              <div className="hidden lg:grid lg:grid-cols-4 gap-2">
+                {listing.images.slice(0, 4).map((img, i) => (
+                  <div 
+                    key={i} 
+                    className={`aspect-square bg-muted rounded-lg overflow-hidden cursor-pointer border-2 ${
+                      i === currentImageIndex ? 'border-primary' : 'border-transparent'
+                    }`}
+                    onClick={() => setCurrentImageIndex(i)}
+                  >
+                    <img src={img} alt={`${listing.name} ${i + 1}`} className="w-full h-full object-cover" />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Image Thumbnails - Hidden on mobile, shown on desktop */}
-          {listing.images?.length > 1 && (
-            <div className="hidden lg:grid lg:grid-cols-4 gap-2">
-              {listing.images.slice(0, 4).map((img, i) => (
-                <div 
-                  key={i} 
-                  className={`aspect-square bg-muted rounded-lg overflow-hidden cursor-pointer border-2 ${
-                    i === currentImageIndex ? 'border-primary' : 'border-transparent'
-                  }`}
-                  onClick={() => setCurrentImageIndex(i)}
-                >
-                  <img src={img} alt={`${listing.name} ${i + 1}`} className="w-full h-full object-cover" />
-                </div>
-              ))}
-            </div>
-          )}
+          {/* Description Section - Desktop Only */}
+          <div className="hidden lg:block">
+            <h2 className="text-xl font-semibold mb-4">About this place</h2>
+            <p className="text-muted-foreground leading-relaxed">{listing.description}</p>
+          </div>
         </div>
 
         {/* Content Area - Mobile Optimized */}
@@ -293,9 +302,9 @@ const ListingPage: React.FC = () => {
           </div>
 
           {/* Booking Widget - Sticky on Mobile */}
-          <div className="lg:space-y-6">
+          <div className="lg:space-y-4">
             {/* Date Selection */}
-            <div className="space-y-4 py-4">
+            <div className="space-y-3 py-2 lg:py-0">
               <h3 className="font-semibold text-lg">Select dates and guests</h3>
               
               <div className="grid grid-cols-2 gap-3">
@@ -341,7 +350,7 @@ const ListingPage: React.FC = () => {
               </div>
 
               {/* Guests Selector */}
-              <div className="border-2 rounded-lg p-4">
+              <div className="border-2 rounded-lg p-3 lg:p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="font-medium">Guests</div>
@@ -373,12 +382,12 @@ const ListingPage: React.FC = () => {
 
               {/* Price Breakdown */}
               {totalPrice > 0 && (
-                <div className="space-y-3">
+                <div className="space-y-2 lg:space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-sm">UGX {listing.price_per_night.toLocaleString()} x {Math.ceil((checkOutDate!.getTime() - checkInDate!.getTime()) / (1000 * 60 * 60 * 24))} nights</span>
                     <span className="font-medium">UGX {totalPrice.toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between items-center border-t pt-3">
+                  <div className="flex justify-between items-center border-t pt-2 lg:pt-3">
                     <span className="font-semibold">Total</span>
                     <span className="font-bold text-lg">UGX {totalPrice.toLocaleString()}</span>
                   </div>
@@ -411,21 +420,10 @@ const ListingPage: React.FC = () => {
               <span className="text-sm">Instant confirmation</span>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Description and Amenities Section */}
-      <div className="px-4 lg:px-0 lg:mt-8">
-        <div className="lg:grid lg:grid-cols-2 lg:gap-8">
-          {/* Description */}
-          <div className="py-6 border-b lg:border-0">
-            <h2 className="text-xl font-semibold mb-4">About this place</h2>
-            <p className="text-muted-foreground leading-relaxed">{listing.description}</p>
-          </div>
-
-          {/* Amenities */}
+          {/* Amenities - Desktop Only */}
           {listing.amenities && listing.amenities.length > 0 && (
-            <div className="py-6 border-b lg:border-0">
+            <div className="hidden lg:block lg:py-6 lg:border-t">
               <h2 className="text-xl font-semibold mb-4">What this place offers</h2>
               <div className="grid grid-cols-1 gap-3">
                 {listing.amenities.slice(0, 8).map((amenity, index) => (
@@ -445,6 +443,36 @@ const ListingPage: React.FC = () => {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Mobile Description and Amenities Section */}
+      <div className="px-4 lg:hidden">
+        <div className="py-6 border-b">
+          <h2 className="text-xl font-semibold mb-4">About this place</h2>
+          <p className="text-muted-foreground leading-relaxed">{listing.description}</p>
+        </div>
+
+        {/* Amenities */}
+        {listing.amenities && listing.amenities.length > 0 && (
+          <div className="py-6 border-b">
+            <h2 className="text-xl font-semibold mb-4">What this place offers</h2>
+            <div className="grid grid-cols-1 gap-3">
+              {listing.amenities.slice(0, 8).map((amenity, index) => (
+                <div key={index} className="flex items-center gap-3">
+                  <div className="w-5 h-5 flex items-center justify-center text-green-600">
+                    <CheckCircle className="h-5 w-5" />
+                  </div>
+                  <span className="text-sm">{amenity}</span>
+                </div>
+              ))}
+              {listing.amenities.length > 8 && (
+                <Button variant="ghost" className="justify-start text-primary font-medium">
+                  Show all {listing.amenities.length} amenities
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Reviews Section - Mobile Optimized */}

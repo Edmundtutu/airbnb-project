@@ -52,15 +52,16 @@ const Discover: React.FC = () => {
     accessibility: []
   });
 
-  // Detect mobile screen
-  // Replace your current useEffect with this:
+  // Detect mobile screen and manage filter panel state
   useEffect(() => {
     const checkMobile = () => {
       const mobile = window.innerWidth < 1024;
       setIsMobile(mobile);
-      // Auto-show filters on desktop
+      // Auto-show filters on desktop, hide on mobile
       if (!mobile) {
         setIsFiltersOpen(true);
+      } else {
+        setIsFiltersOpen(false);
       }
     };
 
@@ -157,7 +158,7 @@ const Discover: React.FC = () => {
       {/* Main Content Area */}
       <div className="lg:flex lg:gap-6">
         {/* Left: Listings */}
-        <div className={`flex-1 space-y-4 md:space-y-6 px-1 sm:px-0 ${isFiltersOpen && !isMobile ? 'lg:pr-0' : ''}`}>
+        <div className={`flex-1 space-y-4 md:space-y-6 px-1 sm:px-0 ${!isMobile ? 'lg:pr-6' : ''}`}>
           {/* Search Bar with Filter Button */}
           <form onSubmit={handleSearch} className="w-full">
             <div className="flex gap-2">
@@ -314,15 +315,14 @@ const Discover: React.FC = () => {
         </div>
 
         {/* Right: Filters Panel (Desktop Only) */}
-        {!isMobile && isFiltersOpen && (
+        {!isMobile && (
           <div className="hidden lg:block lg:w-96 xl:w-[420px] flex-shrink-0">
-            <div className="sticky top-20">
-              <FiltersPanel
-                isOpen={isFiltersOpen}
-                onClose={() => setIsFiltersOpen(false)}
-                onApplyFilters={handleApplyFilters}  // Changed from onApply to onApplyFilters
-              />
-            </div>
+            <FiltersPanel
+              isOpen={true}
+              onClose={() => setIsFiltersOpen(false)}
+              onApplyFilters={handleApplyFilters}
+              isMobile={false}
+            />
           </div>
         )}
       </div>
@@ -332,7 +332,8 @@ const Discover: React.FC = () => {
         <FiltersPanel
           isOpen={isFiltersOpen}
           onClose={() => setIsFiltersOpen(false)}
-          onApplyFilters={handleApplyFilters}  // Changed from onApply to onApplyFilters
+          onApplyFilters={handleApplyFilters}
+          isMobile={true}
         />
       )}
     </div>
