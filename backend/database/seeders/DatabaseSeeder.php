@@ -2,14 +2,14 @@
 
 namespace Database\Seeders;
 
-use App\Models\Booking;
 use App\Models\Comment;
 use App\Models\Follow;
 use App\Models\Like;
-use App\Models\Listing;
+use App\Models\Order;
 use App\Models\Post;
-use App\Models\Property;
+use App\Models\Product;
 use App\Models\Review;
+use App\Models\Shop;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -21,107 +21,107 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->command->info('🌱 Seeding realistic Airbnb-style rental platform data...');
+        $this->command->info('🌱 Seeding realistic social commerce data...');
 
         // === PHASE 1: Create Core Users ===
         $this->command->info('👥 Creating users with roles...');
 
         // Create specific test users
-        $testGuest = User::factory()->guest()->create([
-            'name' => 'John Guest',
-            'email' => 'guest@test.com',
+        $testCustomer = User::factory()->customer()->create([
+            'name' => 'John Customer',
+            'email' => 'customer@test.com',
         ]);
 
-        $testHost = User::factory()->host()->create([
-            'name' => 'Jane Host',
-            'email' => 'host@test.com',
+        $testVendor = User::factory()->vendor()->create([
+            'name' => 'Jane Vendor',
+            'email' => 'vendor@test.com',
         ]);
 
-        // Create realistic user base: 70% guests, 30% hosts
-        $guests = User::factory()->guest()->count(14)->create();
-        $hosts = User::factory()->host()->count(6)->create();
+        // Create realistic user base: 70% customers, 30% vendors
+        $customers = User::factory()->customer()->count(14)->create();
+        $vendors = User::factory()->vendor()->count(6)->create();
 
-        $allGuests = $guests->concat([$testGuest]);
-        $allHosts = $hosts->concat([$testHost]);
-        $allUsers = $allGuests->merge($allHosts);
+        $allCustomers = $customers->concat([$testCustomer]);
+        $allVendors = $vendors->concat([$testVendor]);
+        $allUsers = $allCustomers->merge($allVendors);
 
-        // === PHASE 2: Create Properties (Only hosts own properties) ===
-        $this->command->info('🏠 Creating host properties...');
+        // === PHASE 2: Create ShopHandlers (Only vendors own shops) ===
+        $this->command->info('🏪 Creating vendor shops...');
 
-        $properties = collect();
-        $allHosts->each(function ($host) use (&$properties) {
-            $property = Property::factory()->create(['host_id' => $host->id]);
-            $properties = $properties->concat([$property]);
+        $shops = collect();
+        $allVendors->each(function ($vendor) use (&$shops) {
+            $shop = Shop::factory()->create(['owner_id' => $vendor->id]);
+            $shops = $shops->concat([$shop]);
         });
 
-        // === PHASE 3: Create Listings (1-3 listings per property) ===
-        $this->command->info('📋 Creating property listings...');
+        // === PHASE 3: Create Products (3-8 products per shop) ===
+        $this->command->info('📦 Creating shop products...');
 
-        $allListings = collect();
-        $properties->each(function ($property) use (&$allListings) {
-            $listingCount = fake()->numberBetween(1, 3);
-            $listings = Listing::factory()->count($listingCount)->create([
-                'property_id' => $property->id
+        $allProducts = collect();
+        $shops->each(function ($shop) use (&$allProducts) {
+            $productCount = fake()->numberBetween(3, 8);
+            $products = Product::factory()->count($productCount)->create([
+                'shop_id' => $shop->id
             ]);
-            $allListings = $allListings->merge($listings);
+            $allProducts = $allProducts->merge($products);
         });
 
-        // === PHASE 4: Create Social Content (Posts) ===
+        // === PHASE 4: Create Social Content (PostHandlers) ===
         $this->command->info('📝 Creating social posts...');
 
-        // Hosts create more posts (promoting their properties)
-        $hostPosts = collect();
-        $allHosts->each(function ($host) use (&$hostPosts) {
+        // Vendors create more posts (promoting their products)
+        $vendorPosts = collect();
+        $allVendors->each(function ($vendor) use (&$vendorPosts) {
             $postCount = fake()->numberBetween(2, 5);
             $posts = Post::factory()->count($postCount)->create([
-                'user_id' => $host->id
+                'user_id' => $vendor->id
             ]);
-            $hostPosts = $hostPosts->merge($posts);
+            $vendorPosts = $vendorPosts->merge($posts);
         });
 
-        // Guests create fewer posts
-        $guestPosts = collect();
-        $allGuests->take(10)->each(function ($guest) use (&$guestPosts) {
+        // Customers create fewer posts
+        $customerPosts = collect();
+        $allCustomers->take(10)->each(function ($customer) use (&$customerPosts) {
             $postCount = fake()->numberBetween(0, 2);
             if ($postCount > 0) {
                 $posts = Post::factory()->count($postCount)->create([
-                    'user_id' => $guest->id
+                    'user_id' => $customer->id
                 ]);
-                $guestPosts = $guestPosts->merge($posts);
+                $customerPosts = $customerPosts->merge($posts);
             }
         });
 
-        $allPosts = $hostPosts->merge($guestPosts);
+        $allPosts = $vendorPosts->merge($customerPosts);
 
-        // === PHASE 5: Create Bookings (Guests book properties) ===
-        $this->command->info('🏨 Creating guest bookings...');
+        // === PHASE 5: Create OrderHandlers (Customers buy from vendors) ===
+        $this->command->info('🛒 Creating customer orders...');
 
-        $allBookings = collect();
-        $allGuests->each(function ($guest) use ($properties, &$allBookings) {
-            $bookingCount = fake()->numberBetween(1, 4);
-            for ($i = 0; $i < $bookingCount; $i++) {
-                $property = $properties->random();
-                $booking = Booking::factory()->create([
-                    'guest_id' => $guest->id,
-                    'property_id' => $property->id,
+        $allOrders = collect();
+        $allCustomers->each(function ($customer) use ($shops, &$allOrders) {
+            $orderCount = fake()->numberBetween(1, 4);
+            for ($i = 0; $i < $orderCount; $i++) {
+                $shop = $shops->random();
+                $order = Order::factory()->create([
+                    'user_id' => $customer->id,
+                    'shop_id' => $shop->id,
                 ]);
-                $allBookings->push($booking);
+                $allOrders->push($order);
             }
         });
 
-        // === PHASE 6: Create Reviews (Guests review listings and properties) ===
-        $this->command->info('⭐ Creating listing and property reviews...');
+        // === PHASE 6: Create Reviews (Customers review products and shops) ===
+        $this->command->info('⭐ Creating product and shop reviews...');
 
-        $allGuests->each(function ($guest) use ($allListings, $properties) {
+        $allCustomers->each(function ($customer) use ($allProducts, $shops) {
             $reviewCount = fake()->numberBetween(0, 3);
             for ($i = 0; $i < $reviewCount; $i++) {
-                $reviewableType = fake()->randomElement([Listing::class, Property::class]);
-                $reviewable = $reviewableType === Listing::class
-                    ? $allListings->random()
-                    : $properties->random();
+                $reviewableType = fake()->randomElement([Product::class, Shop::class]);
+                $reviewable = $reviewableType === Product::class
+                    ? $allProducts->random()
+                    : $shops->random();
 
                 Review::factory()->create([
-                    'user_id' => $guest->id,
+                    'user_id' => $customer->id,
                     'reviewable_id' => $reviewable->id,
                     'reviewable_type' => $reviewableType,
                 ]);
@@ -131,14 +131,14 @@ class DatabaseSeeder extends Seeder
         // === PHASE 7: Create Social Interactions ===
         $this->command->info('💬 Creating social interactions...');
 
-        // Comments on posts and listings
-        $allUsers->each(function ($user) use ($allPosts, $allListings) {
+        // Comments on posts and products
+        $allUsers->each(function ($user) use ($allPosts, $allProducts) {
             $commentCount = fake()->numberBetween(0, 5);
             for ($i = 0; $i < $commentCount; $i++) {
-                $commentableType = fake()->randomElement([Post::class, Listing::class]);
+                $commentableType = fake()->randomElement([Post::class, Product::class]);
                 $commentable = $commentableType === Post::class
                     ? $allPosts->random()
-                    : $allListings->random();
+                    : $allProducts->random();
 
                 Comment::factory()->create([
                     'user_id' => $user->id,
@@ -175,8 +175,8 @@ class DatabaseSeeder extends Seeder
             }
         });
 
-        // Follow relationships (users follow other users and properties)
-        $allUsers->each(function ($user) use ($allUsers, $properties) {
+        // Follow relationships (users follow other users and shops)
+        $allUsers->each(function ($user) use ($allUsers, $shops) {
             $followCount = fake()->numberBetween(1, 8);
 
             // Follow other users
@@ -198,22 +198,22 @@ class DatabaseSeeder extends Seeder
                 }
             }
 
-            // Follow some properties (especially if user is a guest)
-            if ($user->role === 'guest') {
-                $propertiesToFollow = $properties->random(min(3, $properties->count()));
-                foreach ($propertiesToFollow as $propertyToFollow) {
+            // Follow some shops (especially if user is a customer)
+            if ($user->role === 'customer') {
+                $shopsToFollow = $shops->random(min(3, $shops->count()));
+                foreach ($shopsToFollow as $shopToFollow) {
                     // Avoid duplicate follows
                     $existingFollow = Follow::where([
                         'user_id' => $user->id,
-                        'followable_id' => $propertyToFollow->id,
-                        'followable_type' => Property::class,
+                        'followable_id' => $shopToFollow->id,
+                        'followable_type' => Shop::class,
                     ])->first();
 
                     if (!$existingFollow) {
                         Follow::factory()->create([
                             'user_id' => $user->id,
-                            'followable_id' => $propertyToFollow->id,
-                            'followable_type' => Property::class,
+                            'followable_id' => $shopToFollow->id,
+                            'followable_type' => Shop::class,
                         ]);
                     }
                 }
@@ -226,12 +226,12 @@ class DatabaseSeeder extends Seeder
             ['Entity', 'Count'],
             [
                 ['Users (Total)', User::count()],
-                ['- Guests', User::where('role', 'guest')->count()],
-                ['- Hosts', User::where('role', 'host')->count()],
-                ['Properties', Property::count()],
-                ['Listings', Listing::count()],
-                ['Posts', Post::count()],
-                ['Bookings', Booking::count()],
+                ['- Customers', User::where('role', 'customer')->count()],
+                ['- Vendors', User::where('role', 'vendor')->count()],
+                ['ShopHandlers', Shop::count()],
+                ['Products', Product::count()],
+                ['PostHandlers', Post::count()],
+                ['OrderHandlers', Order::count()],
                 ['Reviews', Review::count()],
                 ['Comments', Comment::count()],
                 ['Likes', Like::count()],

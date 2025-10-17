@@ -10,7 +10,6 @@ interface ImageCarouselPreviewProps {
 }
 
 const suggestedTags = ['#InstaDaily', '#PhotoDump', '#LifeInTiles', '#CapturedMoments', '#EverydayVibes'];
-const travelTags = ['#TravelDiary', '#StayExperience', '#Wanderlust', '#TravelMemories', '#PerfectStay'];
 
 const ImageCarouselPreview: React.FC<ImageCarouselPreviewProps> = ({ images, onRemoveImage, onAddHashtag }) => {
   if (images.length === 0) return null;
@@ -69,7 +68,7 @@ const ImageCarouselPreview: React.FC<ImageCarouselPreviewProps> = ({ images, onR
 
       {/* Hashtags - Responsive layout */}
       <div className="mt-2 sm:mt-3 flex flex-wrap gap-0.5 sm:gap-1">
-        {travelTags.slice(0, 3).map(tag => (
+        {suggestedTags.slice(0, 3).map(tag => (
           <Button
             key={tag}
             variant="outline"
@@ -83,7 +82,7 @@ const ImageCarouselPreview: React.FC<ImageCarouselPreviewProps> = ({ images, onR
         
         {/* Show remaining tags on larger screens */}
         <div className="hidden sm:contents">
-          {travelTags.slice(3).map(tag => (
+          {suggestedTags.slice(3).map(tag => (
             <Button
               key={tag}
               variant="outline"
@@ -97,14 +96,14 @@ const ImageCarouselPreview: React.FC<ImageCarouselPreviewProps> = ({ images, onR
         </div>
         
         {/* "More" indicator on small screens */}
-        {travelTags.length > 3 && (
+        {suggestedTags.length > 3 && (
           <Button
             variant="outline"
             size="sm"
             className="h-5 text-[9px] px-1 leading-tight border-muted sm:hidden"
             disabled
           >
-            +{travelTags.length - 3}
+            +{suggestedTags.length - 3}
           </Button>
         )}
       </div>

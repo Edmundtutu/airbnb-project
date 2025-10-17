@@ -8,14 +8,14 @@ export interface RegisterData {
   email: string;
   password: string;
   password_confirmation: string;
-  role?: 'guest' | 'host' | 'admin';
+  role?: 'guest' | 'host' | 'customer' | 'vendor'; // Support both new and legacy roles
 }
 
 export interface AuthUser {
   id: string;
   email: string;
   name: string;
-  role: 'guest' | 'host' | 'admin';
+  role: 'guest' | 'host' | 'customer' | 'vendor'; // Support both new and legacy roles
   avatar?: string;
   phone?: string;
   location?: {

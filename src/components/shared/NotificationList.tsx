@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Bell, MessageCircle, Clock, User, Store, Package, TriangleAlert as AlertTriangle } from 'lucide-react';
+import { Bell, MessageCircle, Clock, User, Store, Package, AlertTriangle } from 'lucide-react';
 import { useChat } from '@/context/ChatContext';
 import { useAuth } from '@/context/AuthContext';
 import type { Conversation, Message } from '@/services/chatService';
@@ -62,7 +62,7 @@ export const NotificationList: React.FC<NotificationListProps> = ({
       unreadMessages.forEach((message) => {
         const senderName = message.sender_type === 'user' 
           ? conversation.user?.name || 'Customer'
-          : conversation.property?.name || 'Property';
+          : conversation.shop?.name || 'Shop';
 
         notifications.push({
           id: `msg-${message.id}`,
@@ -112,8 +112,8 @@ export const NotificationList: React.FC<NotificationListProps> = ({
     switch (notification.type) {
       case 'message':
         return <MessageCircle className="h-4 w-4" />;
-      case 'booking_update':
-        return <Calendar className="h-4 w-4" />;
+      case 'order_update':
+        return <Package className="h-4 w-4" />;
       default:
         return <Bell className="h-4 w-4" />;
     }
@@ -133,7 +133,7 @@ export const NotificationList: React.FC<NotificationListProps> = ({
             )}
           </DialogTitle>
           <DialogDescription>
-            Stay updated with your latest messages and booking updates
+            Stay updated with your latest messages and order updates
           </DialogDescription>
         </DialogHeader>
 
@@ -193,7 +193,7 @@ export const NotificationList: React.FC<NotificationListProps> = ({
                       </div>
                       {notification.conversation && (
                         <div className="text-xs text-muted-foreground mt-1">
-                          Booking #{notification.conversation.booking_id}
+                          Order #{notification.conversation.order_id}
                         </div>
                       )}
                     </div>

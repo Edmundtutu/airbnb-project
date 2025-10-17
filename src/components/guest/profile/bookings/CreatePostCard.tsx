@@ -53,9 +53,21 @@ const CreatePostCard: React.FC<CreatePostCardProps> = ({ imageCapture: sharedIma
               type="file"
               accept="image/*"
               multiple
-              onChange={imageCapture.handleFileUpload}
               className="hidden"
-              disabled={imageCapture.capturedImages.length >= 4}
+              onChange={(e) => {
+                const files = Array.from(e.target.files || []);
+                files.forEach(file => {
+                  const reader = new FileReader();
+                  reader.onload = (event) => {
+                    const result = event.target?.result as string;
+                    if (result) {
+                      imageCapture.addImage(result);
+                    }
+                  };
+                  reader.readAsDataURL(file);
+                });
+                e.target.value = '';
+              }}
             />
           </>
         )}

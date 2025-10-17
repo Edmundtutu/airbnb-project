@@ -1,42 +1,39 @@
-import React, { lazy, Suspense } from 'react';
+import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 
 // Layouts
 import AuthLayout from '@/layouts/AuthLayout';
 import MainLayout from '@/layouts/MainLayout';
-import HostLayout from '@/layouts/HostLayout';
-
-// Lazy-loaded Right Panels
-const FeedsPanel = lazy(() => import('@/layouts/FeedsPanel'));
+import VendorLayout from '@/layouts/VendorLayout';
 
 // Auth Pages
 import Login from '@/pages/auth/Login';
 import Register from '@/pages/auth/Register';
 
 // Guest (renter) Pages
-import Feed from '@/pages/guest/Feed';
+import Home from '@/pages/guest/Home';
 import Discover from '@/pages/guest/Discover';
-import Listing from '@/pages/guest/Listing';
-import PropertyMapPage from '@/pages/guest/PropertyMapPage';
-import Bookings from '@/pages/guest/Bookings';
+import Product from '@/pages/guest/Product';
+import ShopMapPage from '@/pages/guest/ShopMapPage';
+import Cart from '@/pages/guest/Cart';
 import Profile from '@/pages/guest/Profile';
 import Favorites from '@/pages/guest/Favorites';
-import PropertyDetails from '@/pages/properties/[propertyId]';
+import ShopDetails from '@/pages/properties/[shopId]';
 
 
 // Host Pages
-import HostDashboard from '@/pages/host/Dashboard';
-import HostListings from '@/pages/host/Listings';
-import HostBookings from '@/pages/host/Bookings';
-import HostAnalytics from '@/pages/host/Analytics';
-import HostProfile from '@/pages/host/Profile';
+import VendorDashboard from '@/pages/host/Dashboard';
+import VendorInventory from '@/pages/host/Inventory';
+import VendorOrders from '@/pages/host/Orders';
+import VendorAnalytics from '@/pages/host/Analytics';
+import VendorProfile from '@/pages/host/Profile';
 
 // Route Guards
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRole?: ('guest' | 'host' | 'admin')[];
-  layout: 'main' | 'host';
+  requiredRole?: string[];
+  layout: 'main' | 'vendor';
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
@@ -62,7 +59,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/" replace />;
   }
 
-  const Layout = layout === 'host' ? HostLayout : MainLayout;
+  const Layout = layout === 'vendor' ? VendorLayout : MainLayout;
   return <Layout>{children}</Layout>;
 };
 
@@ -102,76 +99,72 @@ const AppRoutes: React.FC = () => {
       {/* Public Routes - Allow guests */}
       <Route path="/" element={
         <MainLayout>
+          <Home />
+        </MainLayout>
+      } />
+      <Route path="/discover" element={
+        <MainLayout>
           <Discover />
         </MainLayout>
       } />
-      <Route path="/feed" element={
-        <MainLayout rightPanel={
-          <Suspense fallback={<div className="animate-pulse h-32 bg-muted rounded-lg" />}>
-            <FeedsPanel />
-          </Suspense>
-        }>
-          <Feed />
-        </MainLayout>
-      } />
-      <Route path="/listing/:id" element={
+      <Route path="/product/:id" element={
         <MainLayout>
-          <Listing />
+          <Product />
         </MainLayout>
       } />
       <Route path="/map" element={
         <MainLayout>
-          <PropertyMapPage />
+          <ShopMapPage   />
         </MainLayout>
       } />
       
-      {/* Protected Guest Routes */}
-      <Route path="/bookings" element={
-        <ProtectedRoute requiredRole={['guest']} layout="main">
-          <Bookings />
+      {/* Protected Customer Routes */}
+      <Route path="/cart" element={
+        <ProtectedRoute requiredRole={['customer']} layout="main">
+          <Cart />
         </ProtectedRoute>
       } />
       <Route path="/profile" element={
-        <ProtectedRoute requiredRole={['guest']} layout="main">
+        <ProtectedRoute requiredRole={['customer']} layout="main">
           <Profile />
         </ProtectedRoute>
       } />
       <Route path="/favorites" element={
-        <ProtectedRoute requiredRole={['guest']} layout="main">
+        <ProtectedRoute requiredRole={['customer']} layout="main">
           <Favorites />
         </ProtectedRoute>
       } />
 
 
       {/* Host Routes */}
-      <Route path="/host/dashboard" element={
-        <ProtectedRoute requiredRole={['host']} layout="host">
-          <HostDashboard />
+      <Route path="/vendor/dashboard" element={
+        <ProtectedRoute requiredRole={['vendor']} layout="vendor">
+          <VendorDashboard />
         </ProtectedRoute>
       } />
-      <Route path="/host/listings" element={
-        <ProtectedRoute requiredRole={['host']} layout="host">
-          <HostListings />
+      <Route path="/vendor/inventory" element={
+        <ProtectedRoute requiredRole={['vendor']} layout="vendor">
+          <VendorInventory />
         </ProtectedRoute>
       } />
-      <Route path="/host/bookings" element={
-        <ProtectedRoute requiredRole={['host']} layout="host">
-          <HostBookings />
+      <Route path="/vendor/orders" element={
+        <ProtectedRoute requiredRole={['vendor']} layout="vendor">
+          <VendorOrders />
         </ProtectedRoute>
       } />
-      <Route path="/host/analytics" element={
-        <ProtectedRoute requiredRole={['host']} layout="host">
-          <HostAnalytics />
+      <Route path="/vendor/analytics" element={
+        <ProtectedRoute requiredRole={['vendor']} layout="vendor">
+          <VendorAnalytics />
         </ProtectedRoute>
       } />
-      <Route path="/host/profile" element={
-        <ProtectedRoute requiredRole={['host']} layout="host">
-          <HostProfile />
+      <Route path="/vendor/profile" element={
+        <ProtectedRoute requiredRole={['vendor']} layout="vendor">
+          <VendorProfile />
         </ProtectedRoute>
       } />
 
-      {/* Property Details Route */}
-      <Route path="/properties/:propertyId" element={<PropertyDetails />} />
+      {/* Shop Details Route */}
+      <Route path="/shops/:shopId" element={<ShopDetails />} />
 
       {/* Catch all route */}
       <Route path="*" element={<Navigate to="/" replace />} />

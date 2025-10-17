@@ -1,76 +1,115 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { Listing } from '@/types';
 
-interface WishlistContextType {
-  wishlistedListings: Listing[];
-  toggleListingWishlist: (listing: Listing) => void;
+type WishlistContextValue = {
+  wishlistListings: Listing[];
   isListingWishlisted: (listingId: string) => boolean;
+  addListingToWishlist: (listing: Listing) => void;
+  removeListingFromWishlist: (listingId: string) => void;
+  toggleListingWishlist: (listing: Listing) => void;
   clearWishlist: () => void;
-  removeListingFromFavorites: (listingId: string) => void;
-}
+  
+  // Legacy methods for backward compatibility
+  favoriteProducts: Listing[];
+  isProductFavorited: (listingId: string) => boolean;
+  addProductToFavorites: (listing: Listing) => void;
+  removeProductFromFavorites: (listingId: string) => void;
+  toggleProductFavorite: (listing: Listing) => void;
+  clearFavorites: () => void;
+};
 
-const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
+const WishlistContext = createContext<WishlistContextValue | undefined>(undefined);
+
+const WISHLIST_STORAGE_KEY = 'wishlist_listings_v1';
 
 export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [wishlistedListings, setWishlistedListings] = useState<Listing[]>([]);
+  const [wishlistListings, setWishlistListings] = useState<Listing[]>([]);
 
-  // Load wishlisted listings from localStorage on mount
   useEffect(() => {
-    const saved = localStorage.getItem('wishlistedListings');
-    if (saved) {
-      try {
-        setWishlistedListings(JSON.parse(saved));
-      } catch (error) {
-        console.error('Error loading wishlisted listings:', error);
+    try {
+      const raw = localStorage.getItem(WISHLIST_STORAGE_KEY);
+      if (raw) {
+        const parsed: Listing[] = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          setWishlistListings(parsed);
+        }
       }
+    } catch (_) {
+      // ignore
     }
   }, []);
 
-  // Save to localStorage whenever wishlisted listings change
   useEffect(() => {
-    localStorage.setItem('wishlistedListings', JSON.stringify(wishlistedListings));
-  }, [wishlistedListings]);
+    try {
+      localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(wishlistListings));
+    } catch (_) {
+      // ignore
+    }
+  }, [wishlistListings]);
 
-  const toggleListingWishlist = (listing: Listing) => {
-    setWishlistedListings(prev => {
-      const exists = prev.find(item => item.id === listing.id);
-      if (exists) {
-        return prev.filter(item => item.id !== listing.id);
-      } else {
-        return [...prev, listing];
-      }
+  const isListingWishlisted = (listingId: string) => {
+    return wishlistListings.some(l => l.id === listingId);
+  };
+
+  const addListingToWishlist = (listing: Listing) => {
+    setWishlistListings(prev => {
+      if (prev.some(l => l.id === listing.id)) return prev;
+      return [listing, ...prev];
     });
   };
-  
-  const removeListingFromFavorites = (listingId: string) => {
-    setWishlistedListings(prev => prev.filter(item => item.id !== listingId));
+
+  const removeListingFromWishlist = (listingId: string) => {
+    setWishlistListings(prev => prev.filter(l => l.id !== listingId));
   };
 
-  const isListingWishlisted = (listingId: string): boolean => {
-    return wishlistedListings.some(listing => listing.id === listingId);
+  const toggleListingWishlist = (listing: Listing) => {
+    setWishlistListings(prev => {
+      const exists = prev.some(l => l.id === listing.id);
+      if (exists) return prev.filter(l => l.id !== listing.id);
+      return [listing, ...prev];
+    });
   };
 
-  const clearWishlist = () => {
-    setWishlistedListings([]);
-  };
+  const clearWishlist = () => setWishlistListings([]);
+
+  // Legacy methods for backward compatibility
+  const isProductFavorited = isListingWishlisted;
+  const addProductToFavorites = addListingToWishlist;
+  const removeProductFromFavorites = removeListingFromWishlist;
+  const toggleProductFavorite = toggleListingWishlist;
+  const clearFavorites = clearWishlist;
+
+  const value = useMemo<WishlistContextValue>(() => ({
+    wishlistListings,
+    isListingWishlisted,
+    addListingToWishlist,
+    removeListingFromWishlist,
+    toggleListingWishlist,
+    clearWishlist,
+    // Legacy properties for backward compatibility
+    favoriteProducts: wishlistListings,
+    isProductFavorited,
+    addProductToFavorites,
+    removeProductFromFavorites,
+    toggleProductFavorite,
+    clearFavorites,
+  }), [wishlistListings]);
 
   return (
-    <WishlistContext.Provider value={{
-      wishlistedListings,
-      toggleListingWishlist,
-      isListingWishlisted,
-      removeListingFromFavorites,
-      clearWishlist,
-    }}>
+    <WishlistContext.Provider value={value}>
       {children}
     </WishlistContext.Provider>
   );
 };
 
-export const useWishlist = () => {
-  const context = useContext(WishlistContext);
-  if (context === undefined) {
-    throw new Error('useWishlist must be used within a WishlistProvider');
-  }
-  return context;
+export const useWishlist = (): WishlistContextValue => {
+  const ctx = useContext(WishlistContext);
+  if (!ctx) throw new Error('useWishlist must be used within WishlistProvider');
+  return ctx;
 };
+
+// Legacy exports for backward compatibility
+export const FavoritesProvider = WishlistProvider;
+export const useFavorites = useWishlist;
+
+

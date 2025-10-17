@@ -13,9 +13,9 @@ export default defineConfig(({ mode }) => ({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
-        name: 'Buzz',
-        short_name: 'Buzz',
-        description: 'Find your perfect stay',
+        name: 'Foody',
+        short_name: 'Foody',
+        description: 'Social commerce',
         theme_color: '#00000000',
         icons: [
           {

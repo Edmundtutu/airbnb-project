@@ -3,7 +3,19 @@ import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Chrome as Home, Search, MapPin, Calendar, User, Heart, Building, ChartBar as BarChart3, LogOut, Settings, Rss } from 'lucide-react';
+import { 
+  Home, 
+  Search, 
+  MapPin, 
+  ShoppingCart, 
+  User,
+  Heart,
+  Store,
+  Package,
+  BarChart3,
+  LogOut,
+  Settings
+} from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 interface NavItem {
@@ -19,24 +31,24 @@ const DesktopSidebar: React.FC = () => {
 
   if (!user) return null;
 
-  const guestNavItems: NavItem[] = [
-    { name: 'Discover', href: '/', icon: Home },
-    { name: 'Feed', href: '/feed', icon: Rss },
+  const customerNavItems: NavItem[] = [
+    { name: 'Home', href: '/', icon: Home },
+    { name: 'Discover', href: '/discover', icon: Search },
     { name: 'Map', href: '/map', icon: MapPin },
     { name: 'Favorites', href: '/favorites', icon: Heart },
-    { name: 'Bookings', href: '/bookings', icon: Calendar, badge: 0 },
+    { name: 'Cart', href: '/cart', icon: ShoppingCart, badge: 0 },
     { name: 'Profile', href: '/profile', icon: User },
   ];
 
-  const hostNavItems: NavItem[] = [
-    { name: 'Dashboard', href: '/host/dashboard', icon: BarChart3 },
-    { name: 'Listings', href: '/host/listings', icon: Home },
-    { name: 'Bookings', href: '/host/bookings', icon: Calendar },
-    { name: 'Property Profile', href: '/host/profile', icon: Building },
-    { name: 'Account', href: '/host/account', icon: User },
+  const vendorNavItems: NavItem[] = [
+    { name: 'Dashboard', href: '/vendor/dashboard', icon: BarChart3 },
+    { name: 'Inventory', href: '/vendor/Inventory', icon: Package },
+    { name: 'Orders', href: '/vendor/orders', icon: ShoppingCart },
+    { name: 'Shop Profile', href: '/vendor/profile', icon: Store },
+    { name: 'Account', href: '/vendor/account', icon: User },
   ];
 
-  const navItems = user.role === 'host' ? hostNavItems : guestNavItems;
+  const navItems = user.role === 'vendor' ? vendorNavItems : customerNavItems;
 
   const isActivePath = (path: string) => {
     if (path === '/') {
@@ -50,7 +62,7 @@ const DesktopSidebar: React.FC = () => {
       {/* Logo */}
       <div className="p-4 xl:p-6 border-b">
         <Link to="/" className="text-xl xl:text-2xl font-bold text-primary">
-          Buzz
+          Shopify
         </Link>
       </div>
 
@@ -65,8 +77,8 @@ const DesktopSidebar: React.FC = () => {
           <div className="flex-1 min-w-0">
             <p className="font-medium text-sm truncate">{user.name}</p>
             <p className="text-xs text-muted-foreground truncate">
-              {user.role === 'guest' ? 
-                (user.isInfluencer ? 'Influencer' : 'Guest') : 'Host'}
+              {user.role === 'customer' ? 
+                (user.isInfluencer ? 'Influencer' : 'Customer') : 'Vendor'}
             </p>
           </div>
         </div>

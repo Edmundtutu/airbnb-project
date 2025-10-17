@@ -12,39 +12,39 @@ interface QuickChatAction {
 
 interface QuickChatActionsProps {
   onActionSelect: (action: QuickChatAction) => void;
-  bookingStatus?: string;
-  userRole?: 'guest' | 'host';
+  orderStatus?: string;
+  userRole?: 'customer' | 'vendor';
 }
 
 export const QuickChatActions: React.FC<QuickChatActionsProps> = ({
   onActionSelect,
-  bookingStatus = 'pending',
-  userRole = 'guest'
+  orderStatus = 'pending',
+  userRole = 'customer'
 }) => {
   const getQuickActions = (): QuickChatAction[] => {
-    if (userRole === 'guest') {
+    if (userRole === 'customer') {
       return [
         {
           id: 'status',
-          text: 'What\'s the status of my booking?',
-          icon: <Calendar className="h-3 w-3" />,
+          text: 'What\'s the status of my order?',
+          icon: <Package className="h-3 w-3" />,
           type: 'question'
         },
         {
-          id: 'checkin',
-          text: 'What time can I check in?',
+          id: 'delivery',
+          text: 'When will it be delivered?',
           icon: <Clock className="h-3 w-3" />,
           type: 'question'
         },
         {
           id: 'modify',
-          text: 'Can I modify my booking?',
+          text: 'Can I modify my order?',
           icon: <MessageCircle className="h-3 w-3" />,
           type: 'question'
         },
         {
           id: 'issue',
-          text: 'I have an issue with my booking',
+          text: 'I have an issue with my order',
           icon: <MessageCircle className="h-3 w-3" />,
           type: 'issue'
         }
@@ -53,25 +53,25 @@ export const QuickChatActions: React.FC<QuickChatActionsProps> = ({
       return [
         {
           id: 'confirm',
-          text: 'Booking confirmed and property is ready',
-          icon: <Calendar className="h-3 w-3" />,
+          text: 'Order confirmed and being prepared',
+          icon: <Package className="h-3 w-3" />,
           type: 'update'
         },
         {
           id: 'ready',
-          text: 'Property is ready for check-in',
-          icon: <Calendar className="h-3 w-3" />,
+          text: 'Order is ready for pickup/delivery',
+          icon: <Package className="h-3 w-3" />,
           type: 'update'
         },
         {
           id: 'delay',
-          text: 'Check-in may be delayed',
+          text: 'There will be a slight delay',
           icon: <Clock className="h-3 w-3" />,
           type: 'update'
         },
         {
           id: 'question',
-          text: 'I have a question about your booking',
+          text: 'I have a question about your order',
           icon: <MessageCircle className="h-3 w-3" />,
           type: 'question'
         }

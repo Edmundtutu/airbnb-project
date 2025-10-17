@@ -1,28 +1,28 @@
 <?php
 
 use App\Models\User;
-use App\Models\Property;
-use App\Models\Listing;
+use App\Models\Shop;
+use App\Models\Product;
 use App\Models\Review;
 
 beforeEach(function () {
     $this->seed();
-    $this->host = User::factory()->host()->create();
-    $this->guest = User::factory()->guest()->create();
-    $this->property = Property::factory()->create(['host_id' => $this->host->id]);
-    $this->listing = Listing::factory()->create(['property_id' => $this->property->id]);
+    $this->vendor = User::factory()->vendor()->create();
+    $this->customer = User::factory()->customer()->create();
+    $this->shop = Shop::factory()->create(['owner_id' => $this->vendor->id]);
+    $this->product = Product::factory()->create(['shop_id' => $this->shop->id]);
 });
 
 describe('Review API', function () {
-    it('allows guests to review listings', function () {
+    it('allows customers to review products', function () {
         $reviewData = [
-            'reviewable_id' => $this->listing->id,
-            'reviewable_type' => 'listing',
+            'reviewable_id' => $this->product->id,
+            'reviewable_type' => 'product',
             'rating' => 5,
-            'comment' => 'Excellent listing! Highly recommended.',
+            'comment' => 'Excellent product! Highly recommended.',
         ];
 
-        $response = $this->actingAs($this->guest)
+        $response = $this->actingAs($this->customer)
             ->postJson('/api/v1/reviews', $reviewData);
 
         $response->assertStatus(201)
@@ -43,42 +43,42 @@ describe('Review API', function () {
             ]);
 
         $this->assertDatabaseHas('reviews', [
-            'user_id' => $this->guest->id,
-            'reviewable_id' => $this->listing->id,
-            'reviewable_type' => Listing::class,
+            'user_id' => $this->customer->id,
+            'reviewable_id' => $this->product->id,
+            'reviewable_type' => Product::class,
             'rating' => 5,
         ]);
     });
 
-    it('allows guests to review properties', function () {
+    it('allows customers to review shops', function () {
         $reviewData = [
-            'reviewable_id' => $this->property->id,
-            'reviewable_type' => 'property',
+            'reviewable_id' => $this->shop->id,
+            'reviewable_type' => 'shop',
             'rating' => 4,
-            'comment' => 'Great property with excellent service.',
+            'comment' => 'Great shop with good customer service.',
         ];
 
-        $response = $this->actingAs($this->guest)
+        $response = $this->actingAs($this->customer)
             ->postJson('/api/v1/reviews', $reviewData);
 
         $response->assertStatus(201);
 
         $this->assertDatabaseHas('reviews', [
-            'user_id' => $this->guest->id,
-            'reviewable_id' => $this->property->id,
-            'reviewable_type' => Property::class,
+            'user_id' => $this->customer->id,
+            'reviewable_id' => $this->shop->id,
+            'reviewable_type' => Shop::class,
             'rating' => 4,
         ]);
     });
 
-    it('lists reviews for a listing', function () {
+    it('lists reviews for a product', function () {
         Review::factory()->count(3)->create([
-            'reviewable_id' => $this->listing->id,
-            'reviewable_type' => Listing::class,
+            'reviewable_id' => $this->product->id,
+            'reviewable_type' => Product::class,
         ]);
 
-        $response = $this->actingAs($this->guest)
-            ->getJson("/api/v1/listings/{$this->listing->id}/reviews");
+        $response = $this->actingAs($this->customer)
+            ->getJson("/api/v1/products/{$this->product->id}/reviews");
 
         $response->assertStatus(200)
             ->assertJsonStructure([
@@ -98,14 +98,14 @@ describe('Review API', function () {
             ]);
     });
 
-    it('lists reviews for a property', function () {
+    it('lists reviews for a shop', function () {
         Review::factory()->count(3)->create([
-            'reviewable_id' => $this->property->id,
-            'reviewable_type' => Property::class,
+            'reviewable_id' => $this->shop->id,
+            'reviewable_type' => Shop::class,
         ]);
 
-        $response = $this->actingAs($this->guest)
-            ->getJson("/api/v1/properties/{$this->property->id}/reviews");
+        $response = $this->actingAs($this->customer)
+            ->getJson("/api/v1/shops/{$this->shop->id}/reviews");
 
         $response->assertStatus(200)
             ->assertJsonStructure([
@@ -125,12 +125,12 @@ describe('Review API', function () {
 
     it('shows a specific review', function () {
         $review = Review::factory()->create([
-            'user_id' => $this->guest->id,
-            'reviewable_id' => $this->listing->id,
-            'reviewable_type' => Listing::class,
+            'user_id' => $this->customer->id,
+            'reviewable_id' => $this->product->id,
+            'reviewable_type' => Product::class,
         ]);
 
-        $response = $this->actingAs($this->guest)
+        $response = $this->actingAs($this->customer)
             ->getJson("/api/v1/reviews/{$review->id}");
 
         $response->assertStatus(200)
@@ -153,9 +153,9 @@ describe('Review API', function () {
 
     it('allows users to update their own reviews', function () {
         $review = Review::factory()->create([
-            'user_id' => $this->guest->id,
-            'reviewable_id' => $this->listing->id,
-            'reviewable_type' => Listing::class,
+            'user_id' => $this->customer->id,
+            'reviewable_id' => $this->product->id,
+            'reviewable_type' => Product::class,
         ]);
 
         $updateData = [
@@ -163,7 +163,7 @@ describe('Review API', function () {
             'comment' => 'Updated review comment',
         ];
 
-        $response = $this->actingAs($this->guest)
+        $response = $this->actingAs($this->customer)
             ->putJson("/api/v1/reviews/{$review->id}", $updateData);
 
         $response->assertStatus(200)
@@ -183,8 +183,8 @@ describe('Review API', function () {
         $otherCustomer = User::factory()->customer()->create();
         $review = Review::factory()->create([
             'user_id' => $otherCustomer->id,
-            'reviewable_id' => $this->listing->id,
-            'reviewable_type' => Listing::class,
+            'reviewable_id' => $this->product->id,
+            'reviewable_type' => Product::class,
         ]);
 
         $updateData = [
@@ -192,7 +192,7 @@ describe('Review API', function () {
             'comment' => 'Hacked review',
         ];
 
-        $response = $this->actingAs($this->guest)
+        $response = $this->actingAs($this->customer)
             ->putJson("/api/v1/reviews/{$review->id}", $updateData);
 
         $response->assertStatus(403);
@@ -200,12 +200,12 @@ describe('Review API', function () {
 
     it('allows users to delete their own reviews', function () {
         $review = Review::factory()->create([
-            'user_id' => $this->guest->id,
-            'reviewable_id' => $this->listing->id,
-            'reviewable_type' => Listing::class,
+            'user_id' => $this->customer->id,
+            'reviewable_id' => $this->product->id,
+            'reviewable_type' => Product::class,
         ]);
 
-        $response = $this->actingAs($this->guest)
+        $response = $this->actingAs($this->customer)
             ->deleteJson("/api/v1/reviews/{$review->id}");
 
         $response->assertStatus(204);
@@ -219,11 +219,11 @@ describe('Review API', function () {
         $otherCustomer = User::factory()->customer()->create();
         $review = Review::factory()->create([
             'user_id' => $otherCustomer->id,
-            'reviewable_id' => $this->listing->id,
-            'reviewable_type' => Listing::class,
+            'reviewable_id' => $this->product->id,
+            'reviewable_type' => Product::class,
         ]);
 
-        $response = $this->actingAs($this->guest)
+        $response = $this->actingAs($this->customer)
             ->deleteJson("/api/v1/reviews/{$review->id}");
 
         $response->assertStatus(403);
@@ -231,19 +231,19 @@ describe('Review API', function () {
 
     it('prevents duplicate reviews from same user on same item', function () {
         Review::factory()->create([
-            'user_id' => $this->guest->id,
-            'reviewable_id' => $this->listing->id,
-            'reviewable_type' => Listing::class,
+            'user_id' => $this->customer->id,
+            'reviewable_id' => $this->product->id,
+            'reviewable_type' => Product::class,
         ]);
 
         $reviewData = [
-            'reviewable_id' => $this->listing->id,
-            'reviewable_type' => 'listing',
+            'reviewable_id' => $this->product->id,
+            'reviewable_type' => 'product',
             'rating' => 3,
             'comment' => 'Duplicate review attempt',
         ];
 
-        $response = $this->actingAs($this->guest)
+        $response = $this->actingAs($this->customer)
             ->postJson('/api/v1/reviews', $reviewData);
 
         $response->assertStatus(409)
@@ -273,7 +273,7 @@ describe('Review API', function () {
     });
 
     it('validates required fields when creating review', function () {
-        $response = $this->actingAs($this->guest)
+        $response = $this->actingAs($this->customer)
             ->postJson('/api/v1/reviews', []);
 
         $response->assertStatus(422)
@@ -282,12 +282,12 @@ describe('Review API', function () {
 
     it('validates rating range', function () {
         $reviewData = [
-            'reviewable_id' => $this->listing->id,
-            'reviewable_type' => 'listing',
+            'reviewable_id' => $this->product->id,
+            'reviewable_type' => 'product',
             'rating' => 6, // Invalid rating > 5
         ];
 
-        $response = $this->actingAs($this->guest)
+        $response = $this->actingAs($this->customer)
             ->postJson('/api/v1/reviews', $reviewData);
 
         $response->assertStatus(422)
@@ -296,12 +296,12 @@ describe('Review API', function () {
 
     it('validates reviewable_type values', function () {
         $reviewData = [
-            'reviewable_id' => $this->listing->id,
+            'reviewable_id' => $this->product->id,
             'reviewable_type' => 'invalid_type',
             'rating' => 5,
         ];
 
-        $response = $this->actingAs($this->guest)
+        $response = $this->actingAs($this->customer)
             ->postJson('/api/v1/reviews', $reviewData);
 
         $response->assertStatus(422)
@@ -311,11 +311,11 @@ describe('Review API', function () {
     it('validates that reviewable_id exists', function () {
         $reviewData = [
             'reviewable_id' => '999999',
-            'reviewable_type' => 'listing',
+            'reviewable_type' => 'product',
             'rating' => 5,
         ];
 
-        $response = $this->actingAs($this->guest)
+        $response = $this->actingAs($this->customer)
             ->postJson('/api/v1/reviews', $reviewData);
 
         $response->assertStatus(422)
@@ -323,7 +323,7 @@ describe('Review API', function () {
     });
 
     it('returns 404 for non-existent review', function () {
-        $response = $this->actingAs($this->guest)
+        $response = $this->actingAs($this->customer)
             ->getJson('/api/v1/reviews/999999');
 
         $response->assertStatus(404);
@@ -331,19 +331,19 @@ describe('Review API', function () {
 
     it('filters reviews by rating', function () {
         Review::factory()->create([
-            'reviewable_id' => $this->listing->id,
-            'reviewable_type' => Listing::class,
+            'reviewable_id' => $this->product->id,
+            'reviewable_type' => Product::class,
             'rating' => 5,
         ]);
 
         Review::factory()->create([
-            'reviewable_id' => $this->listing->id,
-            'reviewable_type' => Listing::class,
+            'reviewable_id' => $this->product->id,
+            'reviewable_type' => Product::class,
             'rating' => 3,
         ]);
 
-        $response = $this->actingAs($this->guest)
-            ->getJson("/api/v1/listings/{$this->listing->id}/reviews?rating=5");
+        $response = $this->actingAs($this->customer)
+            ->getJson("/api/v1/products/{$this->product->id}/reviews?rating=5");
 
         $response->assertStatus(200);
         
@@ -355,25 +355,25 @@ describe('Review API', function () {
 
     it('sorts reviews by rating', function () {
         Review::factory()->create([
-            'reviewable_id' => $this->listing->id,
-            'reviewable_type' => Listing::class,
+            'reviewable_id' => $this->product->id,
+            'reviewable_type' => Product::class,
             'rating' => 2,
         ]);
 
         Review::factory()->create([
-            'reviewable_id' => $this->listing->id,
-            'reviewable_type' => Listing::class,
+            'reviewable_id' => $this->product->id,
+            'reviewable_type' => Product::class,
             'rating' => 5,
         ]);
 
         Review::factory()->create([
-            'reviewable_id' => $this->listing->id,
-            'reviewable_type' => Listing::class,
+            'reviewable_id' => $this->product->id,
+            'reviewable_type' => Product::class,
             'rating' => 3,
         ]);
 
-        $response = $this->actingAs($this->guest)
-            ->getJson("/api/v1/listings/{$this->listing->id}/reviews?sort=rating&order=desc");
+        $response = $this->actingAs($this->customer)
+            ->getJson("/api/v1/products/{$this->product->id}/reviews?sort=rating&order=desc");
 
         $response->assertStatus(200);
         
@@ -385,12 +385,12 @@ describe('Review API', function () {
 
     it('paginates reviews list', function () {
         Review::factory()->count(25)->create([
-            'reviewable_id' => $this->listing->id,
-            'reviewable_type' => Listing::class,
+            'reviewable_id' => $this->product->id,
+            'reviewable_type' => Product::class,
         ]);
 
-        $response = $this->actingAs($this->guest)
-            ->getJson("/api/v1/listings/{$this->listing->id}/reviews");
+        $response = $this->actingAs($this->customer)
+            ->getJson("/api/v1/products/{$this->product->id}/reviews");
 
         $response->assertStatus(200);
         

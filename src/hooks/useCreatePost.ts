@@ -15,9 +15,8 @@ export interface UseCreatePostResult {
 }
 
 export interface UseCreatePostOptions {
-  propertyId?: string;
-  listingId?: string;
-  bookingId?: string;
+  shopId?: string;
+  productId?: string;
   onSuccess?: () => void;
 }
 
@@ -40,9 +39,8 @@ export const useCreatePost = (
       postService.createPost({ 
         content: data.content, 
         images: data.images,
-        propertyId: context.propertyId,
-        listingId: context.listingId,
-        bookingId: context.bookingId,
+        shopId: context.shopId,
+        productId: context.productId,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });

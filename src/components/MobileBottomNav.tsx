@@ -1,8 +1,18 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Chrome as Home, Search, MapPin, Calendar, User, Building, ChartBar as BarChart3, MessageCircle, Rss } from 'lucide-react';
+import { 
+  Home, 
+  Search, 
+  MapPin, 
+  ShoppingCart, 
+  User,
+  Store,
+  Package,
+  BarChart3,
+  MessageCircle
+} from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { useBooking } from '@/context/BookingContext';
+import { useCart } from '@/context/BookingContext';
 import { useChat } from '@/context/ChatContext';
 import { Badge } from '@/components/ui/badge';
 import { ConversationList } from '@/components/shared/ConversationList';
@@ -20,7 +30,7 @@ interface NavItem {
 
 const MobileBottomNav: React.FC = () => {
   const { user } = useAuth();
-  const { getItemCount } = useBooking();
+  const { getItemCount } = useCart();
   const location = useLocation();
   const [conversationListOpen, setConversationListOpen] = useState(false);
   const [chatDialogOpen, setChatDialogOpen] = useState(false);
@@ -28,7 +38,7 @@ const MobileBottomNav: React.FC = () => {
 
   if (!user) return null;
 
-  const bookingItemCount = getItemCount();
+  const cartItemCount = getItemCount();
 
   // Safely get chat context with fallback
   let conversations: Conversation[] = [];
@@ -57,23 +67,23 @@ const MobileBottomNav: React.FC = () => {
     setSelectedConversation(null);
   };
 
-  const guestNavItems: NavItem[] = [
-    { name: 'Feed', href: '/feed', icon: Rss },
+  const customerNavItems: NavItem[] = [
+    { name: 'Home', href: '/', icon: Home },
+    { name: 'Discover', href: '/discover', icon: Search },
     { name: 'Map', href: '/map', icon: MapPin },
-    { name: 'Discover', href: '/', icon: Home },
     { name: 'Chat', icon: MessageCircle, badge: totalUnreadMessages, onClick: () => setConversationListOpen(true) },
     { name: 'Profile', href: '/profile', icon: User },
   ];
 
-  const hostNavItems: NavItem[] = [
-    { name: 'Dashboard', href: '/host/dashboard', icon: BarChart3 },
-    { name: 'Listings', href: '/host/listings', icon: Home },
-    { name: 'Bookings', href: '/host/bookings', icon: Calendar },
+  const vendorNavItems: NavItem[] = [
+    { name: 'Dashboard', href: '/vendor/dashboard', icon: BarChart3 },
+    { name: 'Inventory', href: '/vendor/Inventory', icon: Package },
+    { name: 'Orders', href: '/vendor/orders', icon: ShoppingCart },
     { name: 'Chat', icon: MessageCircle, badge: totalUnreadMessages, onClick: () => setConversationListOpen(true) },
-    { name: 'Profile', href: '/host/profile', icon: Building },
+    { name: 'Profile', href: '/vendor/profile', icon: Store },
   ];
 
-  const navItems = user.role === 'host' ? hostNavItems : guestNavItems;
+  const navItems = user.role === 'vendor' ? vendorNavItems : customerNavItems;
 
   const isActivePath = (path: string) => {
     if (path === '/') {
@@ -155,7 +165,7 @@ const MobileBottomNav: React.FC = () => {
       {selectedConversation && chatDialogOpen && (
         <ErrorBoundary>
           <ChatDialog
-            booking={selectedConversation.booking}
+            order={selectedConversation.order}
             isOpen={chatDialogOpen}
             onClose={handleChatDialogClose}
           />

@@ -31,7 +31,7 @@ export const ChatManager: React.FC = () => {
     isLoading = false,
     activeConversation = null,
     setActiveConversation = () => {},
-    ensureConversationForBooking = async () => null,
+    ensureConversationForOrder = async () => null,
   } = chatContext;
 
   // In mobile mode, only show one chat at a time
@@ -39,8 +39,8 @@ export const ChatManager: React.FC = () => {
     ? Array.from(openChats.values()).slice(-1) // Only show the most recent
     : Array.from(openChats.values());
 
-  const handleSendMessage = async (bookingId: string, content: string) => {
-    const chat = openChats.get(bookingId);
+  const handleSendMessage = async (orderId: string, content: string) => {
+    const chat = openChats.get(orderId);
     if (!chat || !chat.conversation) return;
 
     try {
@@ -54,8 +54,8 @@ export const ChatManager: React.FC = () => {
     }
   };
 
-  const handleChatAction = async (bookingId: string, action: 'open' | 'close' | 'minimize' | 'maximize') => {
-    const chat = openChats.get(bookingId);
+  const handleChatAction = async (orderId: string, action: 'open' | 'close' | 'minimize' | 'maximize') => {
+    const chat = openChats.get(orderId);
     if (!chat) return;
 
     switch (action) {
@@ -66,17 +66,17 @@ export const ChatManager: React.FC = () => {
         }
         break;
       case 'close':
-        closeChat(bookingId);
+        closeChat(orderId);
         // If this was the active conversation, clear it
         if (activeConversation?.id === chat.conversation.id) {
           setActiveConversation(null);
         }
         break;
       case 'minimize':
-        minimizeChat(bookingId);
+        minimizeChat(orderId);
         break;
       case 'maximize':
-        maximizeChat(bookingId);
+        maximizeChat(orderId);
         // Set as active when maximizing
         if (activeConversation?.id !== chat.conversation.id) {
           setActiveConversation(chat.conversation);
@@ -91,8 +91,8 @@ export const ChatManager: React.FC = () => {
 
   return (
     <>
-      {chatsToRender.map(({ conversation, booking, isMinimized, position }) => {
-        const bookingId = String(booking.id);
+      {chatsToRender.map(({ conversation, order, isMinimized, position }) => {
+        const orderId = String(order.id);
         const isActive = activeConversation?.id === conversation.id;
         const chatMessages = isActive ? messages : [];
         const typingUsers = isActive ? getTypingUsers(conversation.id) : [];
@@ -100,18 +100,18 @@ export const ChatManager: React.FC = () => {
 
         return (
           <ResponsiveChatDialog
-            key={bookingId}
-            booking={booking}
+            key={orderId}
+            order={order}
             conversation={conversation}
             isOpen={true}
             isMinimized={isMinimized}
             mode={chatMode}
             position={position}
-            onClose={() => handleChatAction(bookingId, 'close')}
-            onMinimize={() => handleChatAction(bookingId, 'minimize')}
-            onMaximize={() => handleChatAction(bookingId, 'maximize')}
+            onClose={() => handleChatAction(orderId, 'close')}
+            onMinimize={() => handleChatAction(orderId, 'minimize')}
+            onMaximize={() => handleChatAction(orderId, 'maximize')}
             messages={chatMessages}
-            sendMessage={(content) => handleSendMessage(bookingId, content)}
+            sendMessage={(content) => handleSendMessage(orderId, content)}
             isLoading={isLoading}
             typingUsers={typingUsers}
             onlineUsers={onlineUsers}

@@ -21,7 +21,7 @@ interface ChatContextType extends ChatState {
   setActiveConversation: (conversation: Conversation | null) => void;
   loadConversations: () => Promise<void>;
   loadMessages: (conversationId: number) => Promise<void>;
-  ensureConversationForBooking: (bookingId: string) => Promise<Conversation>;
+  ensureConversationForOrder: (orderId: string) => Promise<Conversation>;
   
   // Messaging
   sendMessage: (payload: SendMessagePayload) => Promise<void>;
@@ -282,8 +282,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return;
     dispatch({ type: 'SET_LOADING', payload: true });
     try {
-      const isHost = user.role === 'host';
-      const conversations = isHost ? await apiGetPropertyConversations() : await apiGetUserConversations();
+      const isVendor = Array.isArray((user as any)?.shops) && (user as any).shops.length > 0;
+      const conversations = isVendor ? await apiGetShopConversations() : await apiGetUserConversations();
       const safeConversations = Array.isArray(conversations) ? conversations : [];
       dispatch({ type: 'SET_CONVERSATIONS', payload: safeConversations });
       dispatch({ type: 'SET_LOADING', payload: false });
@@ -294,13 +294,13 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [user]);
 
   // Ensure a conversation exists for an order and return it
-  const ensureConversationForBooking = useCallback(async (bookingId: string) => {
-    console.log('🔍 ensureConversationForBooking called with bookingId:', bookingId);
+  const ensureConversationForOrder = useCallback(async (orderId: string) => {
+    console.log('🔍 ensureConversationForOrder called with orderId:', orderId);
     console.log('🔧 apiGetConversation function:', typeof apiGetConversation);
     
     try {
       console.log('📡 Calling apiGetConversation...');
-      const resp = await apiGetConversation({ booking_id: bookingId });
+      const resp = await apiGetConversation({ order_id: orderId });
       console.log('💬 Conversation API response:', resp);
       return resp;
     } catch (error) {
@@ -500,7 +500,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setActiveConversation,
         loadConversations,
         loadMessages,
-        ensureConversationForBooking,
+        ensureConversationForOrder,
         sendMessage,
         addMessage,
         markAsRead,

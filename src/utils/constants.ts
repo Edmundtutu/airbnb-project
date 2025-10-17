@@ -1,23 +1,24 @@
 // App constants
-export const APP_NAME = 'Buzz';
+export const APP_NAME = 'Shopify PWA';
 export const API_BASE_URL = '/api';
 
 export const ROUTES = {
-  FEED: '/',
+  HOME: '/',
   LOGIN: '/login',
   REGISTER: '/register',
-  DISCOVER: '/discover',
-  LISTING: '/listing/:id',
-  PROPERTY: '/property/:id',
-  BOOKINGS: '/bookings',
+  EXPLORE: '/explore',
+  PRODUCT: '/product/:id',
+  SHOP: '/shop/:id',
+  CART: '/cart',
+  ORDERS: '/orders',
   PROFILE: '/profile',
-  HOST_DASHBOARD: '/host/dashboard',
+  VENDOR_DASHBOARD: '/vendor/dashboard',
 } as const;
 
 export const USER_ROLES = {
   GUEST: 'guest',
-  HOST: 'host',
-  ADMIN: 'admin',
+  CUSTOMER: 'customer',
+  VENDOR: 'vendor',
 } as const;
 
 export const INFLUENCER_THRESHOLD = 1000; // followers needed to be considered influencer

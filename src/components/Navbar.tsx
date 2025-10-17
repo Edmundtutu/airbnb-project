@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { 
   Search, 
-  Calendar, 
+  ShoppingCart, 
   User, 
   Heart, 
   Menu,
@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { User as UserType } from '@/types';
 import { useAuth } from '@/context/AuthContext';
-import { useBooking } from '@/context/BookingContext';
+import { useCart } from '@/context/BookingContext';
 import { useChat } from '@/context/ChatContext';
 import { ConversationList } from '@/components/shared/ConversationList';
 import { NotificationList } from '@/components/shared/NotificationList';
@@ -30,7 +30,7 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ user }) => {
   const { logout } = useAuth();
-  const { getItemCount } = useBooking();
+  const { getItemCount } = useCart();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -39,7 +39,7 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
   const [chatDialogOpen, setChatDialogOpen] = useState(false);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
 
-  const bookingItemCount = getItemCount();
+  const cartItemCount = getItemCount();
 
   // Safely get chat context with fallback
   let conversations: Conversation[] = [];
@@ -69,7 +69,7 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      window.location.href = `/?search=${encodeURIComponent(searchQuery)}`;
+      window.location.href = `/discover?search=${encodeURIComponent(searchQuery)}`;
     }
   };
 
@@ -84,12 +84,12 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
   };
 
   return (
-  <nav className="bg-gradient-to-br from-red-imperial via-red-cinnabar via-orange-giants to-orange-safety backdrop-blur-sm">
+    <nav className="bg-card/95 backdrop-blur-sm border-b sticky top-0 z-40">
       <div className="mx-auto px-3 sm:px-4 lg:px-6">
         <div className="flex items-center justify-between h-14 lg:h-16">
           {/* Logo - Always visible */}
           <Link to="/" className="text-lg sm:text-xl font-bold text-primary flex-shrink-0">
-            Buzz
+            Foody
           </Link>
 
           {/* Search Bar - Desktop and tablet */}
@@ -98,7 +98,7 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search stays, properties..."
+                  placeholder="Search products, shops..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10 bg-muted/50 border-0 focus:bg-background h-9 lg:h-10"
@@ -138,7 +138,7 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
                 )}
               </Button>
 
-              {user.role === 'guest' && (
+              {user.role === 'customer' && (
                 <>
                   <Link to="/favorites">
                     <Button variant="ghost" size="icon">
@@ -146,13 +146,13 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
                     </Button>
                   </Link>
 
-                  <Link to="/bookings" className="relative">
+                  <Link to="/cart" className="relative">
                     <Button variant="ghost" size="icon">
-                      <Calendar className="h-5 w-5" />
+                      <ShoppingCart className="h-5 w-5" />
                     </Button>
-                    {bookingItemCount > 0 && (
+                    {cartItemCount > 0 && (
                       <Badge className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center text-xs p-0">
-                        {bookingItemCount > 99 ? '99+' : bookingItemCount}
+                        {cartItemCount > 99 ? '99+' : cartItemCount}
                       </Badge>
                     )}
                   </Link>
@@ -209,14 +209,14 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
                 )}
               </Button>
               
-              {user.role === 'guest' && (
-                <Link to="/bookings" className="relative">
+              {user.role === 'customer' && (
+                <Link to="/cart" className="relative">
                   <Button variant="ghost" size="icon" className="h-9 w-9">
-                    <Calendar className="h-4 w-4" />
+                    <ShoppingCart className="h-4 w-4" />
                   </Button>
-                  {bookingItemCount > 0 && (
+                  {cartItemCount > 0 && (
                     <Badge className="absolute -top-1 -right-1 h-3 w-3 flex items-center justify-center text-xs p-0">
-                      {bookingItemCount > 99 ? '99+' : bookingItemCount}
+                      {cartItemCount > 99 ? '99+' : cartItemCount}
                     </Badge>
                   )}
                 </Link>
@@ -240,7 +240,7 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search stays, properties..."
+                placeholder="Search products, shops..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 bg-muted/50 border-0 h-9"
@@ -298,7 +298,7 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
       {selectedConversation && chatDialogOpen && (
         <ErrorBoundary>
           <ChatDialog
-            booking={selectedConversation.booking}
+            order={selectedConversation.order}
             isOpen={chatDialogOpen}
             onClose={handleChatDialogClose}
           />

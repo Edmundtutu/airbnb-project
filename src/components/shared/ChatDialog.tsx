@@ -6,20 +6,20 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Send, Image, Mic, Paperclip, Circle, TriangleAlert as AlertTriangle, Package, Store, User } from 'lucide-react';
+import { Send, Image, Mic, Paperclip, Circle, AlertTriangle, Package, Store, User } from 'lucide-react';
 import { useChat } from '@/context/ChatContext';
 import { useAuth } from '@/context/AuthContext';
 import { ChatStatusIndicator } from './ChatStatusIndicator';
 import { QuickChatActions } from './QuickChatActions';
-import type { Booking } from '@/types/bookings';
+import type { Order } from '@/types/orders';
 
 interface ChatDialogProps {
-  booking: Booking;
+  order: Order;
   isOpen: boolean;
   onClose: () => void;
 }
 
-export const ChatDialog: React.FC<ChatDialogProps> = ({ booking, isOpen, onClose }) => {
+export const ChatDialog: React.FC<ChatDialogProps> = ({ order, isOpen, onClose }) => {
   const { user } = useAuth();
   
   // Safely get chat context with error handling
@@ -38,7 +38,7 @@ export const ChatDialog: React.FC<ChatDialogProps> = ({ booking, isOpen, onClose
     messages = [], 
     sendMessage = async () => {}, 
     setActiveConversation = () => {},
-    ensureConversationForBooking = async () => null,
+    ensureConversationForOrder = async () => null,
     isLoading = false,
     startTyping = async () => {},
     stopTyping = async () => {},
@@ -61,18 +61,18 @@ export const ChatDialog: React.FC<ChatDialogProps> = ({ booking, isOpen, onClose
   useEffect(() => {
     const init = async () => {
       console.log('🔄 ChatDialog initialization started');
-      console.log('📊 Dialog state:', { isOpen, bookingId: booking?.id });
+      console.log('📊 Dialog state:', { isOpen, orderId: order?.id });
       
-      if (!isOpen || !booking?.id) {
-        console.log('⏭️ Skipping initialization - dialog not open or no booking ID');
+      if (!isOpen || !order?.id) {
+        console.log('⏭️ Skipping initialization - dialog not open or no order ID');
         return;
       }
       
       try {
-        console.log('🔍 Ensuring conversation for booking:', booking.id);
-        console.log('🔧 ensureConversationForBooking function:', typeof ensureConversationForBooking);
+        console.log('🔍 Ensuring conversation for order:', order.id);
+        console.log('🔧 ensureConversationForOrder function:', typeof ensureConversationForOrder);
         
-        const conversation = await ensureConversationForBooking(String(booking.id));
+        const conversation = await ensureConversationForOrder(String(order.id));
         console.log('💬 Conversation result:', conversation);
         
         console.log('🎯 Setting active conversation');
@@ -83,7 +83,7 @@ export const ChatDialog: React.FC<ChatDialogProps> = ({ booking, isOpen, onClose
           console.log('🟢 Setting user presence to online for conversation:', conversation.id);
           updatePresence(conversation.id, 'online');
         } else {
-          console.log('⚠️ No conversation returned from ensureConversationForBooking');
+          console.log('⚠️ No conversation returned from ensureConversationForOrder');
         }
       } catch (e) {
         console.error('❌ Failed to init conversation:', e);
@@ -95,7 +95,7 @@ export const ChatDialog: React.FC<ChatDialogProps> = ({ booking, isOpen, onClose
       }
     };
     init();
-  }, [isOpen, booking?.id, ensureConversationForBooking, setActiveConversation, updatePresence]);
+  }, [isOpen, order?.id, ensureConversationForOrder, setActiveConversation, updatePresence]);
 
   // Set user as offline when closing chat
   useEffect(() => {
@@ -206,19 +206,19 @@ export const ChatDialog: React.FC<ChatDialogProps> = ({ booking, isOpen, onClose
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              <Badge variant="outline">Booking #{booking.id}</Badge>
+              <Package className="h-4 w-4" />
+              <Badge variant="outline">Order #{order.id}</Badge>
             </div>
             <div className="flex items-center gap-2">
-              {user?.role === 'guest' ? (
+              {user?.role === 'customer' ? (
                 <>
-                  <Home className="h-4 w-4" />
-                  <span>{booking.property?.name || 'Property'}</span>
+                  <Store className="h-4 w-4" />
+                  <span>{order.shop?.name || 'Shop'}</span>
                 </>
               ) : (
                 <>
                   <User className="h-4 w-4" />
-                  <span>{booking.guest?.name || 'Guest'}</span>
+                  <span>{order.user?.name || 'Customer'}</span>
                 </>
               )}
             </div>
@@ -229,7 +229,7 @@ export const ChatDialog: React.FC<ChatDialogProps> = ({ booking, isOpen, onClose
           </DialogTitle>
           <DialogDescription className="flex items-center justify-between">
             <span>
-              Communicate about your booking details and any questions you may have.
+              Communicate about your order details and any questions you may have.
             </span>
             {typingUsers.length > 0 && (
               <span className="text-blue-600 text-sm">
@@ -324,8 +324,8 @@ export const ChatDialog: React.FC<ChatDialogProps> = ({ booking, isOpen, onClose
           {!chatError && messages.length < 3 && (
             <QuickChatActions 
               onActionSelect={handleQuickAction}
-              bookingStatus={booking.status}
-              userRole={user?.role as 'guest' | 'host'}
+              orderStatus={order.status}
+              userRole={(user?.role === 'guest' ? 'customer' : user?.role) as 'customer' | 'vendor'}
             />
           )}
 

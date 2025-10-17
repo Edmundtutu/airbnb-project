@@ -7,7 +7,21 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, MapPin, Navigation, Crosshair, Filter, X, Phone, Star, Layers, Map as MapIcon, Users, Bed, Bath } from 'lucide-react';
+import { 
+  Search, 
+  MapPin, 
+  Navigation,
+  Crosshair,
+  Filter,
+  X,
+  Phone,
+  Star,
+  Layers,
+  MapIcon,
+  Users,
+  Bed,
+  Bath
+} from 'lucide-react';
 import { Property } from '@/types';
 import { useGeolocation } from '@/hooks/utils/useGeolocation';
 import { getPropertiesWithinRadius, formatDistance, reverseGeocode } from '@/utils/location';
@@ -185,7 +199,7 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
     return () => window.removeEventListener('resize', checkMobile);
   }, [requestLocation]);
 
-  // Show tooltip on property marker click
+  // Show tooltip on marker click
   const handlePropertyMarkerClick = (property: Property, event: any) => {
     setSelectedProperty(property);
     // Get marker position relative to map container
