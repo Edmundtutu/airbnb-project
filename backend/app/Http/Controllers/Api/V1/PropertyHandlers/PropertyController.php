@@ -77,7 +77,7 @@ class PropertyController extends Controller
             }
         }
 
-        $query->with(['reviews', 'host']); // Eager load reviews and host
+        $query->with('reviews'); // Eager load reviews for rating/total reviews
 
         return PropertyResource::collection($query->paginate());
     }
@@ -87,13 +87,10 @@ class PropertyController extends Controller
      */
     public function store(StorePropertyRequest $request)
     {
-        $this->authorize('create', Property::class);
-        
         $validated = $request->validated();
         $validated['host_id'] = Auth::id();
 
         $property = Property::create($validated);
-        $property->load('host');
 
         return new PropertyResource($property);
     }
@@ -103,8 +100,8 @@ class PropertyController extends Controller
      */
     public function show(Property $property)
     {
-        // Ensure reviews, host, and listings are loaded
-        $property->load(['reviews', 'host', 'listings']);
+        // Ensure reviews are loaded so rating/total_reviews are populated
+        $property->load('reviews');
         return new PropertyResource($property);
     }
 

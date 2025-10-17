@@ -1,33 +1,33 @@
-# Buzz - Short-Term Rental Platform
+# Project info
 
-## Feature Checklist: Short-Term Rental PWA (Airbnb-style)
+## Feature Checklist: Peer-to-Peer Rentals PWA
 
 ### Success Criteria & Current Status
 
 * [x] **PWA installable on mobile devices with offline capability**
 
   * Uses `vite-plugin-pwa` and `workbox-window` for manifest, offline support, and installability (see `vite.config.ts`).
-* [x] **Role-based authentication with smooth transitions between guest and host**
+* [x] **Role-based authentication with smooth transitions between user types**
 
-  * Role-based auth (`guest`, `host`) with protected routes and context (`AuthContext`, `authService`, `AppRoutes.tsx`).
+  * Role-based auth (`guest`, `host`, `admin`) with protected routes and context (`AuthContext`, `authService`, `AppRoutes.tsx`).
 * \[\~] **Real-time social feed with stay discovery**
 
-  * Feed includes property highlights, reviews, and experiences for discovery (`propertyService`, `Feed`, `Discover`, `Property`, `Profile`), but real-time (websocket) updates are not yet implemented.
+  * Feed includes property highlights, reviews, and experiences for discovery (`rentalService`, `Home`, `Discover`, `Property`, `Profile`), but real-time (websocket) updates are not yet implemented.
 * [x] **Interactive map showing nearby rentals and availability**
 
-  * `PropertyMap` uses `react-leaflet` and geolocation to show available properties and the user's location.
+  * `RentalMap` uses `react-leaflet` and geolocation to show available rentals and the user’s location.
 * \[\~] **Complete booking flow from request to confirmation and stay tracking**
 
   * Booking requests, confirmations, and stay tracking logic/services/routes exist, but some UI/API hooks are marked as TODO.
 * [x] **Host dashboard with listing management and analytics**
 
-  * Host dashboard includes property listings, booking management, analytics, and profile pages.
+  * Host dashboard includes rental listings, booking management, analytics, and profile pages.
 * [x] **Responsive design optimized for mobile-first usage**
 
   * Uses Tailwind CSS, mobile-first breakpoints, and responsive layouts throughout.
 * \[\~] **Integration-ready for Laravel Breeze backend**
 
-  * API layer (`api.ts`, `authService.ts`, `propertyService.ts`) is set up for `/api` endpoints, CSRF, and Laravel Sanctum, but Inertia.js integration is not yet implemented.
+  * API layer (`api.ts`, `authService.ts`, `rentalService.ts`) is set up for `/api` endpoints, CSRF, and Laravel Sanctum, but Inertia.js integration is not yet implemented.
 
 Legend: \[x] = Complete, \[\~] = Partial, \[ ] = Not started
 
@@ -35,7 +35,7 @@ Legend: \[x] = Complete, \[\~] = Partial, \[ ] = Not started
 
 ## How to Integrate with Laravel 12 + Inertia.js Backend
 
-This project is designed as a React PWA frontend for short-term rentals (Airbnb-style), ready to connect to a Laravel backend using Inertia.js for a seamless full-stack SPA experience.
+This project is designed as a React PWA frontend, ready to connect to a Laravel backend using Inertia.js for a seamless full-stack SPA experience in the **short-term rental context**.
 
 ### 1. **Set Up Laravel 12 Backend**
 
@@ -94,7 +94,7 @@ This project is designed as a React PWA frontend for short-term rentals (Airbnb-
 ## Notes
 
 * This project is frontend-only and expects a Laravel backend for full functionality.
-* The core idea is **short-term rentals**, where **guests discover and book stays**, and **hosts manage their properties and bookings**.
+* The core idea is **peer-to-peer rentals**, where **guests discover and book stays**, and **hosts manage their properties and bookings**.
 * For backend changes, always follow Laravel official documentation and upgrade guides.
 
 

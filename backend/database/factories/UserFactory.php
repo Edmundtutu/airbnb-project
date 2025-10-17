@@ -29,7 +29,7 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
-            'role' => fake()->randomElement(['guest', 'host']),
+            'role' => fake()->randomElement(['customer', 'vendor']),
             'phone' => fake()->phoneNumber(),
             'address' => fake()->address(),
             'lat' => fake()->latitude(-1.5, 1.5), // Kenya/East Africa region
@@ -49,40 +49,22 @@ class UserFactory extends Factory
     }
 
     /**
-     * Create a host user who will own properties.
-     */
-    public function host(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'role' => 'host',
-        ]);
-    }
-
-    /**
-     * Create a guest user who will make bookings.
-     */
-    public function guest(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'role' => 'guest',
-        ]);
-    }
-
-    /**
-     * Legacy method for backward compatibility.
-     * @deprecated Use host() instead
+     * Create a vendor user who will own shops.
      */
     public function vendor(): static
     {
-        return $this->host();
+        return $this->state(fn (array $attributes) => [
+            'role' => 'vendor',
+        ]);
     }
 
     /**
-     * Legacy method for backward compatibility.
-     * @deprecated Use guest() instead
+     * Create a customer user who will make purchases.
      */
     public function customer(): static
     {
-        return $this->guest();
+        return $this->state(fn (array $attributes) => [
+            'role' => 'customer',
+        ]);
     }
 }
