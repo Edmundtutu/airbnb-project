@@ -131,17 +131,16 @@ class BookingController extends Controller
      */
     public function confirmBooking(Booking $booking): JsonResponse
     {
-       if( ! $this->authorize('confirm', $booking)) {
-         return response()->json(['message' => 'Some error about authpolicy.'], 403);
-       }
-       $booking->update(['status' => 'processing']);
+        if (! $this->authorize('confirm', $booking)) {
+            return response()->json(['message' => 'Some error about authpolicy.'], 403);
+        }
+        $booking->update(['status' => 'processing']);
         return response()->json(['message' => 'Booking confirmed successfully.']);
-
     }
 
     /**
      * Reject booking When not available, cancel and revert Transaction
-    */
+     */
     public function rejectBooking(Booking $booking): JsonResponse
     {
         $this->authorize('confirm', $booking);

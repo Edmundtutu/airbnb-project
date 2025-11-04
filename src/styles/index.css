@@ -4,6 +4,7 @@
 
 @layer base {
   html {
+    /* Font is already set to Nunito Sans */
     font-family: "Nunito Sans", sans-serif;
     font-optical-sizing: auto;
     font-weight: 500;
@@ -82,9 +83,9 @@
     @apply text-sm sm:text-base;
   }
 
-  /* Card hover effects like Facebook */
+  /* Card hover effects updated to use the new secondary color for a border hint */
   .card-hover {
-    @apply transition-all duration-200 hover:shadow-md hover:border-primary/20;
+    @apply transition-all duration-200 hover:shadow-md hover:border-secondary/50;
   }
 }
 
@@ -93,54 +94,61 @@ All colors MUST be HSL.
 */
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222 84% 15%; /* Dark gray for better readability with Montserrat */
+    /* ----------------------------------------------------- */
+    /* ENERGETIC MODERN PALETTE (Light Mode) */
+    /* Background: #F7FFF7 (Very Light Mint) | Foreground: #556270 (Dark Slate Gray) */
+    /* Primary (Action): #FF6B6B (Bright Coral) | Secondary (Brand): #4ECDC4 (Vibrant Aqua) */
+    /* ----------------------------------------------------- */
+    
+    --background: 90 100% 98%;      /* #F7FFF7 */
+    --foreground: 214 13% 38%;      /* #556270 */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222 84% 15%;
+    --card: 90 100% 98%;
+    --card-foreground: 214 13% 38%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 84% 15%;
+    --popover: 90 100% 98%;
+    --popover-foreground: 214 13% 38%;
 
-    --primary: 357 85% 56%; /* Imperial red - EE2F39 */
-    --primary-foreground: 0 0% 100%;
+    --primary: 0 100% 70%;          /* #FF6B6B - Bright Coral */
+    --primary-foreground: 0 0% 100%; /* White */
 
-    --secondary: 8 88% 56%; /* Cinnabar red */
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 176 59% 55%;       /* #4ECDC4 - Vibrant Aqua */
+    --secondary-foreground: 0 0% 100%; /* White */
 
-    --muted: 222 84% 97%;
-    --muted-foreground: 222 84% 55%; /* Lighter gray for muted text */
+    --muted: 90 100% 95%;           /* Lighter background for subtle elements */
+    --muted-foreground: 214 13% 60%; /* Lighter gray text */
 
-    --accent: 222 84% 97%;
-    --accent-foreground: 222 84% 15%;
+    --accent: 176 59% 85%;          /* Very Light Aqua for subtle highlight */
+    --accent-foreground: 214 13% 38%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 222 84% 90%;
-    --input: 222 84% 90%;
-    --ring: 357 85% 56%;
+    --border: 214 13% 85%;          /* Light gray border */
+    --input: 214 13% 85%;           /* Input border */
+    --ring: 176 59% 55%;            /* Vibrant Aqua Focus Ring */
 
-    --radius: 0.5rem;
+    --radius: 1rem; /* Increased for a playful, modern aesthetic */
 
-    --sidebar-background: 222 84% 98%;
-    --sidebar-foreground: 222 84% 15%;
-    --sidebar-primary: 357 85% 56%;
+    --sidebar-background: 90 100% 95%;
+    --sidebar-foreground: 214 13% 38%;
+    --sidebar-primary: 0 100% 70%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 222 84% 95%;
-    --sidebar-accent-foreground: 222 84% 15%;
-    --sidebar-border: 222 84% 90%;
-    --sidebar-ring: 357 85% 56%;
+    --sidebar-accent: 90 100% 93%;
+    --sidebar-accent-foreground: 214 13% 38%;
+    --sidebar-border: 214 13% 85%;
+    --sidebar-ring: 176 59% 55%;
 
-    /* Text color variables for Montserrat */
-    --text-primary: 222 84% 15%;
-    --text-secondary: 222 84% 35%;
-    --text-tertiary: 222 84% 55%;
-    --text-muted: 222 84% 65%;
+    /* Text color variables updated to match the new foreground */
+    --text-primary: 214 13% 38%;
+    --text-secondary: 214 13% 50%;
+    --text-tertiary: 214 13% 65%;
+    --text-muted: 214 13% 75%;
     --text-inverse: 0 0% 100%;
   }
 
   .dark {
+    /* Dark mode variables remain largely untouched, only ensuring primary/secondary fallbacks are consistent */
     --background: 222 84% 5%;
     --foreground: 222 84% 98%;
 
@@ -150,10 +158,10 @@ All colors MUST be HSL.
     --popover: 222 84% 5%;
     --popover-foreground: 222 84% 98%;
 
-    --primary: 357 85% 56%;
+    --primary: 0 100% 70%; /* Updated to Coral */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 8 88% 56%;
+    --secondary: 176 59% 55%; /* Updated to Aqua */
     --secondary-foreground: 0 0% 100%;
 
     --muted: 222 84% 15%;
@@ -167,16 +175,16 @@ All colors MUST be HSL.
 
     --border: 222 84% 20%;
     --input: 222 84% 20%;
-    --ring: 357 85% 56%;
+    --ring: 176 59% 55%; /* Updated to Aqua */
 
     --sidebar-background: 222 84% 8%;
     --sidebar-foreground: 222 84% 98%;
-    --sidebar-primary: 357 85% 56%;
+    --sidebar-primary: 0 100% 70%; /* Updated to Coral */
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 222 84% 12%;
     --sidebar-accent-foreground: 222 84% 98%;
     --sidebar-border: 222 84% 15%;
-    --sidebar-ring: 357 85% 56%;
+    --sidebar-ring: 176 59% 55%; /* Updated to Aqua */
 
     /* Dark mode text colors */
     --text-primary: 222 84% 98%;
@@ -254,21 +262,8 @@ All colors MUST be HSL.
     color: hsl(var(--text-inverse));
   }
 
-  /* Red-dominant gradients */
-  .gradient-red-dominant {
-    background: linear-gradient(135deg, hsl(357, 85%, 56%), hsl(8, 88%, 56%), hsl(17, 93%, 55%));
-  }
-
-  .gradient-warm-red {
-    background: linear-gradient(135deg, #ee2f39, #f2482e, #f76022, #fb7917, #ff910c);
-  }
-
-  .text-gradient-red {
-    background: linear-gradient(135deg, hsl(357, 85%, 56%), hsl(8, 88%, 56%));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
+  /* Red-dominant gradients have been removed as they rely on old colors. 
+     If you need gradients, you should define new ones using Coral and Aqua. */
 
   /* Montserrat-specific font weights */
   .font-thin {
