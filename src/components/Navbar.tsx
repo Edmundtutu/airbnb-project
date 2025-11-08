@@ -89,7 +89,7 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
         <div className="flex items-center justify-between h-14 lg:h-16">
           {/* Logo - Always visible */}
           <Link to="/" className="text-lg sm:text-xl font-bold text-primary flex-shrink-0">
-            Buzz
+            CavaYo
           </Link>
 
           {/* Search Bar - Desktop and tablet */}

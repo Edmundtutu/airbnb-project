@@ -50,7 +50,7 @@ const DesktopSidebar: React.FC = () => {
       {/* Logo */}
       <div className="p-4 xl:p-6 border-b">
         <Link to="/" className="text-xl xl:text-2xl font-bold text-primary">
-          Buzz
+          CavaYo
         </Link>
       </div>
 

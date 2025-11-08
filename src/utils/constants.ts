@@ -1,5 +1,5 @@
 // App constants
-export const APP_NAME = 'Buzz';
+export const APP_NAME = 'CavaYo';
 export const API_BASE_URL = '/api';
 
 export const ROUTES = {

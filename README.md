@@ -1,4 +1,4 @@
-# Buzz - Short-Term Rental Platform
+# CavaYo - Short-Term Rental Platform
 
 ## Feature Checklist: Short-Term Rental PWA (Airbnb-style)
 
