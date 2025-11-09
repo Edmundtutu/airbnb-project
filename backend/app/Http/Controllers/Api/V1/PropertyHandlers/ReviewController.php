@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\StoreReviewRequest;
 use App\Http\Requests\Api\V1\UpdateReviewRequest;
 use App\Http\Resources\Api\V1\ReviewResource;
-use App\Models\Product;
+use App\Models\Property;
 use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,12 +18,12 @@ class ReviewController extends Controller
      */
     public function index(Request $request)
     {
-        if (!$request->has('product_id')) {
-            return response()->json(['message' => 'Product ID is required.'], 400);
+        if (!$request->has('property_id')) {
+            return response()->json(['message' => 'Property ID is required.'], 400);
         }
 
-        $product = Product::findOrFail($request->product_id);
-        $reviews = $product->reviews()->with('user')->latest()->paginate();
+        $property = Property::findOrFail($request->property_id);
+        $reviews = $property->reviews()->with('user')->latest()->paginate();
 
         return ReviewResource::collection($reviews);
     }

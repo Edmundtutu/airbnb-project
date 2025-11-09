@@ -1,43 +1,30 @@
 <?php
 
-use App\Http\Controllers\Api\V1\PostHandlers\CommentController;
-use App\Http\Controllers\Api\V1\PostHandlers\CommentLikeController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\V1\ChatController;
 use App\Http\Controllers\Api\V1\PostHandlers\LikeController;
-use App\Http\Controllers\Api\V1\PostHandlers\PostCommentController;
-use App\Http\Controllers\Api\V1\UserHandlers\AuthController;
 use App\Http\Controllers\Api\V1\PostHandlers\PostController;
+use App\Http\Controllers\Api\V1\UserHandlers\AuthController;
+use App\Http\Controllers\Api\V1\UserHandlers\FollowController;
+use App\Http\Controllers\Api\V1\PostHandlers\CommentController;
 use App\Http\Controllers\Api\V1\BookingHandlers\BookingController;
 use App\Http\Controllers\Api\V1\BookingHandlers\ListingController;
-use App\Http\Controllers\Api\V1\PropertyHandlers\Inventory\AddonController;
-use App\Http\Controllers\Api\V1\PropertyHandlers\Inventory\CategoryController;
-use App\Http\Controllers\Api\V1\PropertyHandlers\Inventory\InventoryController;
-use App\Http\Controllers\Api\V1\PropertyHandlers\Inventory\ModificationController;
-use App\Http\Controllers\Api\V1\PropertyHandlers\ReviewController;
+use App\Http\Controllers\Api\V1\UserHandlers\SubscriberController;
+use App\Http\Controllers\Api\V1\PostHandlers\CommentLikeController;
+use App\Http\Controllers\Api\V1\PostHandlers\PostCommentController;
 use App\Http\Controllers\Api\V1\PropertyHandlers\PropertyController;
-use App\Http\Controllers\Api\V1\UserHandlers\FollowController;
-use App\Http\Controllers\Api\V1\ChatController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\V1\PropertyHandlers\ReviewController;
 
 Route::prefix('v1')->group(function () {
     // Authentication routes
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
+    // Subscription and News Updates routes
+    Route::post('/subscribe', [SubscriberController::class, 'subscribe'])->name('subscribe');    
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/user', [AuthController::class, 'user']);
-
-        // Inventory react flow nodes and edges routes
-        Route::get('/inventory/{property}/graph', [InventoryController::class, 'getGraph']);
-
-        Route::post('/inventory/nodes', [InventoryController::class, 'storeNode']);
-        Route::patch('/inventory/nodes/{node}', [InventoryController::class, 'updateNode'])->middleware('can:update,node');
-        Route::delete('/inventory/nodes/{node}', [InventoryController::class, 'destroyNode'])->middleware('can:delete,node');
-
-        Route::post('/inventory/edges', [InventoryController::class, 'storeEdge']);
-        Route::delete('/inventory/edges/{edge}', [InventoryController::class, 'destroyEdge'])->middleware('can:delete,edge');
-
-        Route::patch('/nodes/{node}/position', [InventoryController::class, 'updateNodePosition'])->middleware('can:update,node');
     });
 
     // Property routes
@@ -47,16 +34,6 @@ Route::prefix('v1')->group(function () {
     // Listing routes
     Route::apiResource('listings', ListingController::class)->only(['index', 'show']);
     Route::apiResource('listings', ListingController::class)->middleware('auth:sanctum')->except(['index', 'show']);
-
-    // Category routes
-    Route::apiResource('categories', CategoryController::class)->only(['index', 'show']);
-    Route::apiResource('categories', CategoryController::class)->middleware('auth:sanctum')->except(['index', 'show']);
-
-    // Modifications & Addons routes
-    Route::apiResource('modifications', ModificationController::class)->only(['index']);
-    Route::apiResource('modifications', ModificationController::class)->middleware('auth:sanctum')->except(['index', 'show']);
-    Route::apiResource('addons', AddonController::class)->only(['index']);
-    Route::apiResource('addons', AddonController::class)->middleware('auth:sanctum')->except(['index', 'show']);
 
     // Post routes
     Route::apiResource('posts', PostController::class)->only(['index', 'show']);

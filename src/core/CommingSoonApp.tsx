@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Facebook, Twitter, Instagram, Home, MapPin, Building, Check, Mail, Phone, MessageSquare, MessageCircle } from 'lucide-react';
 import '../styles/CommingSoonPage.css';
+import { SubscriberService } from '@/services/subsriberService';
 
 const ComingSoonPage = () => {
     const [email, setEmail] = useState('');
@@ -44,10 +45,10 @@ const ComingSoonPage = () => {
         if (!email) return;
 
         setLoading(true);
-        setTimeout(() => {
+        SubscriberService.subscribe(email).then(() => {
             setLoading(false);
             setSubmitted(true);
-        }, 1500);
+        });
     };
 
     const handleSubscribeClick = () => {
