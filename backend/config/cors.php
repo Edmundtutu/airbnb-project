@@ -20,9 +20,9 @@ return [
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
-        env('FRONTEND_URL', 'http://localhost:3000'),
-        env('STAGE_FRONTEND_URL', 'https://stage.domain.com'),
-        env('PROD_FRONTEND_URL', 'https://foody.lockfreed.com'),
+        env('FRONTEND_URL', 'http://localhost:8080'),
+        env('STAGE_FRONTEND_URL', 'http://localhost:8080'),
+        env('PROD_FRONTEND_URL', 'https://yocava.com'),
     ],
 
     'allowed_origins_patterns' => [],

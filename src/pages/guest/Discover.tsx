@@ -57,12 +57,8 @@ const Discover: React.FC = () => {
     const checkMobile = () => {
       const mobile = window.innerWidth < 1024;
       setIsMobile(mobile);
-      // Auto-show filters on desktop, hide on mobile
-      if (!mobile) {
-        setIsFiltersOpen(true);
-      } else {
-        setIsFiltersOpen(false);
-      }
+      // Keep filters closed by default on both; user toggles open
+      setIsFiltersOpen(false);
     };
 
     checkMobile();
@@ -158,7 +154,7 @@ const Discover: React.FC = () => {
       {/* Main Content Area */}
       <div className="lg:flex lg:gap-6">
         {/* Left: Listings */}
-        <div className={`flex-1 space-y-4 md:space-y-6 px-1 sm:px-0 ${!isMobile ? 'lg:pr-6' : ''}`}>
+        <div className={`flex-1 space-y-4 md:space-y-6 px-1 sm:px-0 ${!isMobile && isFiltersOpen ? 'lg:pr-6' : ''}`}>
           {/* Search Bar with Filter Button */}
           <form onSubmit={handleSearch} className="w-full">
             <div className="flex gap-2">
@@ -279,7 +275,17 @@ const Discover: React.FC = () => {
                   </CardContent>
                 </Card>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 md:gap-4 lg:gap-6">
+                <div
+                  className={
+                    `grid grid-cols-1 sm:grid-cols-2 ` +
+                    (
+                      (!isMobile && isFiltersOpen)
+                        ? `md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4`
+                        : `md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5`
+                    ) +
+                    ` gap-3 sm:gap-4 lg:gap-6`
+                  }
+                >
                   {listingsToDisplay.map((listing) => (
                     <ListingCard key={listing.id} listing={listing} />
                   ))}
@@ -315,17 +321,17 @@ const Discover: React.FC = () => {
         </div>
 
         {/* Right: Filters Panel (Desktop Only) */}
-        {!isMobile && (
+        {!isMobile && isFiltersOpen && (
           <div className="hidden lg:block lg:w-96 xl:w-[420px] flex-shrink-0">
             <FiltersPanel
-              isOpen={true}
+              isOpen={isFiltersOpen}
               onClose={() => setIsFiltersOpen(false)}
               onApplyFilters={handleApplyFilters}
               isMobile={false}
             />
           </div>
         )}
-      </div>
+      </div>  
 
       {/* Mobile Filters Modal */}
       {isMobile && (

@@ -85,11 +85,11 @@ const ListingCard: React.FC<ListingCardProps> = ({
   const hasMultipleImages = images.length > 1;
 
   return (
-    <Card className={`group cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-[1.02] border-0 shadow-sm ${className ?? ''}`}>
+    <Card className={`group cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-[1.02] border-0 shadow-sm rounded-lg ${className ?? ''}`}>
       <CardContent className="p-0 h-full flex flex-col">
         <div className="relative flex-1">
           {/* Image Container - Takes most of the card space */}
-          <div className="aspect-[4/3] bg-muted flex items-center justify-center overflow-hidden rounded-t-2xl relative">
+          <div className="aspect-[4/3] bg-muted flex items-center justify-center overflow-hidden rounded-t-lg relative">
             {images.length > 0 ? (
               <>
                 <Link to={`/listing/${actualListing.id}`} className="w-full h-full">

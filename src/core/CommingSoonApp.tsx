@@ -45,10 +45,20 @@ const ComingSoonPage = () => {
         if (!email) return;
 
         setLoading(true);
-        SubscriberService.subscribe(email).then(() => {
-            setLoading(false);
-            setSubmitted(true);
-        });
+        SubscriberService.subscribe(email)
+            .then(() => {
+                setLoading(false);
+                setSubmitted(true);
+            })
+            .catch((error) => {
+                setLoading(false);
+                // Reset CSRF token fetch flag if we get a token mismatch
+                if (error.response?.status === 419) {
+                    // This will trigger a new token fetch on the next request
+                    localStorage.setItem('csrf-token-fetched', 'false');
+                }
+                console.error('Subscription error:', error);
+            });
     };
 
     const handleSubscribeClick = () => {
