@@ -21,7 +21,7 @@ Route::prefix('v1')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     // Subscription and News Updates routes
     Route::post('/subscribe', [SubscriberController::class, 'subscribe'])
-        ->middleware('web')
+        ->withoutMiddleware([\Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class])
         ->name('subscribe');
 
     Route::middleware('auth:sanctum')->group(function () {

@@ -279,18 +279,30 @@ const ComingSoonPage = () => {
                     <div className="footer-social">
                         <h4 className="social-heading">Lets Connect</h4>
                         <div className="social-links">
-                            <a href="mailto:info@yocava.com" className="social-link" aria-label="Email">
+                            <a href="mailto:info@yocava.com"
+                                className="social-link" 
+                                aria-label="Email">
                                 <Mail size={18} />
                             </a>
                             <a href="https://wa.me/256763977921?text=Hi%20there%2C%20I'm%20interested%20in%20CavaYo%20launch%20updates"
                                 className="social-link"
-                                aria-label="WhatsApp">
-                                <MessageCircle size={18} />
+                                aria-label="WhatsApp"
+                                target="_blank"
+                                rel="noopener noreferrer">
+                                <MessageSquare size={18} />
                             </a>
-                            <a href="#" className="social-link" aria-label="Twitter">
+                            <a href="https://x.com/CavaYo256?t=tkcV6CmXPGLwcV6qUOhfbg&s=08" 
+                                className="social-link" 
+                                aria-label="Twitter"
+                                target="_blank"
+                                rel="noopener noreferrer">
                                 <Twitter size={18} />
                             </a>
-                            <a href="#" className="social-link" aria-label="Instagram">
+                            <a href="https://www.instagram.com/yo.cava?igsh=MXQwY3BweGd6eTBldA%3D%3D" 
+                                className="social-link" 
+                                aria-label="Instagram"
+                                target="_blank"
+                                rel="noopener noreferrer">
                                 <Instagram size={18} />
                             </a>
                         </div>
