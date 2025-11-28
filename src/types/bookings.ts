@@ -12,7 +12,7 @@ export interface CreateBookingAddOnPayload {
 export interface CreateBookingDetailPayload {
   listing_id: string; // ULID
   nights: number;
-  base_price_per_night?: number;
+  price_per_night?: number;
   add_ons?: CreateBookingAddOnPayload[];
   detail_total?: number;
   package_savings?: number;
@@ -53,9 +53,35 @@ export interface BookingDetail {
   listing_id: string; // ULID
   nights: number;
   price_per_night: number;
+  line_total?: number;
   created_at: string;
   updated_at: string;
   listing?: Listing; // Nested listing details
+}
+
+export interface ListingReservation {
+  id: number;
+  property_id: string;
+  listing_id: string;
+  check_in_date: string;
+  check_out_date: string;
+  status: Booking['status'];
+  guest_count: number;
+}
+
+export interface HostListingReservation {
+  id: string;
+  booking_id: string;
+  listing_id: string;
+  listing_name?: string;
+  property_id: string;
+  property_name?: string;
+  guest_id: string;
+  guest_name?: string;
+  guest_count: number;
+  status: Booking['status'];
+  check_in_date: string;
+  check_out_date: string;
 }
 
 export interface Booking {
@@ -63,7 +89,7 @@ export interface Booking {
   guest_id: string; // ULID
   property_id: string; // ULID
   total: number;
-  status: 'pending' | 'processing' | 'completed' | 'cancelled';
+  status: 'pending' | 'processing' | 'confirmed' | 'checked_in' | 'checked_out' | 'completed' | 'cancelled' | 'rejected';
   check_in_date: string;
   check_out_date: string;
   guest_count: number;

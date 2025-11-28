@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Calendar, MapPin, Users, Bed, Bath, X } from 'lucide-react';
 import { useBooking } from '@/context/BookingContext';
 import { useToast } from '@/hooks/use-toast';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createBooking } from '@/services/bookingService';
 import type { CreateBookingPayload, Booking } from '@/types/bookings';
 import { format } from 'date-fns';
@@ -17,12 +17,11 @@ import { format } from 'date-fns';
 const Bookings: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const {
     items,
     removeItem,
-    updateNights,
     clearBooking,
-    getTotal,
     getItemCount,
     getItemsByProperty,
     canCheckout,
@@ -31,59 +30,66 @@ const Bookings: React.FC = () => {
   } = useBooking();
 
   const [notes, setNotes] = useState('');
-  const { mutateAsync: placeBooking, isPending: isProcessingBooking } = useMutation<Booking, any, CreateBookingPayload>({
-    mutationFn: createBooking,
-    onSuccess: (data) => {
-      console.log('Booking placed successfully!', data);
-      clearBooking();
-      toast({
-        title: 'Booking confirmed!',
-        description: 'You can view your bookings in your profile.',
-      });
-      navigate('/profile');
-    },
-    onError: (error: any) => {
-      toast({
-        title: 'Booking failed',
-        description: error?.message || 'An unexpected error occurred.',
-        variant: 'destructive',
-      });
-    },
-  });
-
-  const itemsByProperty = getItemsByProperty();
+  const itemsByProperty = useMemo(() => getItemsByProperty(), [items]);
+  const propertyIds = Object.keys(itemsByProperty);
   const total = useMemo(() => getTotalWithAddOns(), [items]);
   const itemCount = getItemCount();
+
+  const { mutateAsync: placeBookings, isPending: isProcessingBooking } = useMutation<Booking[], Error, CreateBookingPayload[]>(
+    {
+      mutationFn: async (payloads) => {
+        const results = await Promise.all(payloads.map(payload => createBooking(payload)));
+        return results;
+      },
+      onSuccess: () => {
+        clearBooking();
+        queryClient.invalidateQueries({ queryKey: ['bookings'] }).catch(() => undefined);
+        queryClient.invalidateQueries({ queryKey: ['guestBookings'] }).catch(() => undefined);
+        toast({
+          title: 'Booking confirmed!',
+          description: 'You can view your bookings in your profile.',
+        });
+        navigate('/profile');
+      },
+      onError: (error: Error) => {
+        console.error('Booking failed', error);
+        toast({
+          title: 'Booking failed',
+          description: error.message || 'An unexpected error occurred.',
+          variant: 'destructive',
+        });
+      },
+    }
+  );
 
   const handleCheckout = async () => {
     if (!canCheckout) return;
 
-    const payloads = Object.entries(itemsByProperty).map(([propertyId, propertyItems]) => {
-      const payload: CreateBookingPayload = {
-        property_id: propertyId,
-        details: propertyItems.map((item) => ({
-          listing_id: item.listing.id,
-          nights: item.nights,
-          base_price_per_night: item.basePricePerNight,
-          add_ons: (item.addOns ?? []).map((a) => ({
-            listing_id: a.listing.id,
-            nights: a.nights,
-            original_price: a.originalPrice,
-            discounted_price: a.discountedPrice,
-          })),
+    const payloads = Object.entries(itemsByProperty).map(([propertyId, propertyItems]) => ({
+      property_id: propertyId,
+      details: propertyItems.map((item) => ({
+        listing_id: item.listing.id,
+        nights: item.nights,
+        price_per_night: item.basePricePerNight,
+        add_ons: (item.addOns ?? []).map((a) => ({
+          listing_id: a.listing.id,
+          nights: a.nights,
+          original_price: a.originalPrice,
+          discounted_price: a.discountedPrice,
         })),
-        check_in_date: format(propertyItems[0].checkInDate, 'yyyy-MM-dd'),
-        check_out_date: format(propertyItems[0].checkOutDate, 'yyyy-MM-dd'),
-        guest_count: propertyItems[0].guests,
-        notes: notes || undefined,
-      };
+      })),
+      check_in_date: format(propertyItems[0].checkInDate, 'yyyy-MM-dd'),
+      check_out_date: format(propertyItems[0].checkOutDate, 'yyyy-MM-dd'),
+      guest_count: propertyItems[0].guests,
+      notes: notes || undefined,
+    } satisfies CreateBookingPayload));
 
-      return payload;
-    });
+    if (payloads.length === 0) {
+      return;
+    }
 
     try {
-      const bookingPromises = payloads.map((p) => placeBooking(p));
-      await Promise.all(bookingPromises);
+      await placeBookings(payloads);
     } catch (error) {
       console.error('An error occurred during booking:', error);
     }
@@ -115,7 +121,7 @@ const Bookings: React.FC = () => {
       <div className="text-center">
         <h1 className="text-2xl font-bold mb-2">Your Bookings</h1>
         <p className="text-muted-foreground text-sm sm:text-base">
-          {itemCount} stay{itemCount !== 1 ? 's' : ''} from {Object.keys(itemsByProperty).length} propert{Object.keys(itemsByProperty).length !== 1 ? 'ies' : 'y'}
+          {itemCount} stay{itemCount !== 1 ? 's' : ''} from {propertyIds.length} propert{propertyIds.length !== 1 ? 'ies' : 'y'}
         </p>
       </div>
 

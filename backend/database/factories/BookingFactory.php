@@ -18,28 +18,24 @@ class BookingFactory extends Factory
      */
     public function definition(): array
     {
-        $statuses = ['pending', 'confirmed', 'checked_in', 'checked_out', 'cancelled'];
-        
+        $statuses = ['pending', 'processing', 'confirmed', 'checked_in', 'checked_out', 'completed', 'cancelled', 'rejected'];
+
         $checkIn = $this->faker->dateTimeBetween('now', '+30 days');
         $checkOut = $this->faker->dateTimeBetween($checkIn->format('Y-m-d') . ' +1 day', $checkIn->format('Y-m-d') . ' +7 days');
-        
-        $nights = $checkIn->diff($checkOut)->days;
+
+        $nights = max(1, $checkIn->diff($checkOut)->days);
         $pricePerNight = $this->faker->randomFloat(2, 25, 500);
         $total = $nights * $pricePerNight;
-        
+
         return [
             'guest_id' => User::factory()->guest(),
             'property_id' => Property::factory(),
-            'check_in' => $checkIn,
-            'check_out' => $checkOut,
-            'guests' => $this->faker->numberBetween(1, 8),
-            'nights' => $nights,
-            'price_per_night' => $pricePerNight,
-            'total_price' => $total,
-            'cleaning_fee' => $this->faker->randomFloat(2, 0, 50),
-            'service_fee' => $this->faker->randomFloat(2, 0, 30),
+            'check_in_date' => $checkIn,
+            'check_out_date' => $checkOut,
+            'guest_count' => $this->faker->numberBetween(1, 8),
+            'notes' => $this->faker->optional(0.2)->sentence(),
+            'total' => $total,
             'status' => $this->faker->randomElement($statuses),
-            'special_requests' => $this->faker->optional(0.3)->sentence(), // 30% chance of having special requests
         ];
     }
 }

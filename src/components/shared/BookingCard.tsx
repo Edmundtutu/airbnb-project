@@ -7,8 +7,6 @@ import CreatePostCard from '@/components/guest/profile/orders/CreatePostCard';
 import { useImageCapture } from '@/hooks/useImageCapture';
 import CameraCapture from '@/components/features/CameraCapture';
 import { useToast } from '@/hooks/use-toast';
-import { ChatDialog } from './ChatDialog';
-import { useChat } from '@/context/ChatContext';
 
 type BookingCardContext = 'guest' | 'host';
 
@@ -20,7 +18,6 @@ interface BookingCardProps {
   onConfirm?: (booking: Booking) => Promise<void>;
   onReject?: (booking: Booking) => Promise<void>;
   onAccept?: (booking: Booking) => Promise<void>;
-  onOpenConversation?: (booking: Booking) => void;
 }
 
 const getStatusBadgeVariant = (status: Booking['status']): 'default' | 'secondary' | 'destructive' => {
@@ -34,6 +31,8 @@ const getStatusBadgeVariant = (status: Booking['status']): 'default' | 'secondar
     case 'confirmed':
     case 'checked_in':
       return 'default';
+    case 'processing':
+      return 'secondary';
     case 'pending':
     default:
       return 'default';
@@ -53,6 +52,10 @@ const formatDateRange = (checkIn: string, checkOut: string) => {
   };
 };
 
+const getDetailTotal = (detail: Booking['details'][number]) => {
+  return detail.line_total ?? detail.price_per_night * detail.nights;
+};
+
 export const BookingCard: React.FC<BookingCardProps> = ({
   booking,
   context,
@@ -60,40 +63,46 @@ export const BookingCard: React.FC<BookingCardProps> = ({
   isPostDisabled,
   onConfirm,
   onReject,
-  onAccept,
-  onOpenConversation
+  onAccept
 }) => {
   const [isComposerOpen, setIsComposerOpen] = useState(false);
   const [isActionInProgress, setIsActionInProgress] = useState(false);
   const [hasActionCompleted, setHasActionCompleted] = useState(false);
-  const [isChatOpen, setIsChatOpen] = useState(false);
   const imageCapture = useImageCapture();
   const { toast } = useToast();
-  const { getUnreadCount } = useChat();
   const createdAt = new Date(booking.created_at);
   const { dateRange, nights } = formatDateRange(booking.check_in_date, booking.check_out_date);
+  const approvalAction = onConfirm ?? onAccept;
+  const approvalLabel = onConfirm ? 'Confirm' : 'Accept';
+  const approvalPastTense = approvalLabel === 'Confirm' ? 'Confirmed' : 'Accepted';
+  const approvalInProgressLabel = approvalLabel === 'Confirm' ? 'Confirming...' : 'Accepting...';
+  const details = booking.details ?? [];
+  const displayedDetails = details.slice(0, 2);
+  const primaryDetail = displayedDetails[0];
+  const remainingDetails = Math.max(0, details.length - displayedDetails.length);
+  const locationLabel = booking.property?.location?.address;
 
   // Check if booking is in a state that allows confirm/reject actions
   const canPerformActions = booking.status === 'pending';
   
   // Check if booking has completed an action (confirmed/rejected)
-  const hasCompletedAction = ['confirmed', 'rejected', 'cancelled', 'completed'].includes(booking.status);
+  const hasCompletedAction = ['confirmed', 'rejected', 'cancelled', 'completed', 'checked_in', 'checked_out'].includes(booking.status);
 
-  const handleConfirm = async () => {
-    if (!onConfirm || isActionInProgress) return;
+  const handleApprove = async () => {
+    if (!approvalAction || isActionInProgress) return;
     
     setIsActionInProgress(true);
     try {
-      await onConfirm(booking);
+      await approvalAction(booking);
       setHasActionCompleted(true);
       toast({
-        title: 'Booking Confirmed',
-        description: 'Booking has been confirmed successfully.',
+        title: `Booking ${approvalPastTense}`,
+        description: `Booking has been ${approvalPastTense.toLowerCase()} successfully.`,
       });
     } catch (error) {
       toast({
-        title: 'Confirmation Failed',
-        description: error instanceof Error ? error.message : 'Failed to confirm booking.',
+        title: `${approvalLabel} Failed`,
+        description: error instanceof Error ? error.message : `Failed to ${approvalLabel.toLowerCase()} booking.`,
         variant: 'destructive',
       });
     } finally {
@@ -123,27 +132,6 @@ export const BookingCard: React.FC<BookingCardProps> = ({
     }
   };
 
-  const handleAccept = async () => {
-    if (!onAccept || isActionInProgress) return;
-    
-    setIsActionInProgress(true);
-    try {
-      await onAccept(booking);
-      setHasActionCompleted(true);
-      toast({
-        title: 'Booking Accepted',
-        description: 'Booking has been accepted successfully.',
-      });
-    } catch (error) {
-      toast({
-        title: 'Accept Failed',
-        description: error instanceof Error ? error.message : 'Failed to accept booking.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsActionInProgress(false);
-    }
-  };
 
   return (
     <Card className="h-full flex flex-col relative w-full min-w-0">
@@ -188,11 +176,34 @@ export const BookingCard: React.FC<BookingCardProps> = ({
 
         {/* Listing Details */}
         <div className="space-y-1 sm:space-y-1.5 flex-1 mb-2 min-w-0">
-          <div className="flex items-center justify-between text-[10px] sm:text-xs gap-1 sm:gap-2 min-w-0">
-            <span className="truncate flex-1 min-w-0 leading-tight font-medium">
-              {booking.details?.[0]?.listing?.name ?? 'Listing'}
-            </span>
-          </div>
+          {displayedDetails.length > 0 ? (
+            displayedDetails.map((detail) => (
+              <div
+                key={detail.id ?? detail.listing_id}
+                className="flex items-center justify-between gap-2 text-[10px] sm:text-xs border border-dashed rounded-md px-2 py-1"
+              >
+                <div className="min-w-0">
+                  <p className="truncate font-medium leading-tight">
+                    {detail.listing?.name ?? 'Listing'}
+                  </p>
+                  <p className="text-[9px] sm:text-[10px] text-muted-foreground">
+                    {detail.nights} night{detail.nights !== 1 ? 's' : ''} · {formatUGX(detail.price_per_night)}/night
+                  </p>
+                </div>
+                <p className="text-[9px] sm:text-xs font-semibold">
+                  {formatUGX(getDetailTotal(detail))}
+                </p>
+              </div>
+            ))
+          ) : (
+            <p className="text-[10px] sm:text-xs text-muted-foreground">Listing information unavailable</p>
+          )}
+
+          {remainingDetails > 0 && (
+            <p className="text-[9px] sm:text-xs text-muted-foreground">
+              +{remainingDetails} more listing{remainingDetails > 1 ? 's' : ''}
+            </p>
+          )}
           
           {/* Date Range */}
           <div className="flex items-center gap-1 text-[10px] sm:text-xs text-muted-foreground">
@@ -204,33 +215,33 @@ export const BookingCard: React.FC<BookingCardProps> = ({
           <div className="flex items-center gap-2 text-[10px] sm:text-xs text-muted-foreground">
             <div className="flex items-center gap-1">
               <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3 flex-shrink-0" />
-              <span>{nights} nights</span>
+              <span>{nights} night{nights !== 1 ? 's' : ''}</span>
             </div>
-            {booking.details?.[0]?.listing?.bedrooms && (
+            {primaryDetail?.listing?.bedrooms && (
               <>
                 <span>•</span>
                 <div className="flex items-center gap-1">
                   <Bed className="h-2.5 w-2.5 sm:h-3 sm:w-3 flex-shrink-0" />
-                  <span>{booking.details[0].listing.bedrooms} bed</span>
+                  <span>{primaryDetail.listing.bedrooms} bed</span>
                 </div>
               </>
             )}
-            {booking.details?.[0]?.listing?.bathrooms && (
+            {primaryDetail?.listing?.bathrooms && (
               <>
                 <span>•</span>
                 <div className="flex items-center gap-1">
                   <Bath className="h-2.5 w-2.5 sm:h-3 sm:w-3 flex-shrink-0" />
-                  <span>{booking.details[0].listing.bathrooms} bath</span>
+                  <span>{primaryDetail.listing.bathrooms} bath</span>
                 </div>
               </>
             )}
           </div>
 
           {/* Location */}
-          {booking.property?.location && (
+          {locationLabel && (
             <div className="flex items-center gap-1 text-[10px] sm:text-xs text-muted-foreground">
               <MapPin className="h-2.5 w-2.5 sm:h-3 sm:w-3 flex-shrink-0" />
-              <span className="truncate flex-1">{booking.property.location.address}</span>
+              <span className="truncate flex-1">{locationLabel}</span>
             </div>
           )}
         </div>
@@ -303,7 +314,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
                       createContext={{ 
                         propertyId: booking.property_id, 
                         listingId: booking.details?.[0]?.listing_id,
-                        bookingId: booking.id 
+                        bookingId: booking.id.toString()
                       }}
                       forceExpanded={true}
                     />
@@ -314,57 +325,48 @@ export const BookingCard: React.FC<BookingCardProps> = ({
           ) : (
             /* Host context - Action buttons */
             <div className="flex items-center gap-1 sm:gap-2">
-              {/* Confirm and Reject buttons - only show for pending bookings and before action completion */}
               {canPerformActions && !hasActionCompleted && (
                 <>
-                  <button
-                    type="button"
-                    onClick={handleAccept}
-                    disabled={isActionInProgress}
-                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1 text-[10px] sm:text-xs px-2 py-1 sm:px-3 sm:py-2 rounded-md border border-green-200 text-green-700 hover:bg-green-50 transition-colors min-w-0 disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="Accept booking"
-                  >
-                    <Check className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                    <span className="hidden sm:inline truncate">
-                      {isActionInProgress ? 'Accepting...' : 'Accept'}
-                    </span>
-                  </button>
+                  {approvalAction && (
+                    <button
+                      type="button"
+                      onClick={handleApprove}
+                      disabled={isActionInProgress}
+                      className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1 text-[10px] sm:text-xs px-2 py-1 sm:px-3 sm:py-2 rounded-md border border-green-200 text-green-700 hover:bg-green-50 transition-colors min-w-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                      title={`${approvalLabel} booking`}
+                    >
+                      <Check className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                      <span className="hidden sm:inline truncate">
+                        {isActionInProgress ? approvalInProgressLabel : approvalLabel}
+                      </span>
+                    </button>
+                  )}
 
-                  <button
-                    type="button"
-                    onClick={handleReject}
-                    disabled={isActionInProgress}
-                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1 text-[10px] sm:text-xs px-2 py-1 sm:px-3 sm:py-2 rounded-md border border-red-200 text-red-700 hover:bg-red-50 transition-colors min-w-0 disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="Reject booking"
-                  >
-                    <X className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                    <span className="hidden sm:inline truncate">
-                      {isActionInProgress ? 'Rejecting...' : 'Reject'}
-                    </span>
-                  </button>
+                  {onReject && (
+                    <button
+                      type="button"
+                      onClick={handleReject}
+                      disabled={isActionInProgress}
+                      className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1 text-[10px] sm:text-xs px-2 py-1 sm:px-3 sm:py-2 rounded-md border border-red-200 text-red-700 hover:bg-red-50 transition-colors min-w-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Reject booking"
+                    >
+                      <X className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                      <span className="hidden sm:inline truncate">
+                        {isActionInProgress ? 'Rejecting...' : 'Reject'}
+                      </span>
+                    </button>
+                  )}
                 </>
               )}
 
-              {/* Chat button - always visible for host context */}
               <button
                 type="button"
-                onClick={() => setIsChatOpen(true)}
-                className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1 text-[10px] sm:text-xs px-2 py-1 sm:px-3 sm:py-2 rounded-md border border-blue-200 text-blue-700 hover:bg-blue-50 transition-colors min-w-0 relative"
-                title="Open conversation"
+                disabled
+                className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1 text-[10px] sm:text-xs px-2 py-1 sm:px-3 sm:py-2 rounded-md border border-dashed border-blue-200 text-blue-400 bg-blue-50/30 cursor-not-allowed min-w-0"
+                title="Chat coming soon"
               >
                 <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                <span className="hidden sm:inline truncate">Chat</span>
-                {/* Unread message badge */}
-                {(() => {
-                  // We need to get the conversation ID for this booking to check unread count
-                  // For now, we'll show a placeholder - this would need to be connected to the actual conversation
-                  const unreadCount = 0; // getUnreadCount(conversationId);
-                  return unreadCount > 0 ? (
-                    <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 w-4 p-0 text-xs flex items-center justify-center">
-                      {unreadCount > 9 ? '9+' : unreadCount}
-                    </Badge>
-                  ) : null;
-                })()}
+                <span className="hidden sm:inline truncate">Chat (soon)</span>
               </button>
             </div>
           )}
@@ -380,15 +382,6 @@ export const BookingCard: React.FC<BookingCardProps> = ({
           </div>
         )}
       </CardContent>
-
-      {/* Chat Dialog */}
-      {context === 'host' && (
-        <ChatDialog
-          booking={booking}
-          isOpen={isChatOpen}
-          onClose={() => setIsChatOpen(false)}
-        />
-      )}
     </Card>
   );
 };

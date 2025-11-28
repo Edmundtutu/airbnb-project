@@ -20,6 +20,8 @@ export interface Listing {
   tags: string[];
   created_at: string;
   updated_at: string;
+  is_active?: boolean;
+  instant_book?: boolean;
 }
 
 // Legacy interface for backward compatibility

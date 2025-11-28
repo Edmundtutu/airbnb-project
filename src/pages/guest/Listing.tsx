@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -26,10 +26,12 @@ import {
 import { Listing, Review } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 import { listingService } from '@/services/listingService';
+import { bookingService } from '@/services/bookingService';
 import { useWishlist } from '@/context/WishlistContext';
 import { useBooking } from '@/context/BookingContext';
 import { useToast } from '@/hooks/use-toast';
-import { format } from 'date-fns';
+import { format, startOfDay, isBefore, isAfter, isWithinInterval, addDays } from 'date-fns';
+import type { ListingReservation } from '@/types/bookings';
 
 const ListingPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -70,9 +72,86 @@ const ListingPage: React.FC = () => {
     }
   }, [listingReviews]);
 
+  const today = useMemo(() => startOfDay(new Date()), []);
+  const listingId = listing?.id;
+
+  const { data: listingReservations = [], isLoading: isAvailabilityLoading } = useQuery<ListingReservation[]>({
+    enabled: !!listingId,
+    queryKey: ['listingReservations', listingId],
+    queryFn: () => bookingService.getListingReservations(listingId!),
+    staleTime: 60_000,
+  });
+
+  const blockedIntervals = useMemo(() => {
+    return listingReservations
+      .map((reservation) => {
+        const start = startOfDay(new Date(reservation.check_in_date));
+        const checkout = startOfDay(new Date(reservation.check_out_date));
+        const end = addDays(checkout, -1);
+
+        if (isAfter(start, end)) {
+          return null;
+        }
+
+        return { start, end };
+      })
+      .filter((interval): interval is { start: Date; end: Date } => Boolean(interval));
+  }, [listingReservations]);
+
+  const blockedRanges = useMemo(() => {
+    return blockedIntervals.map((interval) => ({ from: interval.start, to: interval.end }));
+  }, [blockedIntervals]);
+
+  const isDateBlocked = useCallback(
+    (date: Date) => {
+      if (!blockedIntervals.length) return false;
+      const day = startOfDay(date);
+      return blockedIntervals.some((interval) => isWithinInterval(day, interval));
+    },
+    [blockedIntervals]
+  );
+
+  const stayConflicts = useCallback(
+    (startDate?: Date, endDate?: Date) => {
+      if (!startDate || !endDate) return false;
+      const stayStart = startOfDay(startDate);
+      const stayEnd = addDays(startOfDay(endDate), -1);
+
+      if (isAfter(stayStart, stayEnd)) {
+        return true;
+      }
+
+      return blockedIntervals.some((interval) => {
+        const endsBefore = isBefore(stayEnd, interval.start);
+        const startsAfter = isAfter(stayStart, interval.end);
+        return !(endsBefore || startsAfter);
+      });
+    },
+    [blockedIntervals]
+  );
+
   useEffect(() => {
-    setIsLoading(loadingListing || loadingReviews);
-  }, [loadingListing, loadingReviews]);
+    if (loadingListing || loadingReviews) {
+      setIsLoading(true);
+    } else if (!isAvailabilityLoading) {
+      setIsLoading(false);
+    }
+  }, [loadingListing, loadingReviews, isAvailabilityLoading]);
+
+  useEffect(() => {
+    if (checkInDate && isDateBlocked(checkInDate)) {
+      setCheckInDate(undefined);
+      setCheckOutDate(undefined);
+    }
+  }, [checkInDate, isDateBlocked]);
+
+  useEffect(() => {
+    if (checkInDate && checkOutDate) {
+      if (!isAfter(checkOutDate, checkInDate) || stayConflicts(checkInDate, checkOutDate)) {
+        setCheckOutDate(undefined);
+      }
+    }
+  }, [checkInDate, checkOutDate, stayConflicts]);
 
   const handleBookNow = () => {
     if (!listing || !checkInDate || !checkOutDate) {
@@ -323,7 +402,12 @@ const ListingPage: React.FC = () => {
                       mode="single"
                       selected={checkInDate}
                       onSelect={setCheckInDate}
-                      disabled={(date) => date < new Date()}
+                      modifiers={{ booked: blockedRanges }}
+                      modifiersClassNames={{ booked: 'bg-red-500/10 text-red-600 ring-1 ring-red-400/40 rounded-md' }}
+                      disabled={(date) => {
+                        const day = startOfDay(date);
+                        return isBefore(day, today) || isDateBlocked(day);
+                      }}
                     />
                   </PopoverContent>
                 </Popover>
@@ -343,11 +427,27 @@ const ListingPage: React.FC = () => {
                       mode="single"
                       selected={checkOutDate}
                       onSelect={setCheckOutDate}
-                      disabled={(date) => date <= (checkInDate || new Date())}
+                      modifiers={{ booked: blockedRanges }}
+                      modifiersClassNames={{ booked: 'bg-red-500/10 text-red-600 ring-1 ring-red-400/40 rounded-md' }}
+                      disabled={(date) => {
+                        const day = startOfDay(date);
+                        if (!checkInDate) {
+                          return isBefore(day, addDays(today, 1)) || isDateBlocked(day);
+                        }
+                        return !isAfter(day, checkInDate) || stayConflicts(checkInDate, day);
+                      }}
                     />
                   </PopoverContent>
                 </Popover>
               </div>
+
+              <p className="text-xs text-muted-foreground">
+                {isAvailabilityLoading
+                  ? 'Loading availability…'
+                  : blockedIntervals.length > 0
+                    ? 'Unavailable dates are disabled based on existing reservations.'
+                    : 'All future dates are currently available for this property.'}
+              </p>
 
               {/* Guests Selector */}
               <div className="border-2 rounded-lg p-3 lg:p-4">

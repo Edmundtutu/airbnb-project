@@ -39,6 +39,11 @@ export const listingService = {
     return response.data.data;
   },
 
+  async getHostListings(): Promise<Listing[]> {
+    const response = await api.get<{ data: Listing[] }>(`${apiVersion}/host/listings`);
+    return response.data.data;
+  },
+
   async createListing(listingData: Partial<Listing>): Promise<Listing> {
     const response = await api.post<ApiResponse<Listing>>(`${apiVersion}/listings`, listingData);
     return response.data.data;

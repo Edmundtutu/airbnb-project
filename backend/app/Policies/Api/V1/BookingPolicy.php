@@ -16,8 +16,8 @@ class BookingPolicy
 
     public function view(User $user, Booking $booking): bool
     {
-        return $user->id === $booking->user_id   // guest sees own booking
-            || ($user->isHost() && $user->id === $booking->property->host_id); // host sees property booking
+        return $user->id === $booking->guest_id   // guest sees own booking
+            || ($user->isHost() && $user->id === optional($booking->property)->host_id); // host sees property booking
     }
 
     public function create(User $user): bool
@@ -29,14 +29,14 @@ class BookingPolicy
     public function update(User $user, Booking $booking): bool
     {
         // Hosts can update bookings for their properties
-        return $user->isHost() && $user->id === $booking->property->host_id;
+        return $user->isHost() && $user->id === optional($booking->property)->host_id;
     }
 
     public function delete(User $user, Booking $booking): bool
     {
         // Guests can cancel their own booking if still pending
         return $user->isGuest()
-            && $user->id === $booking->user_id
+            && $user->id === $booking->guest_id
             && $booking->status === 'pending';
     }
 
@@ -54,7 +54,7 @@ class BookingPolicy
     {
         // Host confirms only pending bookings
         return $user->isHost()
-            && $user->id === $booking->property->host_id
+            && $user->id === optional($booking->property)->host_id
             && $booking->status === 'pending';
     }
 
@@ -62,7 +62,7 @@ class BookingPolicy
     {
         // Host can check in guests for their properties
         return $user->isHost()
-            && $user->id === $booking->property->host_id
+            && $user->id === optional($booking->property)->host_id
             && $booking->status === 'confirmed';
     }
 
@@ -70,7 +70,7 @@ class BookingPolicy
     {
         // Host can check out guests for their properties
         return $user->isHost()
-            && $user->id === $booking->property->host_id
+            && $user->id === optional($booking->property)->host_id
             && $booking->status === 'checked_in';
     }
 }

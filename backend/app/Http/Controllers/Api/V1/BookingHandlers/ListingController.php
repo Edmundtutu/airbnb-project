@@ -10,6 +10,7 @@ use App\Http\Resources\Api\V1\ListingResource;
 use App\Models\Listing;
 use App\Models\Property;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ListingController extends Controller
 {
@@ -101,5 +102,17 @@ class ListingController extends Controller
         $listing->delete();
 
         return response()->noContent();
+    }
+
+    public function hostListings(Request $request)
+    {
+        $this->authorize('viewAny', Listing::class);
+
+        $listings = Listing::with(['property', 'reviews'])
+            ->whereHas('property', fn ($query) => $query->where('host_id', Auth::id()))
+            ->orderByDesc('created_at')
+            ->get();
+
+        return ListingResource::collection($listings);
     }
 }

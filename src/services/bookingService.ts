@@ -1,6 +1,6 @@
 import api from './api';
-import { CreateBookingPayload, Booking } from '@/types/bookings';
-import type { ApiResponse, PaginatedResponse } from '@/types/api';
+import { CreateBookingPayload, Booking, ListingReservation, HostListingReservation } from '@/types/bookings';
+import type { ApiResponse, LaravelPaginatedResponse } from '@/types/api';
 
 const apiVersion = import.meta.env.VITE_API_VERSION;
 
@@ -13,8 +13,8 @@ export const bookingService = {
   async getBookings(params?: {
     status?: string;
     page?: number;
-  }): Promise<PaginatedResponse<Booking>> {
-    const response = await api.get<PaginatedResponse<Booking>>(`${apiVersion}/bookings`, { params });
+  }): Promise<LaravelPaginatedResponse<Booking>> {
+    const response = await api.get<LaravelPaginatedResponse<Booking>>(`${apiVersion}/bookings`, { params });
     return response.data;
   },
 
@@ -39,8 +39,8 @@ export const bookingService = {
     upcoming?: boolean;
     past?: boolean;
     page?: number;
-  }): Promise<PaginatedResponse<Booking>> {
-    const response = await api.get<PaginatedResponse<Booking>>(`${apiVersion}/guest/bookings`, { params });
+  }): Promise<LaravelPaginatedResponse<Booking>> {
+    const response = await api.get<LaravelPaginatedResponse<Booking>>(`${apiVersion}/guest/bookings`, { params });
     return response.data;
   },
 
@@ -66,9 +66,24 @@ export const bookingService = {
     upcoming?: boolean;
     past?: boolean;
     page?: number;
-  }): Promise<PaginatedResponse<Booking>> {
-    const response = await api.get<PaginatedResponse<Booking>>(`${apiVersion}/host/bookings`, { params });
+  }): Promise<LaravelPaginatedResponse<Booking>> {
+    const response = await api.get<LaravelPaginatedResponse<Booking>>(`${apiVersion}/host/bookings`, { params });
     return response.data;
+  },
+
+  async getListingReservations(listingId: string): Promise<ListingReservation[]> {
+    const response = await api.get<{ data: ListingReservation[] }>(
+      `${apiVersion}/listings/${listingId}/reservations`
+    );
+    return response.data.data;
+  },
+
+  async getHostListingReservations(params: { month: number; year: number }): Promise<HostListingReservation[]> {
+    const response = await api.get<{ data: HostListingReservation[] }>(
+      `${apiVersion}/host/listings/reservations`,
+      { params }
+    );
+    return response.data.data;
   },
 
   async confirmBooking(bookingId: number): Promise<{ message: string }> {
@@ -141,5 +156,8 @@ export const getBookings = bookingService.getBookings;
 export const getBooking = bookingService.getBooking;
 export const cancelBooking = bookingService.cancelBooking;
 export const getHostBookings = bookingService.getHostBookings;
+export const getGuestBookings = bookingService.getGuestBookings;
 export const confirmBooking = bookingService.confirmBooking;
 export const rejectBooking = bookingService.rejectBooking;
+export const getListingReservations = bookingService.getListingReservations;
+export const getHostListingReservations = bookingService.getHostListingReservations;

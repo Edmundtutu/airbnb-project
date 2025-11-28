@@ -6,11 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\StoreBookingRequest;
 use App\Http\Requests\Api\V1\UpdateBookingRequest;
 use App\Http\Resources\Api\V1\BookingResource;
+use App\Http\Resources\Api\V1\BookingReservationResource;
+use App\Http\Resources\Api\V1\ListingCalendarReservationResource;
 use App\Models\Booking;
 use App\Models\Listing;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 
 class BookingController extends Controller
 {
@@ -22,7 +27,10 @@ class BookingController extends Controller
     {
         $this->authorize('viewAny', Booking::class);
 
-        $bookings = Auth::user()->bookings()->with('details.listing')->latest()->paginate();
+        $bookings = Booking::where('guest_id', Auth::id())
+            ->with('details.listing')
+            ->latest()
+            ->paginate();
 
         return BookingResource::collection($bookings);
     }
@@ -36,7 +44,37 @@ class BookingController extends Controller
 
         $validated = $request->validated();
 
-        $booking = DB::transaction(function () use ($validated) {
+        $detailPayload = collect($validated['details']);
+        $listingIds = $detailPayload->pluck('listing_id')->unique();
+        $listings = Listing::whereIn('id', $listingIds)->get()->keyBy('id');
+
+        if ($listings->count() !== $listingIds->count()) {
+            throw ValidationException::withMessages([
+                'details' => ['One or more listings could not be found.'],
+            ]);
+        }
+
+        foreach ($listingIds as $listingId) {
+            $listing = $listings->get($listingId);
+            if ($listing->property_id !== $validated['property_id']) {
+                throw ValidationException::withMessages([
+                    'details' => ['All listings must belong to the specified property.'],
+                ]);
+            }
+        }
+
+        $details = $detailPayload->map(function (array $detail) use ($listings) {
+            $listing = $listings->get($detail['listing_id']);
+            $pricePerNight = $detail['price_per_night'] ?? $listing->price_per_night;
+
+            return [
+                'listing' => $listing,
+                'nights' => (int) $detail['nights'],
+                'price_per_night' => (float) $pricePerNight,
+            ];
+        });
+
+        $booking = DB::transaction(function () use ($validated, $details) {
             $booking = Booking::create([
                 'guest_id' => Auth::id(),
                 'property_id' => $validated['property_id'],
@@ -44,21 +82,19 @@ class BookingController extends Controller
                 'check_out_date' => $validated['check_out_date'],
                 'guest_count' => $validated['guest_count'],
                 'notes' => $validated['notes'] ?? null,
-                'total' => 0, // Will be calculated next
+                'total' => 0,
                 'status' => 'pending',
             ]);
 
             $total = 0;
-            foreach ($validated['details'] as $detail) {
-                $listing = Listing::findOrFail($detail['listing_id']);
-                $pricePerNight = $detail['price_per_night'] ?? $listing->price_per_night;
 
-                $lineTotal = $pricePerNight * $detail['nights'];
+            foreach ($details as $detail) {
+                $lineTotal = $detail['price_per_night'] * $detail['nights'];
 
                 $booking->details()->create([
-                    'listing_id' => $listing->id,
+                    'listing_id' => $detail['listing']->id,
                     'nights' => $detail['nights'],
-                    'price_per_night' => $pricePerNight,
+                    'price_per_night' => $detail['price_per_night'],
                 ]);
 
                 $total += $lineTotal;
@@ -131,10 +167,14 @@ class BookingController extends Controller
      */
     public function confirmBooking(Booking $booking): JsonResponse
     {
-        if (! $this->authorize('confirm', $booking)) {
-            return response()->json(['message' => 'Some error about authpolicy.'], 403);
+        $this->authorize('confirm', $booking);
+
+        if ($booking->status !== 'pending') {
+            return response()->json(['message' => 'Only pending bookings can be confirmed.'], 422);
         }
-        $booking->update(['status' => 'processing']);
+
+        $booking->update(['status' => 'confirmed']);
+
         return response()->json(['message' => 'Booking confirmed successfully.']);
     }
 
@@ -144,9 +184,83 @@ class BookingController extends Controller
     public function rejectBooking(Booking $booking): JsonResponse
     {
         $this->authorize('confirm', $booking);
-        // TODO When Transactions features are added under payment, revert the transaction here.
+
+        if (! in_array($booking->status, ['pending', 'confirmed'])) {
+            return response()->json(['message' => 'Booking cannot be rejected in its current state.'], 422);
+        }
 
         $booking->update(['status' => 'cancelled']);
+
+        // TODO When Transactions features are added under payment, revert the transaction here.
+
         return response()->json(['message' => 'Booking rejected successfully.']);
+    }
+
+    /**
+     * Fetch existing reservations for a property to drive availability calendars.
+     */
+    public function listingReservations(Listing $listing)
+    {
+        $bookings = Booking::whereHas('details', fn ($query) => $query->where('listing_id', $listing->id))
+            ->with(['details' => fn ($query) => $query
+                ->select('id', 'booking_id', 'listing_id')
+                ->where('listing_id', $listing->id)
+            ])
+            ->whereNotIn('status', ['cancelled', 'rejected'])
+            ->orderBy('check_in_date')
+            ->get(['id', 'property_id', 'check_in_date', 'check_out_date', 'status', 'guest_count']);
+
+        $bookings->each(fn ($booking) => $booking->setAttribute('listing_id', $listing->id));
+
+        return BookingReservationResource::collection($bookings);
+    }
+
+    public function hostListingReservations(Request $request)
+    {
+        $this->authorize('viewAny', Booking::class);
+
+        $month = (int) $request->query('month', (int) now()->format('m'));
+        $year = (int) $request->query('year', (int) now()->format('Y'));
+
+        $start = Carbon::createFromDate($year, $month, 1)->startOfDay();
+        $end = (clone $start)->endOfMonth();
+
+        $bookings = Booking::with([
+                'property:id,name,host_id',
+                'details.listing:id,name,property_id',
+                'guest:id,name',
+            ])
+            ->whereHas('property', fn ($query) => $query->where('host_id', Auth::id()))
+            ->whereNotIn('status', ['cancelled', 'rejected'])
+            ->where(function ($query) use ($start, $end) {
+                $query->whereBetween('check_in_date', [$start, $end])
+                    ->orWhereBetween('check_out_date', [$start, $end])
+                    ->orWhere(function ($subQuery) use ($start, $end) {
+                        $subQuery->where('check_in_date', '<', $start)
+                            ->where('check_out_date', '>', $end);
+                    });
+            })
+            ->get();
+
+        $reservations = $bookings->flatMap(function (Booking $booking) {
+            return $booking->details->map(function ($detail) use ($booking) {
+                return [
+                    'id' => (string) $detail->id,
+                    'booking_id' => $booking->id,
+                    'listing_id' => $detail->listing_id,
+                    'listing_name' => optional($detail->listing)->name,
+                    'property_id' => $booking->property_id,
+                    'property_name' => optional($booking->property)->name,
+                    'guest_id' => $booking->guest_id,
+                    'guest_name' => optional($booking->guest)->name,
+                    'guest_count' => $booking->guest_count,
+                    'status' => $booking->status,
+                    'check_in_date' => optional($booking->check_in_date)->toDateString(),
+                    'check_out_date' => optional($booking->check_out_date)->toDateString(),
+                ];
+            });
+        })->values();
+
+        return ListingCalendarReservationResource::collection($reservations);
     }
 }

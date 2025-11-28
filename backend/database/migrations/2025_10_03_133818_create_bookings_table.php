@@ -15,25 +15,19 @@ return new class extends Migration
             $table->ulid('id')->primary();
             $table->foreignUlid('guest_id')->constrained('users')->cascadeOnDelete();
             $table->foreignUlid('property_id')->constrained('properties')->cascadeOnDelete();
-            $table->decimal('total_price', 10, 2);
+            $table->decimal('total', 10, 2)->default(0);
             $table->text('notes')->nullable();
-            $table->date('check_in');
-            $table->date('check_out');
-            $table->integer('guests');
-            $table->integer('nights');
-            $table->decimal('price_per_night', 8, 2);
-            $table->decimal('cleaning_fee', 8, 2)->default(0);
-            $table->decimal('service_fee', 8, 2)->default(0);
-            $table->text('special_requests')->nullable();
-            $table->time('arrival_time')->nullable();
-            $table->enum('status', ['pending', 'confirmed', 'checked_in', 'checked_out', 'cancelled'])->default('pending');
+            $table->date('check_in_date');
+            $table->date('check_out_date');
+            $table->unsignedTinyInteger('guest_count');
+            $table->enum('status', ['pending', 'processing', 'confirmed', 'checked_in', 'checked_out', 'completed', 'cancelled', 'rejected'])->default('pending');
             $table->timestamps();
             $table->softDeletes();
-            
+
             $table->index('guest_id');
             $table->index('property_id');
             $table->index('status');
-            $table->index(['check_in', 'check_out']);
+            $table->index(['check_in_date', 'check_out_date']);
         });
     }
 

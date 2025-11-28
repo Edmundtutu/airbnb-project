@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\V1\PostHandlers\CommentLikeController;
 use App\Http\Controllers\Api\V1\PostHandlers\PostCommentController;
 use App\Http\Controllers\Api\V1\PropertyHandlers\PropertyController;
 use App\Http\Controllers\Api\V1\PropertyHandlers\ReviewController;
+use App\Http\Controllers\Api\V1\Uploads\UploadController;
 
 Route::prefix('v1')->group(function () {
     // Authentication routes
@@ -33,9 +34,14 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('properties', PropertyController::class)->only(['index', 'show']);
     Route::apiResource('properties', PropertyController::class)->middleware('auth:sanctum')->except(['index', 'show']);
 
+    // Upload routes
+    Route::post('/uploads/property-images', [UploadController::class, 'uploadPropertyImages'])
+        ->middleware('auth:sanctum');
+
     // Listing routes
     Route::apiResource('listings', ListingController::class)->only(['index', 'show']);
     Route::apiResource('listings', ListingController::class)->middleware('auth:sanctum')->except(['index', 'show']);
+    Route::get('listings/{listing}/reservations', [BookingController::class, 'listingReservations']);
 
     // Post routes
     Route::apiResource('posts', PostController::class)->only(['index', 'show']);
@@ -49,6 +55,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/host/bookings', [BookingController::class, 'hostBookings']);
         Route::patch('/host/bookings/{booking}/confirm', [BookingController::class, 'confirmBooking']);
         Route::patch('/host/bookings/{booking}/reject', [BookingController::class, 'rejectBooking']);
+        Route::get('/host/listings', [ListingController::class, 'hostListings']);
+        Route::get('/host/listings/reservations', [BookingController::class, 'hostListingReservations']);
     });
     Route::apiResource('bookings', BookingController::class);
 

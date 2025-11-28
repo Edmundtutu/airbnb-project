@@ -28,6 +28,8 @@ import PropertyDetails from '@/pages/properties/[propertyId]';
 // Host Pages
 import HostDashboard from '@/pages/host/Dashboard';
 import HostListings from '@/pages/host/Listings';
+import HostCreateListing from '@/pages/host/CreateListing';
+import HostListingDetails from '@/pages/host/ListingDetails';
 import HostBookings from '@/pages/host/Bookings';
 import HostAnalytics from '@/pages/host/Analytics';
 import HostProfile from '@/pages/host/Profile';
@@ -152,6 +154,16 @@ const AppRoutes: React.FC = () => {
       <Route path="/host/listings" element={
         <ProtectedRoute requiredRole={['host']} layout="host">
           <HostListings />
+        </ProtectedRoute>
+      } />
+      <Route path="/host/listings/new" element={
+        <ProtectedRoute requiredRole={['host']} layout="host">
+          <HostCreateListing />
+        </ProtectedRoute>
+      } />
+      <Route path="/host/listings/:listingId" element={
+        <ProtectedRoute requiredRole={['host']} layout="host">
+          <HostListingDetails />
         </ProtectedRoute>
       } />
       <Route path="/host/bookings" element={

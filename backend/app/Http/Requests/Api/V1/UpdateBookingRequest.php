@@ -22,11 +22,11 @@ class UpdateBookingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'check_in' => 'sometimes|date|after:today',
-            'check_out' => 'sometimes|date|after:check_in',
-            'guests' => 'sometimes|integer|min:1|max:50',
-            'status' => 'sometimes|string|in:pending,confirmed,checked_in,checked_out,cancelled',
-            'special_requests' => 'nullable|string|max:500',
+            'check_in_date' => 'sometimes|date|after:today',
+            'check_out_date' => 'sometimes|date|after:check_in_date',
+            'guest_count' => 'sometimes|integer|min:1|max:50',
+            'status' => 'sometimes|string|in:pending,processing,confirmed,checked_in,checked_out,completed,cancelled,rejected',
+            'notes' => 'nullable|string|max:500',
         ];
     }
 
@@ -38,11 +38,11 @@ class UpdateBookingRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'check_in.after' => 'Check-in date must be in the future.',
-            'check_out.after' => 'Check-out date must be after check-in date.',
-            'guests.min' => 'At least 1 guest is required.',
-            'guests.max' => 'Maximum 50 guests allowed.',
-            'status.in' => 'Status must be one of: pending, confirmed, checked_in, checked_out, cancelled.',
+            'check_in_date.after' => 'Check-in date must be in the future.',
+            'check_out_date.after' => 'Check-out date must be after check-in date.',
+            'guest_count.min' => 'At least 1 guest is required.',
+            'guest_count.max' => 'Maximum 50 guests allowed.',
+            'status.in' => 'Status must be one of: pending, processing, confirmed, checked_in, checked_out, completed, cancelled, rejected.',
         ];
     }
 }

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Send, Image, Mic, Paperclip, Circle, TriangleAlert as AlertTriangle, Package, Store, User } from 'lucide-react';
+import { Send, Image, Mic, Paperclip, Circle, TriangleAlert as AlertTriangle, Calendar, Home, User } from 'lucide-react';
 import { useChat } from '@/context/ChatContext';
 import { useAuth } from '@/context/AuthContext';
 import { ChatStatusIndicator } from './ChatStatusIndicator';

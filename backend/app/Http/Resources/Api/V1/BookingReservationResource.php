@@ -5,7 +5,7 @@ namespace App\Http\Resources\Api\V1;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class BookingResource extends JsonResource
+class BookingReservationResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,19 +16,12 @@ class BookingResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'guest_id' => $this->guest_id,
             'property_id' => $this->property_id,
-            'total' => (float) $this->total,
-            'status' => $this->status,
+            'listing_id' => $this->listing_id ?? optional($this->details->first())->listing_id,
             'check_in_date' => optional($this->check_in_date)->toDateString(),
             'check_out_date' => optional($this->check_out_date)->toDateString(),
+            'status' => $this->status,
             'guest_count' => $this->guest_count,
-            'notes' => $this->notes,
-            'guest' => new UserResource($this->whenLoaded('guest')),
-            'property' => new PropertyResource($this->whenLoaded('property')),
-            'details' => BookingDetailResource::collection($this->whenLoaded('details')),
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
         ];
     }
 }
