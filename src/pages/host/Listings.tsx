@@ -1,8 +1,18 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import {
   Plus,
   Home,
@@ -10,7 +20,6 @@ import {
   Users,
   DollarSign,
   Calendar as CalendarIcon,
-  Edit,
   Eye,
   Trash2,
   Star,
@@ -18,9 +27,11 @@ import {
   ChevronRight,
   Grid,
   Loader2,
+  AlertTriangle,
 } from 'lucide-react';
 import { listingService } from '@/services/listingService';
 import { bookingService } from '@/services/bookingService';
+import { useToast } from '@/hooks/use-toast';
 import type { Listing } from '@/types';
 import type { HostListingReservation } from '@/types/bookings';
 
@@ -57,11 +68,48 @@ const getDaysInMonth = (date: Date) => {
 
 const HostListings = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
   const [currentMonth, setCurrentMonth] = useState(() => new Date());
   const [viewMode, setViewMode] = useState<'grid' | 'calendar'>('grid');
   const [selectedListing, setSelectedListing] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [listingToDelete, setListingToDelete] = useState<Listing | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const listingRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  // Delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: (listingId: string) => listingService.deleteListing(listingId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['hostListings'] });
+      toast({
+        title: 'Listing deleted',
+        description: 'Your listing has been permanently deleted.',
+      });
+      setIsDeleteDialogOpen(false);
+      setListingToDelete(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Delete failed',
+        description: error?.response?.data?.message || 'Failed to delete listing. Please try again.',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const handleDeleteClick = (listing: Listing, event: React.MouseEvent) => {
+    event.stopPropagation();
+    setListingToDelete(listing);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (listingToDelete) {
+      deleteMutation.mutate(listingToDelete.id);
+    }
+  };
 
   const { data: listings = [], isLoading: isLoadingListings } = useQuery<Listing[]>({
     queryKey: ['hostListings'],
@@ -143,9 +191,9 @@ const HostListings = () => {
     const element = listingRefs.current[listingId];
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      element.classList.add('ring-2', 'ring-blue-500', 'ring-offset-2');
+      element.classList.add('ring-2', 'ring-primary', 'ring-offset-2');
       setTimeout(() => {
-        element.classList.remove('ring-2', 'ring-blue-500', 'ring-offset-2');
+        element.classList.remove('ring-2', 'ring-primary', 'ring-offset-2');
       }, 2000);
     }
   };
@@ -173,15 +221,15 @@ const HostListings = () => {
     const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
     return (
-      <div className={`bg-white rounded-lg ${compact ? 'p-3' : 'p-6'} border`}>
+      <div className={`bg-card rounded-lg ${compact ? 'p-3' : 'p-6'} border`}>
         {!compact && (
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="font-semibold text-lg text-gray-900">Reservations Calendar</h3>
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col items-start gap-2 mb-6">
+            <h3 className="font-semibold text-lg text-foreground">Reservations Calendar</h3>
+            <div className="flex items-center gap-auto justify-between w-full">
               <Button variant="outline" size="sm" onClick={prevMonth} className="h-8 w-8 p-0">
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <span className="font-semibold text-gray-900 min-w-[120px] text-center text-sm">
+              <span className="font-semibold text-foreground min-w-[120px] text-center text-sm">
                 {monthNames[month]} {year}
               </span>
               <Button variant="outline" size="sm" onClick={nextMonth} className="h-8 w-8 p-0">
@@ -192,10 +240,10 @@ const HostListings = () => {
         )}
 
         <div className={`grid grid-cols-7 gap-1 ${compact ? 'text-xs' : 'text-sm'}`}>
-          {days.map((dayLabel) => (
+          {days.map((dayLabel, idx) => (
             <div
-              key={dayLabel}
-              className={`text-center font-semibold text-gray-500 ${compact ? 'py-1' : 'py-2'}`}
+              key={`day-${idx}`}
+              className={`text-center font-semibold text-muted-foreground ${compact ? 'py-1' : 'py-2'}`}
             >
               {dayLabel}
             </div>
@@ -223,9 +271,9 @@ const HostListings = () => {
                   aspect-square rounded-full flex items-center justify-center transition-all
                   hover:scale-105 hover:shadow-md
                   ${hasReservation
-                    ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold shadow-sm'
-                    : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}
-                  ${today ? 'ring-2 ring-blue-400 ring-offset-1' : ''}
+                    ? 'bg-primary text-primary-foreground font-semibold shadow-sm'
+                    : 'bg-muted text-muted-foreground hover:bg-accent'}
+                  ${today ? 'ring-2 ring-primary ring-offset-1' : ''}
                   ${isSelected ? 'ring-2 ring-yellow-400 ring-offset-1' : ''}
                   ${compact ? 'text-xs' : 'text-sm'}
                 `}
@@ -240,21 +288,21 @@ const HostListings = () => {
         </div>
 
         {!compact && (
-          <div className="flex items-center gap-4 mt-6 pt-4 border-t border-gray-200 flex-wrap">
+          <div className="flex items-center gap-4 mt-6 pt-4 border-t border-border flex-wrap">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full" />
-              <span className="text-xs text-gray-600">Reserved</span>
+              <div className="w-3 h-3 bg-primary rounded-full" />
+              <span className="text-xs text-muted-foreground">Reserved</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 ring-2 ring-blue-400 rounded-full" />
-              <span className="text-xs text-gray-600">Today</span>
+              <div className="w-3 h-3 ring-2 ring-primary rounded-full" />
+              <span className="text-xs text-muted-foreground">Today</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 ring-2 ring-yellow-400 bg-white rounded-full" />
-              <span className="text-xs text-gray-600">Selected Listing</span>
+              <div className="w-3 h-3 ring-2 ring-yellow-400 bg-background rounded-full" />
+              <span className="text-xs text-muted-foreground">Selected Listing</span>
             </div>
             {isLoadingReservations && (
-              <div className="flex items-center gap-2 text-xs text-gray-600">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <Loader2 className="h-3 w-3 animate-spin" />
                 <span>Loading reservations…</span>
               </div>
@@ -267,7 +315,7 @@ const HostListings = () => {
 
   if (isLoadingListings) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-[50vh] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
@@ -275,7 +323,7 @@ const HostListings = () => {
 
   if (isEmptyState) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 flex items-center justify-center p-4">
+      <div className="flex min-h-[50vh] items-center justify-center p-4">
         <Card className="max-w-md w-full text-center">
           <CardHeader>
             <CardTitle className="text-2xl">No listings yet</CardTitle>
@@ -285,7 +333,6 @@ const HostListings = () => {
               Create your first listing to start welcoming guests.
             </p>
             <Button
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg"
               onClick={() => navigate('/host/listings/new')}
             >
               <Plus className="h-4 w-4 mr-2" />
@@ -298,50 +345,49 @@ const HostListings = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2 bg-gradient-to-r from-gray-900 to-blue-800 bg-clip-text text-transparent">
-              My Listings
-            </h1>
-            <p className="text-gray-600 flex items-center gap-2">
-              <span className="flex items-center gap-1 bg-white px-3 py-1 rounded-full text-sm shadow-sm border">
-                <Home className="h-4 w-4 text-blue-600" />
-                {activePropertyCount} active {activePropertyCount === 1 ? 'property' : 'properties'}
-              </span>
-            </p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="flex bg-white rounded-lg p-1 shadow-sm border">
-              <Button
-                variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setViewMode('grid')}
-                className="flex items-center gap-2"
-              >
-                <Grid className="h-4 w-4" />
-                {isMobile ? 'Grid' : 'Grid View'}
-              </Button>
-              <Button
-                variant={viewMode === 'calendar' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setViewMode('calendar')}
-                className="flex items-center gap-2"
-              >
-                <CalendarIcon className="h-4 w-4" />
-                {isMobile ? 'Calendar' : 'Calendar View'}
-              </Button>
-            </div>
-            <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Listing
-            </Button>
-          </div>
+    <div className="space-y-6">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2">
+            My Listings
+          </h1>
+          <p className="text-muted-foreground flex items-center gap-2">
+            <span className="flex items-center gap-1 bg-muted px-3 py-1 rounded-full text-sm">
+              <Home className="h-4 w-4 text-primary" />
+              {activePropertyCount} active {activePropertyCount === 1 ? 'property' : 'properties'}
+            </span>
+          </p>
         </div>
 
-        {!isMobile ? (
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex bg-muted rounded-lg p-1">
+            <Button
+              variant={viewMode === 'grid' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('grid')}
+              className="flex items-center gap-2"
+            >
+              <Grid className="h-4 w-4" />
+              {isMobile ? 'Grid' : 'Grid View'}
+            </Button>
+            <Button
+              variant={viewMode === 'calendar' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('calendar')}
+              className="flex items-center gap-2"
+            >
+              <CalendarIcon className="h-4 w-4" />
+              {isMobile ? 'Calendar' : 'Calendar View'}
+            </Button>
+          </div>
+          <Button onClick={() => navigate('/host/listings/new')}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Listing
+          </Button>
+        </div>
+      </div>
+
+      {!isMobile ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -356,8 +402,8 @@ const HostListings = () => {
                       ref={(el) => {
                         listingRefs.current[listing.id] = el;
                       }}
-                      className={`overflow-hidden hover:shadow-xl transition-all duration-300 border-0 bg-white shadow-sm hover:scale-[1.02] group cursor-pointer ${
-                        selectedListing === listing.id ? 'ring-2 ring-blue-500 ring-offset-2' : ''
+                      className={`overflow-hidden hover:shadow-xl transition-all duration-300 border-0 bg-card shadow-sm hover:scale-[1.02] group cursor-pointer ${
+                        selectedListing === listing.id ? 'ring-2 ring-primary ring-offset-2' : ''
                       }`}
                       onClick={() => setSelectedListing(listing.id)}
                     >
@@ -375,7 +421,7 @@ const HostListings = () => {
                         <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm px-2 py-1 rounded-full text-sm font-semibold flex items-center gap-1 shadow-lg">
                           <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
                           {listing.rating?.toFixed(1) ?? '—'}
-                          <span className="text-gray-500 text-xs">({listing.total_reviews ?? 0})</span>
+                          <span className="text-muted-foreground text-xs">({listing.total_reviews ?? 0})</span>
                         </div>
                         <div className="absolute bottom-3 left-3 text-white">
                           <h3 className="font-bold text-lg leading-tight">{listing.name}</h3>
@@ -389,33 +435,33 @@ const HostListings = () => {
                       <CardContent className="p-4">
                         <div className="grid grid-cols-3 gap-4 mb-4 text-center">
                           <div className="text-sm">
-                            <Users className="h-4 w-4 mx-auto mb-1 text-gray-500" />
-                            <span className="font-semibold text-gray-900">{listing.max_guests ?? '—'}</span>
-                            <p className="text-xs text-gray-500">Guests</p>
+                            <Users className="h-4 w-4 mx-auto mb-1 text-muted-foreground" />
+                            <span className="font-semibold text-foreground">{listing.max_guests ?? '—'}</span>
+                            <p className="text-xs text-muted-foreground">Guests</p>
                           </div>
                           <div className="text-sm">
-                            <Home className="h-4 w-4 mx-auto mb-1 text-gray-500" />
-                            <span className="font-semibold text-gray-900">{listing.bedrooms ?? '—'}</span>
-                            <p className="text-xs text-gray-500">Beds</p>
+                            <Home className="h-4 w-4 mx-auto mb-1 text-muted-foreground" />
+                            <span className="font-semibold text-foreground">{listing.bedrooms ?? '—'}</span>
+                            <p className="text-xs text-muted-foreground">Beds</p>
                           </div>
                           <div className="text-sm">
-                            <div className="h-4 w-4 mx-auto mb-1 flex items-center justify-center text-gray-500">
+                            <div className="h-4 w-4 mx-auto mb-1 flex items-center justify-center text-muted-foreground">
                               <span className="text-xs font-bold">B</span>
                             </div>
-                            <span className="font-semibold text-gray-900">{listing.bathrooms ?? '—'}</span>
-                            <p className="text-xs text-gray-500">Baths</p>
+                            <span className="font-semibold text-foreground">{listing.bathrooms ?? '—'}</span>
+                            <p className="text-xs text-muted-foreground">Baths</p>
                           </div>
                         </div>
 
                         <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center gap-1 font-bold text-lg text-gray-900">
+                          <div className="flex items-center gap-1 font-bold text-lg text-foreground">
                             <DollarSign className="h-4 w-4" />
                             {listing.price_per_night.toLocaleString()}
-                            <span className="text-sm font-normal text-gray-600">/night</span>
+                            <span className="text-sm font-normal text-muted-foreground">/night</span>
                           </div>
                           <span
                             className={`px-2 py-1 text-xs font-medium rounded-full ${
-                              listing.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+                              listing.is_active ? 'bg-green-100 text-green-800' : 'bg-muted text-muted-foreground'
                             }`}
                           >
                             {listing.is_active ? 'Active' : 'Inactive'}
@@ -426,7 +472,7 @@ const HostListings = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            className="flex-1 hover:bg-gray-50"
+                            className="flex-1 hover:bg-accent"
                             onClick={(event) => {
                               event.stopPropagation();
                               navigate(`/host/listings/${listing.id}`);
@@ -435,12 +481,18 @@ const HostListings = () => {
                             <Eye className="h-4 w-4 mr-1" />
                             View
                           </Button>
-                          <Button variant="outline" size="sm" className="flex-1 hover:bg-blue-50 hover:text-blue-600">
-                            <Edit className="h-4 w-4 mr-1" />
-                            Edit
-                          </Button>
-                          <Button variant="outline" size="sm" className="hover:bg-red-50 hover:text-red-600">
-                            <Trash2 className="h-4 w-4" />
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+                            onClick={(event) => handleDeleteClick(listing, event)}
+                            disabled={deleteMutation.isPending}
+                          >
+                            {deleteMutation.isPending && listingToDelete?.id === listing.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-4 w-4" />
+                            )}
                           </Button>
                         </div>
                       </CardContent>
@@ -468,7 +520,7 @@ const HostListings = () => {
                       <div className="flex">
                         <div className="flex-1 p-4">
                           <h3 className="font-bold text-lg mb-2">{listing.name}</h3>
-                          <div className="space-y-2 text-sm text-gray-600 mb-3">
+                          <div className="space-y-2 text-sm text-muted-foreground mb-3">
                             <div className="flex items-center gap-2">
                               <MapPin className="h-4 w-4" />
                               <span>{location}</span>
@@ -485,12 +537,12 @@ const HostListings = () => {
                             </div>
                           </div>
                           <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-1 font-semibold text-gray-900">
+                            <div className="flex items-center gap-1 font-semibold text-foreground">
                               <DollarSign className="h-4 w-4" />
                               {listing.price_per_night.toLocaleString()}
-                              <span className="text-sm font-normal text-gray-600">/night</span>
+                              <span className="text-sm font-normal text-muted-foreground">/night</span>
                             </div>
-                            <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-xs">
+                            <div className="flex items-center gap-1 bg-muted px-2 py-1 rounded text-xs">
                               <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
                               {listing.rating?.toFixed(1) ?? '—'}
                             </div>
@@ -503,6 +555,19 @@ const HostListings = () => {
                               onClick={() => navigate(`/host/listings/${listing.id}`)}
                             >
                               Manage
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+                              onClick={(event) => handleDeleteClick(listing, event)}
+                              disabled={deleteMutation.isPending}
+                            >
+                              {deleteMutation.isPending && listingToDelete?.id === listing.id ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Trash2 className="h-4 w-4" />
+                              )}
                             </Button>
                           </div>
                         </div>
@@ -521,7 +586,48 @@ const HostListings = () => {
             )}
           </div>
         )}
-      </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-red-500" />
+              Delete Listing
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              <p>
+                Are you sure you want to delete <strong>"{listingToDelete?.name}"</strong>?
+              </p>
+              <p className="text-red-600 font-medium">
+                This action cannot be undone. All data associated with this listing, including photos and booking history, will be permanently removed.
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteMutation.isPending}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              disabled={deleteMutation.isPending}
+              className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+            >
+              {deleteMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Listing
+                </>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

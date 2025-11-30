@@ -23,7 +23,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->json('tags')->nullable();
             $table->integer('bedrooms')->default(1);
-            $table->integer('bathrooms')->default(1);
+            $table->decimal('bathrooms', 3, 1)->default(1);
             $table->json('amenities')->nullable();
             $table->json('house_rules')->nullable();
             $table->string('check_in_time')->default('15:00');

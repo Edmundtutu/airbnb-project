@@ -20,8 +20,8 @@ const HostLayout: React.FC<HostLayoutProps> = ({ children }) => {
         <DesktopSidebar />
         
         {/* Main Content */}
-        <main className="flex-1 min-h-screen md:ml-64 pb-20 md:pb-6">
-          <div className="container mx-auto px-4 py-6 max-w-6xl">
+        <main className="flex-1 min-h-screen lg:ml-64 xl:ml-72 pb-20 lg:pb-6">
+          <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
             {children}
           </div>
         </main>

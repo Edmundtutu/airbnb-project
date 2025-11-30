@@ -33,10 +33,11 @@ const uploadService = {
       }
     );
 
-    if (response.data.status === 'success' && response.data.data) {
-      return response.data.data;
+    const payload = response.data?.data;
+    if (payload && Array.isArray(payload)) {
+      return payload;
     }
-    throw new Error(response.data.message || 'Failed to upload images');
+    throw new Error(response.data?.message || 'Failed to upload images');
   },
 };
 

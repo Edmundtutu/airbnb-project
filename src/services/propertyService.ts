@@ -101,6 +101,38 @@ export const propertyService = {
     await api.delete(`${apiVersion}/properties/${id}`);
   },
 
+  /**
+   * Get properties owned by the authenticated host.
+   * This is a secure endpoint - the backend determines ownership from the auth session.
+   */
+  async getHostProperties(params?: { search?: string; page?: number }): Promise<LaravelPaginatedResponse<Property>> {
+    const response = await api.get(`${apiVersion}/host/properties`, { params });
+    const apiData = response.data as LaravelPaginatedResponse<any>;
+
+    const mapApiPropertyToClient = (p: any): Property => ({
+      id: p.id,
+      name: p.name,
+      description: p.description ?? '',
+      location: { lat: Number(p.lat), lng: Number(p.lng), address: p.address ?? '' },
+      avatar: p.avatar ?? undefined,
+      cover_image: p.cover_image ?? undefined,
+      host_id: p.host_id,
+      host: p.host,
+      rating: p.rating ?? 0,
+      total_reviews: p.total_reviews ?? 0,
+      phone: p.phone ?? undefined,
+      hours: p.hours ?? undefined,
+      verified: !!p.verified,
+      created_at: p.created_at,
+      updated_at: p.updated_at,
+    });
+
+    return {
+      ...apiData,
+      data: (apiData.data ?? []).map(mapApiPropertyToClient),
+    };
+  },
+
   // Listings Management
   async getPropertyListings(propertyId: string | number): Promise<Listing[]> {
     const response = await api.get(`${apiVersion}/listings`, { params: { property_id: propertyId } });

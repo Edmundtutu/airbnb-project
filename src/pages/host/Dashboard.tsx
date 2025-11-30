@@ -5,7 +5,10 @@ import { ChartBar as BarChart3, TrendingUp, Calendar, Chrome as Home } from 'luc
 const HostDashboard: React.FC = () => {
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Host Dashboard</h1>
+      <div>
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">Host Dashboard</h1>
+        <p className="text-muted-foreground">Welcome back! Here's an overview of your hosting activity.</p>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

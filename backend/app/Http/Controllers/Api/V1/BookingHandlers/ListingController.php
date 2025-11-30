@@ -47,6 +47,68 @@ class ListingController extends Controller
             });
         }
 
+        // Handle JSON array filtering for amenities (AND logic - must have ALL selected amenities)
+        if ($request->has('amenities')) {
+            $amenities = is_array($request->input('amenities'))
+                ? $request->input('amenities')
+                : explode(',', $request->input('amenities'));
+
+            foreach ($amenities as $amenity) {
+                $amenity = trim($amenity);
+                if (!empty($amenity)) {
+                    $query->whereJsonContains('amenities', $amenity);
+                }
+            }
+        }
+
+        // Handle JSON array filtering for house_rules
+        if ($request->has('house_rules')) {
+            $rules = is_array($request->input('house_rules'))
+                ? $request->input('house_rules')
+                : explode(',', $request->input('house_rules'));
+
+            foreach ($rules as $rule) {
+                $rule = trim($rule);
+                if (!empty($rule)) {
+                    $query->whereJsonContains('house_rules', $rule);
+                }
+            }
+        }
+
+        // Handle JSON array filtering for accessibility_features
+        if ($request->has('accessibility')) {
+            $features = is_array($request->input('accessibility'))
+                ? $request->input('accessibility')
+                : explode(',', $request->input('accessibility'));
+
+            foreach ($features as $feature) {
+                $feature = trim($feature);
+                if (!empty($feature)) {
+                    $query->whereJsonContains('accessibility_features', $feature);
+                }
+            }
+        }
+
+        // Simple parameter aliases for cleaner frontend requests
+        // Price range filtering via minPrice/maxPrice
+        if ($request->has('minPrice')) {
+            $query->where('price_per_night', '>=', (float) $request->input('minPrice'));
+        }
+        if ($request->has('maxPrice')) {
+            $query->where('price_per_night', '<=', (float) $request->input('maxPrice'));
+        }
+
+        // Simple search parameter (searches name, description, tags)
+        if ($request->has('search') && !empty($request->input('search'))) {
+            $searchTerm = '%' . $request->input('search') . '%';
+            $rawSearchTerm = $request->input('search');
+            $query->where(function ($q) use ($searchTerm, $rawSearchTerm) {
+                $q->where('name', 'LIKE', $searchTerm)
+                    ->orWhere('description', 'LIKE', $searchTerm)
+                    ->orWhereJsonContains('tags', $rawSearchTerm);
+            });
+        }
+
         // Apply eager loading for the property and reviews relationships
         $query->with(['property', 'reviews']);
 
@@ -109,7 +171,7 @@ class ListingController extends Controller
         $this->authorize('viewAny', Listing::class);
 
         $listings = Listing::with(['property', 'reviews'])
-            ->whereHas('property', fn ($query) => $query->where('host_id', Auth::id()))
+            ->whereHas('property', fn($query) => $query->where('host_id', Auth::id()))
             ->orderByDesc('created_at')
             ->get();
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,20 +15,7 @@ import { useQuery } from '@tanstack/react-query';
 import { listingService } from '@/services/listingService';
 import { useWishlist } from '@/context/WishlistContext';
 import { ListingCard } from '@/components/guest/discover/ListingCard';
-import FiltersPanel from '@/layouts/FiltersPanel';
-
-// Filter State Interface
-interface FilterState {
-  priceRange: [number, number];
-  propertyTypes: string[];
-  bedrooms: number | null;
-  beds: number | null;
-  bathrooms: number | null;
-  amenities: string[];
-  bookingOptions: string[];
-  houseRules: string[];
-  accessibility: string[];
-}
+import FiltersPanel, { FilterState, DEFAULT_FILTER_STATE } from '@/layouts/FiltersPanel';
 
 const Discover: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -40,17 +27,15 @@ const Discover: React.FC = () => {
   const [page, setPage] = useState(1);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [activeFilters, setActiveFilters] = useState<FilterState>({
-    priceRange: [0, 1000000],
-    propertyTypes: [],
-    bedrooms: null,
-    beds: null,
-    bathrooms: null,
-    amenities: [],
-    bookingOptions: [],
-    houseRules: [],
-    accessibility: []
-  });
+  
+  // Active filters that are applied to the main listing query
+  const [activeFilters, setActiveFilters] = useState<FilterState>({ ...DEFAULT_FILTER_STATE });
+  
+  // Preview filters - live updated as user changes filters in panel (before Apply)
+  const [previewFilters, setPreviewFilters] = useState<FilterState>({ ...DEFAULT_FILTER_STATE });
+  
+  // Preview result count (for showing in filter panel)
+  const [previewCount, setPreviewCount] = useState<number | undefined>(undefined);
 
   // Detect mobile screen and manage filter panel state
   useEffect(() => {
@@ -66,52 +51,126 @@ const Discover: React.FC = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Build query params from filters
-  const buildQueryParams = () => {
-    const params: any = {
-      search: searchQuery,
-      page
+  // Build query params from filters - maps FilterState to backend API params
+  const buildQueryParams = useCallback((filters: FilterState, pageNum: number = 1) => {
+    const params: Record<string, any> = {
+      page: pageNum,
+      per_page: 12, // Default items per page
     };
 
-    if (activeFilters.propertyTypes.length > 0) {
-      params.propertyTypes = activeFilters.propertyTypes.join(',');
+    // Search query
+    if (searchQuery && searchQuery.trim()) {
+      params.search = searchQuery.trim();
     }
-    if (activeFilters.bedrooms !== null) {
-      params.bedrooms = activeFilters.bedrooms;
+
+    // Property types (categories)
+    if (filters.propertyTypes.length > 0) {
+      params.propertyTypes = filters.propertyTypes;
     }
-    if (activeFilters.beds !== null) {
-      params.beds = activeFilters.beds;
+
+    // Room counts
+    if (filters.bedrooms !== null) {
+      params.bedrooms = filters.bedrooms;
     }
-    if (activeFilters.bathrooms !== null) {
-      params.bathrooms = activeFilters.bathrooms;
+    if (filters.beds !== null) {
+      params.beds = filters.beds;
     }
-    if (activeFilters.amenities.length > 0) {
-      params.amenities = activeFilters.amenities.join(',');
+    if (filters.bathrooms !== null) {
+      params.bathrooms = filters.bathrooms;
     }
-    if (activeFilters.priceRange[0] > 0 || activeFilters.priceRange[1] < 1000000) {
-      params.minPrice = activeFilters.priceRange[0];
-      params.maxPrice = activeFilters.priceRange[1];
+
+    // Price range
+    if (filters.priceRange[0] > 0) {
+      params.minPrice = filters.priceRange[0];
+    }
+    if (filters.priceRange[1] < 1000000) {
+      params.maxPrice = filters.priceRange[1];
+    }
+
+    // Amenities (JSON array filter)
+    if (filters.amenities.length > 0) {
+      params.amenities = filters.amenities;
+    }
+
+    // House rules (JSON array filter)
+    if (filters.houseRules.length > 0) {
+      params.house_rules = filters.houseRules;
+    }
+
+    // Accessibility features (JSON array filter)
+    if (filters.accessibility.length > 0) {
+      params.accessibility = filters.accessibility;
+    }
+
+    // Booking options - map to individual boolean params
+    if (filters.bookingOptions.includes('instantBook')) {
+      params.instant_book = true;
+    }
+    if (filters.bookingOptions.includes('selfCheckIn')) {
+      params.self_check_in = true;
+    }
+    if (filters.bookingOptions.includes('allowsPets')) {
+      params.allows_pets = true;
     }
 
     return params;
-  };
+  }, [searchQuery]);
 
+  // Main listings query - uses activeFilters (applied filters)
   const { data: listingsResponse, isLoading, error } = useQuery({
     queryKey: ['listings', searchQuery, activeFilters, page],
-    queryFn: () => listingService.getListings(buildQueryParams()),
+    queryFn: () => listingService.getListings(buildQueryParams(activeFilters, page)),
     staleTime: 30_000,
   });
+
+  // Preview query - triggered when filters change in the panel (before Apply)
+  // Only runs when the filter panel is open
+  const { data: previewResponse, isFetching: isPreviewFetching } = useQuery({
+    queryKey: ['listings-preview', searchQuery, previewFilters],
+    queryFn: () => listingService.getListings(buildQueryParams(previewFilters, 1)),
+    staleTime: 10_000,
+    enabled: isFiltersOpen, // Only fetch when filter panel is open
+  });
+
+  // Update preview count when preview response changes
+  useEffect(() => {
+    if (previewResponse) {
+      if (Array.isArray(previewResponse)) {
+        setPreviewCount(previewResponse.length);
+      } else if (typeof previewResponse === 'object') {
+        setPreviewCount((previewResponse as any)?.total ?? (previewResponse as any)?.data?.length ?? 0);
+      }
+    }
+  }, [previewResponse]);
+
+  // Sync preview filters when panel opens
+  useEffect(() => {
+    if (isFiltersOpen) {
+      setPreviewFilters({ ...activeFilters });
+    }
+  }, [isFiltersOpen, activeFilters]);
+
+  // Handle live filter changes (triggered by FiltersPanel onFilterChange)
+  const handleFilterChange = useCallback((filters: FilterState) => {
+    setPreviewFilters(filters);
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setPage(1);
   };
 
-  const handleApplyFilters = (filters: FilterState) => {
+  const handleApplyFilters = useCallback((filters: FilterState) => {
     setActiveFilters(filters);
     setPage(1);
     setIsFiltersOpen(false);
-  };
+  }, []);
+
+  const clearAllFilters = useCallback(() => {
+    setActiveFilters({ ...DEFAULT_FILTER_STATE });
+    setPreviewFilters({ ...DEFAULT_FILTER_STATE });
+    setPage(1);
+  }, []);
 
   const getActiveFiltersCount = () => {
     let count = 0;
@@ -132,6 +191,7 @@ const Discover: React.FC = () => {
   let totalListings = 0;
   let currentPage = 1;
   let lastPage = 1;
+  let perPage = 12;
 
   if (Array.isArray(listingsResponse)) {
     listingsToDisplay = listingsResponse as Listing[];
@@ -143,6 +203,7 @@ const Discover: React.FC = () => {
     totalListings = (listingsResponse as any)?.total ?? listingsToDisplay.length;
     currentPage = (listingsResponse as any)?.current_page ?? page;
     lastPage = (listingsResponse as any)?.last_page ?? 1;
+    perPage = (listingsResponse as any)?.per_page ?? 12;
   }
 
   if (error) {
@@ -209,19 +270,7 @@ const Discover: React.FC = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => {
-                  setActiveFilters({
-                    priceRange: [0, 1000000],
-                    propertyTypes: [],
-                    bedrooms: null,
-                    beds: null,
-                    bathrooms: null,
-                    amenities: [],
-                    bookingOptions: [],
-                    houseRules: [],
-                    accessibility: []
-                  });
-                }}
+                onClick={clearAllFilters}
                 className="h-7 text-xs"
               >
                 Clear all
@@ -258,17 +307,7 @@ const Discover: React.FC = () => {
                     </p>
                     <Button onClick={() => {
                       setSearchQuery('');
-                      setActiveFilters({
-                        priceRange: [0, 1000000],
-                        propertyTypes: [],
-                        bedrooms: null,
-                        beds: null,
-                        bathrooms: null,
-                        amenities: [],
-                        bookingOptions: [],
-                        houseRules: [],
-                        accessibility: []
-                      });
+                      clearAllFilters();
                     }}>
                       Clear Search & Filters
                     </Button>
@@ -327,6 +366,9 @@ const Discover: React.FC = () => {
               isOpen={isFiltersOpen}
               onClose={() => setIsFiltersOpen(false)}
               onApplyFilters={handleApplyFilters}
+              onFilterChange={handleFilterChange}
+              initialFilters={activeFilters}
+              resultCount={previewCount}
               isMobile={false}
             />
           </div>
@@ -339,6 +381,9 @@ const Discover: React.FC = () => {
           isOpen={isFiltersOpen}
           onClose={() => setIsFiltersOpen(false)}
           onApplyFilters={handleApplyFilters}
+          onFilterChange={handleFilterChange}
+          initialFilters={activeFilters}
+          resultCount={previewCount}
           isMobile={true}
         />
       )}

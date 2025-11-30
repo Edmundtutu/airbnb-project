@@ -22,19 +22,23 @@ class UpdateListingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'sometimes|string|max:255',
-            'description' => 'nullable|string',
-            'price_per_night' => 'sometimes|numeric|min:0',
-            'images' => 'nullable|array',
-            'images.*' => 'string|max:255',
-            'room_type' => 'sometimes|string|in:Entire place,Private room,Shared room',
-            'bedrooms' => 'sometimes|integer|min:0|max:20',
-            'bathrooms' => 'sometimes|integer|min:0|max:20',
+            'name' => 'sometimes|string|max:255',
+            'description' => 'sometimes|string|min:20',
+            'price_per_night' => 'sometimes|numeric|min:10',
+            'category' => 'sometimes|string|max:50',
             'max_guests' => 'sometimes|integer|min:1|max:50',
-            'beds' => 'sometimes|integer|min:1|max:20',
+            'bedrooms' => 'sometimes|integer|min:0|max:20',
+            'bathrooms' => 'sometimes|numeric|min:0|max:20',
+            'images' => 'nullable|array',
+            'images.*' => 'string|url|max:500',
+            'amenities' => 'nullable|array',
+            'amenities.*' => 'string|max:100',
+            'house_rules' => 'nullable|array',
+            'house_rules.*' => 'string|max:100',
             'tags' => 'nullable|array',
             'tags.*' => 'string|max:50',
-            'available' => 'boolean',
+            'instant_book' => 'nullable|boolean',
+            'is_active' => 'nullable|boolean',
         ];
     }
 }

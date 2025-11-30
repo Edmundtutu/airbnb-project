@@ -57,6 +57,7 @@ Route::prefix('v1')->group(function () {
         Route::patch('/host/bookings/{booking}/reject', [BookingController::class, 'rejectBooking']);
         Route::get('/host/listings', [ListingController::class, 'hostListings']);
         Route::get('/host/listings/reservations', [BookingController::class, 'hostListingReservations']);
+        Route::get('/host/properties', [PropertyController::class, 'hostProperties']);
     });
     Route::apiResource('bookings', BookingController::class);
 

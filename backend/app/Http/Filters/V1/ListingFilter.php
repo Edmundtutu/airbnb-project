@@ -9,14 +9,17 @@ class ListingFilter extends ApiFilter
     protected $allowed_params = [
         'name' => ['eq', 'like'],
         'description' => ['eq', 'like'],
-        'price_per_night' => ['eq', 'btw', 'not_btw','gt','lt','gte','lte','ne','in', 'not_in'],
-        'max_guests' => ['eq', 'btw', 'not_btw','gt','lt','gte','lte','ne','in', 'not_in'],
-        'bedrooms' => ['eq', 'btw', 'not_btw','gt','lt','gte','lte','ne','in', 'not_in'],
-        'bathrooms' => ['eq', 'btw', 'not_btw','gt','lt','gte','lte','ne','in', 'not_in'],
+        'price_per_night' => ['eq', 'btw', 'not_btw', 'gt', 'lt', 'gte', 'lte', 'ne', 'in', 'not_in'],
+        'max_guests' => ['eq', 'btw', 'not_btw', 'gt', 'lt', 'gte', 'lte', 'ne', 'in', 'not_in'],
+        'bedrooms' => ['eq', 'btw', 'not_btw', 'gt', 'lt', 'gte', 'lte', 'ne', 'in', 'not_in'],
+        'beds' => ['eq', 'btw', 'not_btw', 'gt', 'lt', 'gte', 'lte', 'ne', 'in', 'not_in'],
+        'bathrooms' => ['eq', 'btw', 'not_btw', 'gt', 'lt', 'gte', 'lte', 'ne', 'in', 'not_in'],
         'tags' => ['eq', 'like'],
-        'category' => ['eq'],
+        'category' => ['eq', 'in', 'not_in'],
         'is_active' => ['eq'],
         'instant_book' => ['eq'],
+        'self_check_in' => ['eq'],
+        'allows_pets' => ['eq'],
         'property_id' => ['eq'],
     ];
 

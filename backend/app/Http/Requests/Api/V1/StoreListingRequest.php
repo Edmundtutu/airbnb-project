@@ -23,19 +23,23 @@ class StoreListingRequest extends FormRequest
     {
         return [
             'property_id' => 'required|ulid|exists:properties,id',
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price_per_night' => 'required|numeric|min:0',
-            'images' => 'nullable|array',
-            'images.*' => 'string|max:255',
-            'room_type' => 'required|string|in:Entire place,Private room,Shared room',
-            'bedrooms' => 'required|integer|min:0|max:20',
-            'bathrooms' => 'required|integer|min:0|max:20',
+            'name' => 'required|string|max:255',
+            'description' => 'required|string|min:20',
+            'price_per_night' => 'required|numeric|min:10',
+            'category' => 'required|string|max:50',
             'max_guests' => 'required|integer|min:1|max:50',
-            'beds' => 'required|integer|min:1|max:20',
+            'bedrooms' => 'nullable|integer|min:0|max:20',
+            'bathrooms' => 'nullable|numeric|min:0|max:20',
+            'images' => 'nullable|array',
+            'images.*' => 'string|url|max:500',
+            'amenities' => 'nullable|array',
+            'amenities.*' => 'string|max:100',
+            'house_rules' => 'nullable|array',
+            'house_rules.*' => 'string|max:100',
             'tags' => 'nullable|array',
             'tags.*' => 'string|max:50',
-            'available' => 'boolean',
+            'instant_book' => 'nullable|boolean',
+            'is_active' => 'nullable|boolean',
         ];
     }
 }

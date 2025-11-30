@@ -83,6 +83,30 @@ class PropertyController extends Controller
     }
 
     /**
+     * Get properties owned by the authenticated host.
+     * This is a secure endpoint that doesn't trust client-provided host_id.
+     */
+    public function hostProperties(Request $request)
+    {
+        $hostId = Auth::id();
+        
+        $query = Property::where('host_id', $hostId)
+            ->with(['reviews', 'host', 'listings']);
+
+        // Optional search within host's properties
+        if ($request->filled('search')) {
+            $search = '%' . $request->query('search') . '%';
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', $search)
+                  ->orWhere('description', 'LIKE', $search)
+                  ->orWhere('address', 'LIKE', $search);
+            });
+        }
+
+        return PropertyResource::collection($query->paginate());
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(StorePropertyRequest $request)

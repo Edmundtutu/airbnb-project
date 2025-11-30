@@ -33,11 +33,40 @@ class ApiFilter {
 
             foreach($operators as $operator){
                 if(isset($query[$operator])){
-                    $eloquent_query[] = [$column, $this->operator_map[$operator], $query[$operator]];
+                    $value = $this->castValue($query[$operator]);
+                    $eloquent_query[] = [$column, $this->operator_map[$operator], $value];
                 }
             }
             
         }
         return $eloquent_query;
+    }
+
+    /**
+     * Cast string values to appropriate PHP types
+     * Handles boolean strings ('true'/'false'), numeric strings, and null
+     */
+    protected function castValue($value)
+    {
+        // Handle arrays (for IN, NOT IN operators)
+        if (is_array($value)) {
+            return array_map([$this, 'castValue'], $value);
+        }
+
+        // Handle boolean strings
+        if (strtolower($value) === 'true' || $value === '1') {
+            return true;
+        }
+        if (strtolower($value) === 'false' || $value === '0') {
+            return false;
+        }
+
+        // Handle null string
+        if (strtolower($value) === 'null') {
+            return null;
+        }
+
+        // Return as-is for other values
+        return $value;
     }
 }

@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Chrome as Home, Search, MapPin, Calendar, User, Heart, Building, ChartBar as BarChart3, LogOut, Settings, Rss, PlusCircle } from 'lucide-react';
+import { Chrome as Home, Search, MapPin, Calendar, User, Heart, Building, ChartBar as BarChart3, LogOut, Settings, Rss } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 interface NavItem {
@@ -31,7 +31,6 @@ const DesktopSidebar: React.FC = () => {
   const hostNavItems: NavItem[] = [
     { name: 'Dashboard', href: '/host/dashboard', icon: BarChart3 },
     { name: 'Listings', href: '/host/listings', icon: Home },
-    { name: 'Add Listing', href: '/host/listings/new', icon: PlusCircle },
     { name: 'Bookings', href: '/host/bookings', icon: Calendar },
     { name: 'Property Profile', href: '/host/profile', icon: Building },
     { name: 'Account', href: '/host/account', icon: User },
