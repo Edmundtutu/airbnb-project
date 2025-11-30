@@ -28,6 +28,8 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/user', [AuthController::class, 'user']);
+        Route::get('/guest/bookings', [BookingController::class, 'guestBookings']);
+        Route::post('/guest/bookings', [BookingController::class, 'store']);
     });
 
     // Property routes

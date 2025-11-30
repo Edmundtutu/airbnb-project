@@ -18,7 +18,7 @@ import {
   Home,
   MapPin,
   Users,
-  DollarSign,
+  Coins,
   Calendar as CalendarIcon,
   Eye,
   Trash2,
@@ -54,6 +54,9 @@ type CalendarReservation = HostListingReservation & {
   startDate: Date;
   endDate: Date;
 };
+
+const formatUGX = (value: number) =>
+  new Intl.NumberFormat('en-UG', { style: 'currency', currency: 'UGX', maximumFractionDigits: 0 }).format(value);
 
 const getDaysInMonth = (date: Date) => {
   const year = date.getFullYear();
@@ -454,9 +457,9 @@ const HostListings = () => {
                         </div>
 
                         <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center gap-1 font-bold text-lg text-foreground">
-                            <DollarSign className="h-4 w-4" />
-                            {listing.price_per_night.toLocaleString()}
+                          <div className="flex items-center gap-2 font-bold text-lg text-foreground">
+                            <Coins className="h-4 w-4" />
+                            <span>{formatUGX(listing.price_per_night)}</span>
                             <span className="text-sm font-normal text-muted-foreground">/night</span>
                           </div>
                           <span
@@ -537,9 +540,9 @@ const HostListings = () => {
                             </div>
                           </div>
                           <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-1 font-semibold text-foreground">
-                              <DollarSign className="h-4 w-4" />
-                              {listing.price_per_night.toLocaleString()}
+                            <div className="flex items-center gap-2 font-semibold text-foreground">
+                              <Coins className="h-4 w-4" />
+                              <span>{formatUGX(listing.price_per_night)}</span>
                               <span className="text-sm font-normal text-muted-foreground">/night</span>
                             </div>
                             <div className="flex items-center gap-1 bg-muted px-2 py-1 rounded text-xs">

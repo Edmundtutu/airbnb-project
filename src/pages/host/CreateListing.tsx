@@ -11,7 +11,7 @@ import {
     Trash2,
     Home,
     Users,
-    DollarSign,
+    Coins,
     BedDouble,
     Bath,
     Star,
@@ -45,7 +45,7 @@ const listingSchema = z.object({
     property_id: z.string().min(1, 'Select a property'),
     description: z.string().min(20, 'Add a richer description'),
     category: z.string().min(1, 'Pick a category'),
-    price_per_night: z.coerce.number().min(10, 'Price must be at least $10'),
+    price_per_night: z.coerce.number().min(10, 'Price must be at least UGX 10'),
     max_guests: z.coerce.number().min(1, 'At least one guest'),
     bedrooms: z.coerce.number().min(0).optional(),
     bathrooms: z.coerce.number().min(0).optional(),
@@ -448,7 +448,7 @@ const HostCreateListing: React.FC = () => {
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel className="flex items-center gap-2">
-                                                    <DollarSign className="h-4 w-4" />
+                                                    <Coins className="h-4 w-4" />
                                                     Price per night
                                                 </FormLabel>
                                                 <FormControl>
@@ -460,7 +460,7 @@ const HostCreateListing: React.FC = () => {
                                                                 className="w-32"
                                                                 {...field}
                                                             />
-                                                            <span className="text-muted-foreground">USD</span>
+                                                            <span className="text-muted-foreground">UGX</span>
                                                         </div>
                                                         <Slider
                                                             value={[field.value]}
@@ -470,9 +470,9 @@ const HostCreateListing: React.FC = () => {
                                                             className="w-full"
                                                         />
                                                         <div className="flex justify-between text-sm text-muted-foreground">
-                                                            <span>$10</span>
-                                                            <span>$500</span>
-                                                            <span>$1000+</span>
+                                                            <span>UGX 10</span>
+                                                            <span>UGX 500</span>
+                                                            <span>UGX 1000+</span>
                                                         </div>
                                                     </div>
                                                 </FormControl>

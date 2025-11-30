@@ -36,6 +36,39 @@ class BookingController extends Controller
     }
 
     /**
+     * Display paginated bookings for the authenticated guest with optional filters.
+     */
+    public function guestBookings(Request $request)
+    {
+        $this->authorize('viewAny', Booking::class);
+
+        $query = Booking::query()
+            ->where('guest_id', Auth::id())
+            ->with(['details.listing', 'property'])
+            ->latest('check_in_date');
+
+        if ($status = $request->query('status')) {
+            $query->where('status', $status);
+        }
+
+        $today = Carbon::today();
+
+        if ($request->boolean('upcoming')) {
+            $query->whereDate('check_in_date', '>=', $today);
+        }
+
+        if ($request->boolean('past')) {
+            $query->whereDate('check_out_date', '<', $today);
+        }
+
+        $perPage = (int) $request->query('per_page', 15);
+
+        $bookings = $query->paginate($perPage)->appends($request->query());
+
+        return BookingResource::collection($bookings);
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(StoreBookingRequest $request)

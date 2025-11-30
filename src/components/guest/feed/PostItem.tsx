@@ -18,11 +18,11 @@ interface PostItemProps {
   className?: string;
 }
 
-const PostItem: React.FC<PostItemProps> = ({ 
-  post, 
+const PostItem: React.FC<PostItemProps> = ({
+  post,
   onCommentToggle,
   isCommentExpanded = false,
-  className = '' 
+  className = ''
 }) => {
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -90,7 +90,7 @@ const PostItem: React.FC<PostItemProps> = ({
     const date = new Date(dateString);
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
+
     if (diffInHours < 1) return 'Just now';
     if (diffInHours < 24) return `${diffInHours}h ago`;
     const diffInDays = Math.floor(diffInHours / 24);
@@ -105,9 +105,8 @@ const PostItem: React.FC<PostItemProps> = ({
   };
 
   return (
-    <Card className={`shadow-sm hover:shadow-md transition-all duration-200 ${className} ${
-      showComments ? 'ring-1 ring-primary/20' : ''
-    }`}>
+    <Card className={`shadow-sm hover:shadow-md transition-all duration-200 ${className} ${showComments ? 'ring-1 ring-primary/20' : ''
+      }`}>
       {/* Header */}
       <CardHeader className="pb-3 px-3 sm:px-6">
         <div className="flex items-center justify-between">
@@ -154,38 +153,37 @@ const PostItem: React.FC<PostItemProps> = ({
         {/* Image Carousel with enhanced mobile experience */}
         {post.images && post.images.length > 0 && (
           <div className="mb-4 -mx-3 sm:mx-0">
-            <Carousel 
+            <Carousel
               className="w-full"
               setApi={setCarouselApi}
             >
               <CarouselContent className="ml-0">
                 {post.images.map((image, index) => (
                   <CarouselItem key={index} className="pl-0">
-                    <div 
-                      className={`relative ${
-                        isImageExpanded 
-                          ? 'aspect-auto max-h-[70vh]' 
+                    <div
+                      className={`relative ${isImageExpanded
+                          ? 'aspect-auto max-h-[70vh]'
                           : 'aspect-square sm:aspect-video max-h-80'
-                      } cursor-pointer transition-all duration-300`}
+                        } cursor-pointer transition-all duration-300`}
                       onClick={() => setIsImageExpanded(!isImageExpanded)}
                     >
                       <img
-                        src={image}
+                        src={image.startsWith('https://') ? image : `http://localhost:8000/storage/${image}`} // TODO: change to the actual domain
                         alt={`Post Image ${index + 1}`}
                         className="w-full h-full object-cover sm:rounded-lg border-0 sm:border"
                         loading="lazy"
                       />
-                      
+
                       {/* Image overlay controls */}
                       <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-colors duration-200 sm:rounded-lg" />
-                      
+
                       {/* Image counter */}
                       {post.images.length > 1 && (
                         <div className="absolute top-3 right-3 bg-black/70 text-white px-2 py-1 rounded-full text-xs font-medium">
                           {index + 1} / {post.images.length}
                         </div>
                       )}
-                      
+
                       {/* Expand/collapse indicator */}
                       <div className="absolute bottom-3 right-3 bg-black/70 text-white p-1 rounded-full">
                         {isImageExpanded ? (
@@ -198,7 +196,7 @@ const PostItem: React.FC<PostItemProps> = ({
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              
+
               {/* Carousel navigation - hidden on mobile for single images */}
               {post.images.length > 1 && (
                 <div className="hidden sm:block">
@@ -207,16 +205,15 @@ const PostItem: React.FC<PostItemProps> = ({
                 </div>
               )}
             </Carousel>
-            
+
             {/* Mobile dots indicator for multiple images */}
             {post.images.length > 1 && (
               <div className="flex justify-center mt-2 gap-1 sm:hidden">
                 {post.images.map((_, index) => (
                   <div
                     key={index}
-                    className={`h-1.5 w-1.5 rounded-full transition-colors ${
-                      index === currentImageIndex ? 'bg-primary' : 'bg-muted'
-                    }`}
+                    className={`h-1.5 w-1.5 rounded-full transition-colors ${index === currentImageIndex ? 'bg-primary' : 'bg-muted'
+                      }`}
                   />
                 ))}
               </div>
@@ -242,18 +239,18 @@ const PostItem: React.FC<PostItemProps> = ({
                       <Home className="h-6 w-6 sm:h-10 sm:w-10 text-muted-foreground" />
                     )}
                   </div>
-                  
+
                   <div className="flex-1 min-w-0">
                     <h4 className="font-semibold text-sm sm:text-base line-clamp-1 group-hover:text-primary transition-colors">
                       {post.listing.name}
                     </h4>
-                    
+
                     {post.listing.property?.name && (
                       <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1 mb-2">
                         {post.listing.property.name}
                       </p>
                     )}
-                    
+
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-3 min-w-0">
                         {post.listing.rating !== undefined && (
@@ -265,7 +262,7 @@ const PostItem: React.FC<PostItemProps> = ({
                           </div>
                         )}
                       </div>
-                      
+
                       {post.listing.price_per_night !== undefined && (
                         <div className="text-right flex-shrink-0">
                           <span className="text-sm sm:text-lg font-bold text-primary">
@@ -288,11 +285,10 @@ const PostItem: React.FC<PostItemProps> = ({
             size="sm"
             onClick={() => likeMutation.mutate(post.id)}
             disabled={likeMutation.isPending}
-            className={`flex-1 sm:flex-initial transition-all duration-200 ${
-              post.liked_by_user 
-                ? 'text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100' 
+            className={`flex-1 sm:flex-initial transition-all duration-200 ${post.liked_by_user
+                ? 'text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100'
                 : 'hover:bg-muted'
-            } ${likeMutation.isPending ? 'opacity-50 cursor-not-allowed' : ''}`}
+              } ${likeMutation.isPending ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             <Heart className={`h-4 w-4 mr-1 sm:mr-2 ${post.liked_by_user ? 'fill-current' : ''}`} />
             <span className="text-xs sm:text-sm">
@@ -303,15 +299,14 @@ const PostItem: React.FC<PostItemProps> = ({
             </span>
           </Button>
 
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             size="sm"
             onClick={handleCommentToggle}
-            className={`flex-1 sm:flex-initial transition-all duration-200 ${
-              showComments 
-                ? 'text-primary bg-primary/10 hover:bg-primary/20' 
+            className={`flex-1 sm:flex-initial transition-all duration-200 ${showComments
+                ? 'text-primary bg-primary/10 hover:bg-primary/20'
                 : 'hover:bg-muted'
-            }`}
+              }`}
           >
             <MessageCircle className="h-4 w-4 mr-1 sm:mr-2" />
             <span className="text-xs sm:text-sm">
@@ -320,13 +315,12 @@ const PostItem: React.FC<PostItemProps> = ({
                 {post.comments_count === 1 ? 'Comment' : 'Comments'}
               </span>
             </span>
-            <ChevronDown className={`h-3 w-3 ml-1 transition-transform duration-200 ${
-              showComments ? 'rotate-180' : ''
-            }`} />
+            <ChevronDown className={`h-3 w-3 ml-1 transition-transform duration-200 ${showComments ? 'rotate-180' : ''
+              }`} />
           </Button>
 
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             size="sm"
             className="flex-1 sm:flex-initial hover:bg-muted transition-colors duration-200"
           >
@@ -337,9 +331,8 @@ const PostItem: React.FC<PostItemProps> = ({
       </CardContent>
 
       {/* Enhanced Comment Section Integration */}
-      <div className={`transition-all duration-300 ease-in-out ${
-        showComments ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
-      }`}>
+      <div className={`transition-all duration-300 ease-in-out ${showComments ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
+        }`}>
         <CommentSection
           postId={post.id}
           isOpen={showComments}

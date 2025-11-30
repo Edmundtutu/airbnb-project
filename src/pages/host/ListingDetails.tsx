@@ -9,7 +9,7 @@ import {
     ArrowLeft,
     Home,
     MapPin,
-    DollarSign,
+    Coins,
     Users,
     BedDouble,
     Bath,
@@ -45,7 +45,7 @@ import BookingSummaryCard from '@/components/host/listings/BookingSummaryCard';
 const detailSchema = z.object({
     name: z.string().min(3, 'Listing name must be at least 3 characters'),
     description: z.string().min(20, 'Description should be more detailed'),
-    price_per_night: z.coerce.number().min(10, 'Price must be at least $10'),
+    price_per_night: z.coerce.number().min(10, 'Price must be at least UGX 10'),
     category: z.string().min(1, 'Please select a category'),
     max_guests: z.coerce.number().min(1, 'At least one guest required'),
     bedrooms: z.coerce.number().min(0).optional(),
@@ -97,6 +97,9 @@ const HOUSE_RULE_OPTIONS = [
     'No smoking', 'No parties', 'No pets', 'Quiet hours', 'Check-in before 10 PM',
     'Shoes off inside', 'No unregistered guests', 'Clean up after cooking'
 ];
+
+const formatUGX = (value: number) =>
+    new Intl.NumberFormat('en-UG', { style: 'currency', currency: 'UGX', maximumFractionDigits: 0 }).format(value);
 
 const HostListingDetails: React.FC = () => {
     const { listingId } = useParams<{ listingId: string }>();
@@ -316,7 +319,7 @@ const HostListingDetails: React.FC = () => {
                                                 render={({ field }) => (
                                                     <FormItem>
                                                         <FormLabel className="flex items-center gap-2">
-                                                            <DollarSign className="h-4 w-4" />
+                                                            <Coins className="h-4 w-4" />
                                                             Nightly Price
                                                         </FormLabel>
                                                         <FormControl>
@@ -328,7 +331,7 @@ const HostListingDetails: React.FC = () => {
                                                                         className="w-32"
                                                                         {...field}
                                                                     />
-                                                                    <span className="text-muted-foreground">USD</span>
+                                                                    <span className="text-muted-foreground">UGX</span>
                                                                 </div>
                                                                 <Slider
                                                                     value={[field.value]}
@@ -338,9 +341,9 @@ const HostListingDetails: React.FC = () => {
                                                                     className="w-full"
                                                                 />
                                                                 <div className="flex justify-between text-sm text-muted-foreground">
-                                                                    <span>$10</span>
-                                                                    <span>$500</span>
-                                                                    <span>$1000+</span>
+                                                                    <span>UGX 10</span>
+                                                                    <span>UGX 500</span>
+                                                                    <span>UGX 1000+</span>
                                                                 </div>
                                                             </div>
                                                         </FormControl>
@@ -651,9 +654,9 @@ const HostListingDetails: React.FC = () => {
                                                 </div>
                                             </div>
                                             <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                                                <DollarSign className="h-5 w-5 text-muted-foreground mt-0.5" />
+                                                <Coins className="h-5 w-5 text-muted-foreground mt-0.5" />
                                                 <div>
-                                                    <p className="font-medium text-sm">${listing.price_per_night}/night</p>
+                                                    <p className="font-medium text-sm">{formatUGX(listing.price_per_night)}/night</p>
                                                     <p className="text-xs text-muted-foreground">Current rate</p>
                                                 </div>
                                             </div>
@@ -782,10 +785,10 @@ const HostListingDetails: React.FC = () => {
                                             <div>
                                                 <p className="text-sm font-medium">Monthly Revenue</p>
                                                 <p className="text-2xl font-bold">
-                                                    ${(reservations.length * listing.price_per_night * 0.7).toLocaleString()}
+                                                    {formatUGX(reservations.length * listing.price_per_night * 0.7)}
                                                 </p>
                                             </div>
-                                            <DollarSign className="h-8 w-8 text-muted-foreground" />
+                                            <Coins className="h-8 w-8 text-muted-foreground" />
                                         </div>
                                     </CardContent>
                                 </Card>
