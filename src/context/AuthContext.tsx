@@ -3,6 +3,7 @@ import { AuthUser, AuthState, RegisterData } from '@/types/auth';
 import { INFLUENCER_THRESHOLD } from '@/utils/constants';
 import { authService } from '@/services/authService';
 import api from '@/services/api';
+import { initializeFirebaseAuth } from '@/services/firebaseAuthService';
 
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
@@ -57,22 +58,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const initAuth = async () => {
       const token = localStorage.getItem('auth-token');
-      
+
       if (token) {
         try {
           // Set the Authorization header for the stored token
           api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-          
+
           // Validate the token by fetching user data
           const user = await authService.me();
-          
+
           // Calculate influencer status
           const authUser: AuthUser = {
             ...user,
             isInfluencer: (user.followers || 0) >= INFLUENCER_THRESHOLD,
             createdAt: user.createdAt ? new Date(user.createdAt) : new Date()
           };
-          
+
           // Update stored user data
           localStorage.setItem('auth-user', JSON.stringify(authUser));
           dispatch({ type: 'SET_USER', payload: authUser });
@@ -96,22 +97,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const response = await authService.login(email, password);
       const { user, access_token } = response;
-      
+
       // Store token and user data
       localStorage.setItem('auth-token', access_token);
       localStorage.setItem('auth-user', JSON.stringify(user));
-      
+
       // Set Authorization header for future requests
       api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-      
+
       // Calculate influencer status
       const authUser: AuthUser = {
         ...user,
         isInfluencer: user.followers >= INFLUENCER_THRESHOLD,
         createdAt: user.createdAt ? new Date(user.createdAt) : new Date()
       };
-      
+
       dispatch({ type: 'SET_USER', payload: authUser });
+      
+      // try to initialize firebase auth
+      try {
+        await initializeFirebaseAuth();
+      } catch (error) {
+        console.warn('Firebase auth failed, but user is logged in');
+      }
+
     } catch (error) {
       dispatch({ type: 'SET_LOADING', payload: false });
       throw error;
@@ -123,21 +132,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const response = await authService.register(data);
       const { user, access_token } = response;
-      
+
       // Store token and user data
       localStorage.setItem('auth-token', access_token);
       localStorage.setItem('auth-user', JSON.stringify(user));
-      
+
       // Set Authorization header for future requests
       api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-      
+
       // Calculate influencer status
       const authUser: AuthUser = {
         ...user,
         isInfluencer: user.followers >= INFLUENCER_THRESHOLD,
         createdAt: user.createdAt ? new Date(user.createdAt) : new Date()
       };
-      
+
       dispatch({ type: 'SET_USER', payload: authUser });
     } catch (error) {
       dispatch({ type: 'SET_LOADING', payload: false });

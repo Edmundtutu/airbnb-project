@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { Booking } from '@/types/bookings';
-import { MapPin, User as UserIcon, Chrome as PropertyIcon, ChevronDown, ChevronUp, Check, X, MessageCircle, Calendar, Users, Bed, Bath, Clock } from 'lucide-react';
+import { MapPin, User as UserIcon, Chrome as PropertyIcon, ChevronDown, ChevronUp, Check, X, Calendar, Users, Bed, Bath, Clock } from 'lucide-react';
 import CreatePostCard from '@/components/guest/profile/orders/CreatePostCard';
 import { useImageCapture } from '@/hooks/useImageCapture';
 import CameraCapture from '@/components/features/CameraCapture';
 import { useToast } from '@/hooks/use-toast';
+import { BookingChatButton } from '@/components/chat/BookingChatButton';
+import { useBookingChat } from '@/hooks/useBookingChat';
 
 type BookingCardContext = 'guest' | 'host';
 
@@ -70,6 +72,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
   const [hasActionCompleted, setHasActionCompleted] = useState(false);
   const imageCapture = useImageCapture();
   const { toast } = useToast();
+  const { openChat, unreadCount } = useBookingChat(booking);
   const createdAt = new Date(booking.created_at);
   const { dateRange, nights } = formatDateRange(booking.check_in_date, booking.check_out_date);
   const approvalAction = onConfirm ?? onAccept;
@@ -359,15 +362,12 @@ export const BookingCard: React.FC<BookingCardProps> = ({
                 </>
               )}
 
-              <button
-                type="button"
-                disabled
-                className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1 text-[10px] sm:text-xs px-2 py-1 sm:px-3 sm:py-2 rounded-md border border-dashed border-blue-200 text-blue-400 bg-blue-50/30 cursor-not-allowed min-w-0"
-                title="Chat coming soon"
-              >
-                <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                <span className="hidden sm:inline truncate">Chat (soon)</span>
-              </button>
+              <BookingChatButton
+                booking={booking}
+                unreadCount={unreadCount}
+                onClick={openChat}
+                className="flex-1 sm:flex-none"
+              />
             </div>
           )}
         </div>

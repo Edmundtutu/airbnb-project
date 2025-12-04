@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -17,70 +17,35 @@ import {
 import { User as UserType } from '@/types';
 import { useAuth } from '@/context/AuthContext';
 import { useBooking } from '@/context/BookingContext';
-import { useChat } from '@/context/ChatContext';
-import { ConversationList } from '@/components/shared/ConversationList';
+import { useChatRooms } from '@/context/ChatRoomsContext';
+import { ChatRoomsList } from '@/components/chat/ChatRoomsList';
 import { NotificationList } from '@/components/shared/NotificationList';
-import { ChatDialog } from '@/components/shared/ChatDialog';
 import ErrorBoundary from '@/components/ErrorBoundary';
-import type { Conversation } from '@/services/chatService';
 
 interface NavbarProps {
   user: UserType | null;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ user }) => {
+  const navigate = useNavigate();
   const { logout } = useAuth();
   const { getItemCount } = useBooking();
+  const { rooms, totalUnreadCount } = useChatRooms();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [conversationListOpen, setConversationListOpen] = useState(false);
+  const [chatRoomsOpen, setChatRoomsOpen] = useState(false);
   const [notificationListOpen, setNotificationListOpen] = useState(false);
-  const [chatDialogOpen, setChatDialogOpen] = useState(false);
-  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
 
   const bookingItemCount = getItemCount();
-
-  // Safely get chat context with fallback
-  let conversations: Conversation[] = [];
-  let messages: any[] = [];
-  let getUnreadCount = (id: number) => 0;
-  
-  try {
-    const chatContext = useChat();
-    conversations = chatContext.conversations || [];
-    messages = chatContext.messages || [];
-    getUnreadCount = chatContext.getUnreadCount || (() => 0);
-  } catch (error) {
-    // Chat context not available, use fallback values
-    console.warn('Chat context not available:', error);
-  }
-
-  // Calculate total unread messages across all conversations
-  const totalUnreadMessages = conversations.reduce((total, conversation) => {
-    return total + getUnreadCount(conversation.id);
-  }, 0);
-
-  // Calculate total unread notifications
-  const totalUnreadNotifications = messages.filter(
-    msg => !msg.read_at && msg.sender_id !== user?.id
-  ).length;
+  const totalUnreadNotifications = totalUnreadCount;
+  const currentUserRole = user?.role === 'host' ? 'host' : 'guest';
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       window.location.href = `/?search=${encodeURIComponent(searchQuery)}`;
     }
-  };
-
-  const handleConversationSelect = (conversation: Conversation) => {
-    setSelectedConversation(conversation);
-    setChatDialogOpen(true);
-  };
-
-  const handleChatDialogClose = () => {
-    setChatDialogOpen(false);
-    setSelectedConversation(null);
   };
 
   return (
@@ -114,12 +79,12 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
                 variant="ghost" 
                 size="icon" 
                 className="relative"
-                onClick={() => setConversationListOpen(true)}
+                onClick={() => navigate('/chats')}
               >
                 <MessageCircle className="h-5 w-5" />
-                {totalUnreadMessages > 0 && (
+                {totalUnreadCount > 0 && (
                   <Badge className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center text-xs p-0 bg-blue-500">
-                    {totalUnreadMessages > 9 ? '9+' : totalUnreadMessages}
+                    {totalUnreadCount > 9 ? '9+' : totalUnreadCount}
                   </Badge>
                 )}
               </Button>
@@ -181,16 +146,16 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
           {/* Mobile Actions */}
           {user ? (
             <div className="flex lg:hidden items-center space-x-2">
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="relative h-9 w-9"
-                onClick={() => setConversationListOpen(true)}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative"
+                onClick={() => navigate('/chats')}
               >
-                <MessageCircle className="h-4 w-4" />
-                {totalUnreadMessages > 0 && (
-                  <Badge className="absolute -top-1 -right-1 h-3 w-3 flex items-center justify-center text-xs p-0 bg-blue-500">
-                    {totalUnreadMessages > 9 ? '9+' : totalUnreadMessages}
+                <MessageCircle className="h-5 w-5" />
+                {totalUnreadCount > 0 && (
+                  <Badge className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center text-xs p-0 bg-blue-500">
+                    {totalUnreadCount > 9 ? '9+' : totalUnreadCount}
                   </Badge>
                 )}
               </Button>
@@ -272,35 +237,15 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
         )}
       </div>
 
-      {/* Conversation List Dialog */}
-      {conversationListOpen && (
-        <ErrorBoundary>
-          <ConversationList
-            isOpen={conversationListOpen}
-            onClose={() => setConversationListOpen(false)}
-            onSelectConversation={handleConversationSelect}
-          />
-        </ErrorBoundary>
-      )}
-
       {/* Notification List Dialog */}
       {notificationListOpen && (
         <ErrorBoundary>
           <NotificationList
             isOpen={notificationListOpen}
             onClose={() => setNotificationListOpen(false)}
-            onSelectConversation={handleConversationSelect}
-          />
-        </ErrorBoundary>
-      )}
-
-      {/* Chat Dialog */}
-      {selectedConversation && chatDialogOpen && (
-        <ErrorBoundary>
-          <ChatDialog
-            booking={selectedConversation.booking}
-            isOpen={chatDialogOpen}
-            onClose={handleChatDialogClose}
+            onSelectConversation={(room) => {
+              navigate(`/chats/${room.bookingId}`);
+            }}
           />
         </ErrorBoundary>
       )}

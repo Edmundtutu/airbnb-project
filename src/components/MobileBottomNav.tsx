@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Chrome as Home, Search, MapPin, Calendar, User, Building, ChartBar as BarChart3, MessageCircle, Rss, PlusCircle } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useBooking } from '@/context/BookingContext';
-import { useChat } from '@/context/ChatContext';
+import { useChatRooms } from '@/context/ChatRoomsContext';
 import { Badge } from '@/components/ui/badge';
-import { ConversationList } from '@/components/shared/ConversationList';
-import { ChatDialog } from '@/components/shared/ChatDialog';
+import { ChatRoomsList } from '@/components/chat/ChatRoomsList';
 import ErrorBoundary from '@/components/ErrorBoundary';
-import type { Conversation } from '@/services/chatService';
 
 interface NavItem {
   name: string;
@@ -19,49 +17,23 @@ interface NavItem {
 }
 
 const MobileBottomNav: React.FC = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { getItemCount } = useBooking();
+  const { rooms, totalUnreadCount } = useChatRooms();
   const location = useLocation();
-  const [conversationListOpen, setConversationListOpen] = useState(false);
-  const [chatDialogOpen, setChatDialogOpen] = useState(false);
-  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
+  const [chatRoomsOpen, setChatRoomsOpen] = useState(false);
 
   if (!user) return null;
 
   const bookingItemCount = getItemCount();
-
-  // Safely get chat context with fallback
-  let conversations: Conversation[] = [];
-  let getUnreadCount = (id: number) => 0;
-  
-  try {
-    const chatContext = useChat();
-    conversations = chatContext.conversations || [];
-    getUnreadCount = chatContext.getUnreadCount || (() => 0);
-  } catch (error) {
-    // Chat context not available, use fallback values
-    console.warn('Chat context not available:', error);
-  }
-
-  const totalUnreadMessages = conversations.reduce((total, conversation) => {
-    return total + getUnreadCount(conversation.id);
-  }, 0);
-
-  const handleConversationSelect = (conversation: Conversation) => {
-    setSelectedConversation(conversation);
-    setChatDialogOpen(true);
-  };
-
-  const handleChatDialogClose = () => {
-    setChatDialogOpen(false);
-    setSelectedConversation(null);
-  };
+  const currentUserRole = user.role === 'host' ? 'host' : 'guest';
 
   const guestNavItems: NavItem[] = [
     { name: 'Feed', href: '/feed', icon: Rss },
     { name: 'Map', href: '/map', icon: MapPin },
     { name: 'Discover', href: '/', icon: Home },
-    { name: 'Chat', icon: MessageCircle, badge: totalUnreadMessages, onClick: () => setConversationListOpen(true) },
+    { name: 'Chat', icon: MessageCircle, badge: totalUnreadCount, onClick: () => navigate('/chats') },
     { name: 'Profile', href: '/profile', icon: User },
   ];
 
@@ -70,7 +42,7 @@ const MobileBottomNav: React.FC = () => {
     { name: 'Listings', href: '/host/listings', icon: Home },
     { name: 'Add', href: '/host/listings/new', icon: PlusCircle },
     { name: 'Bookings', href: '/host/bookings', icon: Calendar },
-    { name: 'Chat', icon: MessageCircle, badge: totalUnreadMessages, onClick: () => setConversationListOpen(true) },
+    { name: 'Chat', icon: MessageCircle, badge: totalUnreadCount, onClick: () => navigate('/chats') },
     { name: 'Profile', href: '/host/profile', icon: Building },
   ];
 
@@ -141,27 +113,7 @@ const MobileBottomNav: React.FC = () => {
         })}
       </div>
 
-      {/* Conversation List Dialog */}
-      {conversationListOpen && (
-        <ErrorBoundary>
-          <ConversationList
-            isOpen={conversationListOpen}
-            onClose={() => setConversationListOpen(false)}
-            onSelectConversation={handleConversationSelect}
-          />
-        </ErrorBoundary>
-      )}
-
-      {/* Chat Dialog */}
-      {selectedConversation && chatDialogOpen && (
-        <ErrorBoundary>
-          <ChatDialog
-            booking={selectedConversation.booking}
-            isOpen={chatDialogOpen}
-            onClose={handleChatDialogClose}
-          />
-        </ErrorBoundary>
-      )}
+      {/* Legacy chat rooms list dialog removed in favor of /chats route */}
     </div>
   );
 };

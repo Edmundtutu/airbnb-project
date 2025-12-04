@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\ChatController;
+use App\Http\Controllers\Api\V1\FirebaseAuthController;
+use App\Http\Controllers\Api\V1\Uploads\UploadController;
 use App\Http\Controllers\Api\V1\PostHandlers\LikeController;
 use App\Http\Controllers\Api\V1\PostHandlers\PostController;
 use App\Http\Controllers\Api\V1\UserHandlers\AuthController;
@@ -9,12 +11,11 @@ use App\Http\Controllers\Api\V1\UserHandlers\FollowController;
 use App\Http\Controllers\Api\V1\PostHandlers\CommentController;
 use App\Http\Controllers\Api\V1\BookingHandlers\BookingController;
 use App\Http\Controllers\Api\V1\BookingHandlers\ListingController;
+use App\Http\Controllers\Api\V1\PropertyHandlers\ReviewController;
 use App\Http\Controllers\Api\V1\UserHandlers\SubscriberController;
 use App\Http\Controllers\Api\V1\PostHandlers\CommentLikeController;
 use App\Http\Controllers\Api\V1\PostHandlers\PostCommentController;
 use App\Http\Controllers\Api\V1\PropertyHandlers\PropertyController;
-use App\Http\Controllers\Api\V1\PropertyHandlers\ReviewController;
-use App\Http\Controllers\Api\V1\Uploads\UploadController;
 
 Route::prefix('v1')->group(function () {
     // Authentication routes
@@ -93,5 +94,20 @@ Route::prefix('v1')->group(function () {
         Route::post('/chat/typing/start', [ChatController::class, 'startTyping']);
         Route::post('/chat/typing/stop', [ChatController::class, 'stopTyping']);
         Route::post('/chat/presence', [ChatController::class, 'updatePresence']);
+    });
+    // Firebase Authentication Routes
+    Route::middleware('auth:sanctum')->group(function () {
+
+        // Get Firebase custom token for authenticated user
+        Route::get('/firebase/auth', [FirebaseAuthController::class, 'getCustomToken'])
+            ->name('firebase.auth.token');
+
+        // Verify Firebase ID token (optional - for additional validation)
+        Route::post('/firebase/auth/verify', [FirebaseAuthController::class, 'verifyToken'])
+            ->name('firebase.auth.verify');
+
+        // Revoke user's Firebase tokens (for logout)
+        Route::post('/firebase/auth/revoke', [FirebaseAuthController::class, 'revokeTokens'])
+            ->name('firebase.auth.revoke');
     });
 });

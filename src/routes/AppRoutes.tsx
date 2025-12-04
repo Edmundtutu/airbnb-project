@@ -33,6 +33,8 @@ import HostListingDetails from '@/pages/host/ListingDetails';
 import HostBookings from '@/pages/host/Bookings';
 import HostAnalytics from '@/pages/host/Analytics';
 import HostProfile from '@/pages/host/Profile';
+import ChatsListPage from '@/pages/chats/ChatsListPage';
+import ChatRoomPage from '@/pages/chats/ChatRoomPage';
 
 // Route Guards
 interface ProtectedRouteProps {
@@ -181,6 +183,24 @@ const AppRoutes: React.FC = () => {
           <HostProfile />
         </ProtectedRoute>
       } />
+
+      {/* Chat Routes (shared by host and guest) */}
+      <Route
+        path="/chats"
+        element={
+          <ProtectedRoute layout="main">
+            <ChatsListPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/chats/:bookingId"
+        element={
+          <ProtectedRoute layout="main">
+            <ChatRoomPage />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Property Details Route */}
       <Route path="/properties/:propertyId" element={<PropertyDetails />} />

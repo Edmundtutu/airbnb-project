@@ -28,6 +28,9 @@
 * \[\~] **Integration-ready for Laravel Breeze backend**
 
   * API layer (`api.ts`, `authService.ts`, `propertyService.ts`) is set up for `/api` endpoints, CSRF, and Laravel Sanctum, but Inertia.js integration is not yet implemented.
+* [x] **Real-time chat system with Firebase**
+
+  * Complete Firebase Realtime Database integration for booking-based chat between guests and hosts with typing indicators, presence, and unread counts.
 
 Legend: \[x] = Complete, \[\~] = Partial, \[ ] = Not started
 
@@ -97,4 +100,52 @@ This project is designed as a React PWA frontend for short-term rentals (Airbnb-
 * The core idea is **short-term rentals**, where **guests discover and book stays**, and **hosts manage their properties and bookings**.
 * For backend changes, always follow Laravel official documentation and upgrade guides.
 
+---
 
+## Chat System (Firebase Integration)
+
+This application uses **Firebase Realtime Database** for real-time chat functionality between guests and hosts.
+
+### Quick Setup
+
+1. **Install dependencies**: `npm install`
+2. **Set up Firebase project** (see [FIREBASE_SETUP.md](FIREBASE_SETUP.md))
+3. **Configure environment variables** in `.env.development`
+4. **Set up backend** for custom token generation
+5. **Follow the migration guide** in [FIREBASE_CHAT_MIGRATION.md](FIREBASE_CHAT_MIGRATION.md)
+
+### Chat Features
+
+- ✅ Real-time messaging between guests and hosts
+- ✅ Typing indicators
+- ✅ Presence status (online/offline)
+- ✅ Unread message counts
+- ✅ Multi-window chat support
+- ✅ Booking-scoped conversations
+- ✅ Message persistence
+- ✅ Offline support
+
+### Documentation
+
+- **[QUICK_START_CHECKLIST.md](QUICK_START_CHECKLIST.md)** - Quick reference for setup
+- **[FIREBASE_SETUP.md](FIREBASE_SETUP.md)** - Detailed setup guide
+- **[FIREBASE_CHAT_MIGRATION.md](FIREBASE_CHAT_MIGRATION.md)** - Technical implementation details
+- **[MIGRATION_STATUS.md](MIGRATION_STATUS.md)** - Migration progress tracker
+- **[IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md)** - What's been implemented
+
+### Environment Variables
+
+```env
+# Firebase Configuration (Required for Chat)
+VITE_FIREBASE_API_KEY=your-api-key
+VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+VITE_FIREBASE_DATABASE_URL=https://your-project.firebaseio.com
+VITE_FIREBASE_PROJECT_ID=your-project-id
+VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+VITE_FIREBASE_APP_ID=your-app-id
+```
+
+See `.env.example` for complete configuration.
+
+---

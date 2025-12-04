@@ -5,26 +5,26 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Bell, MessageCircle, Clock, User, Store, Package, TriangleAlert as AlertTriangle } from 'lucide-react';
-import { useChat } from '@/context/ChatContext';
+import { Bell, MessageCircle, Clock, User, Store, Package, TriangleAlert as AlertTriangle, Calendar } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import type { Conversation, Message } from '@/services/chatService';
+import { useChatRooms } from '@/context/ChatRoomsContext';
+import type { BookingChatRoom } from '@/types/chat';
 
 interface Notification {
   id: string;
-  type: 'message' | 'order_update';
+  type: 'message' | 'booking_update';
   title: string;
   message: string;
-  timestamp: string;
+  timestamp: number;
   isRead: boolean;
-  conversation?: Conversation;
-  orderId?: string;
+  room?: BookingChatRoom;
+  bookingId?: string;
 }
 
 interface NotificationListProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelectConversation: (conversation: Conversation) => void;
+  onSelectConversation: (room: BookingChatRoom) => void;
 }
 
 export const NotificationList: React.FC<NotificationListProps> = ({
@@ -33,59 +33,38 @@ export const NotificationList: React.FC<NotificationListProps> = ({
   onSelectConversation,
 }) => {
   const { user } = useAuth();
-  
-  // Safely get chat context with error handling
-  let conversations: Conversation[] = [];
-  let messages: Message[] = [];
-  let chatError: string | null = null;
+  const { rooms } = useChatRooms();
 
-  try {
-    const chatContext = useChat();
-    conversations = chatContext.conversations || [];
-    messages = chatContext.messages || [];
-  } catch (error) {
-    console.warn('Chat context not available in NotificationList:', error);
-    chatError = 'Notification service is currently unavailable';
-  }
-
-  // Generate notifications from unread messages
+  // Generate notifications from unread messages in Firebase rooms
   const generateNotifications = (): Notification[] => {
     const notifications: Notification[] = [];
+    const userRole = user?.role === 'host' ? 'host' : 'guest';
 
-    conversations.forEach((conversation) => {
-      const unreadMessages = messages.filter(
-        msg => msg.conversation_id === conversation.id && 
-               !msg.read_at && 
-               msg.sender_id !== user?.id
-      );
-
-      unreadMessages.forEach((message) => {
-        const senderName = message.sender_type === 'user' 
-          ? conversation.user?.name || 'Customer'
-          : conversation.property?.name || 'Property';
-
+    rooms.forEach((room) => {
+      const unreadCount = userRole === 'guest' ? room.unreadCount.guest : room.unreadCount.host;
+      
+      if (unreadCount > 0) {
         notifications.push({
-          id: `msg-${message.id}`,
+          id: `${room.bookingId}-unread`,
           type: 'message',
-          title: `New message from ${senderName}`,
-          message: message.content,
-          timestamp: message.created_at,
+          title: 'New Message',
+          message: room.lastMessage?.content || 'You have new messages',
+          timestamp: room.lastActivity || Date.now(),
           isRead: false,
-          conversation,
+          room,
+          bookingId: room.bookingId,
         });
-      });
+      }
     });
 
     // Sort by timestamp (newest first)
-    return notifications.sort((a, b) => 
-      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-    );
+    return notifications.sort((a, b) => b.timestamp - a.timestamp);
   };
 
   const notifications = generateNotifications();
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
-  const formatTime = (timestamp: string) => {
+  const formatTime = (timestamp: number) => {
     const date = new Date(timestamp);
     const now = new Date();
     const diffInMinutes = (now.getTime() - date.getTime()) / (1000 * 60);
@@ -102,8 +81,8 @@ export const NotificationList: React.FC<NotificationListProps> = ({
   };
 
   const handleNotificationClick = (notification: Notification) => {
-    if (notification.conversation) {
-      onSelectConversation(notification.conversation);
+    if (notification.room) {
+      onSelectConversation(notification.room);
       onClose();
     }
   };
@@ -139,17 +118,7 @@ export const NotificationList: React.FC<NotificationListProps> = ({
 
         <ScrollArea className="flex-1 -mx-6 px-6">
           <div className="space-y-2">
-            {chatError ? (
-              <div className="flex flex-col items-center justify-center py-8 text-center">
-                <Alert variant="destructive" className="mb-4">
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertDescription>{chatError}</AlertDescription>
-                </Alert>
-                <Button variant="outline" onClick={onClose}>
-                  Close
-                </Button>
-              </div>
-            ) : notifications.length === 0 ? (
+            {notifications.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 text-center">
                 <Bell className="h-12 w-12 text-muted-foreground mb-4" />
                 <div className="text-muted-foreground">No notifications</div>
@@ -191,9 +160,9 @@ export const NotificationList: React.FC<NotificationListProps> = ({
                       }`}>
                         {notification.message}
                       </div>
-                      {notification.conversation && (
+                      {notification.bookingId && (
                         <div className="text-xs text-muted-foreground mt-1">
-                          Booking #{notification.conversation.booking_id}
+                          Booking #{notification.bookingId}
                         </div>
                       )}
                     </div>
