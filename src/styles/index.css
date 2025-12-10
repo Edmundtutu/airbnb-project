@@ -85,6 +85,7 @@
 
   /* Card hover effects updated to use the new secondary color for a border hint */
   .card-hover {
+    /* Secondary is the Warm Brown (#3e2e25) */
     @apply transition-all duration-200 hover:shadow-md hover:border-secondary/50;
   }
 }
@@ -95,103 +96,105 @@ All colors MUST be HSL.
 @layer base {
   :root {
     /* ----------------------------------------------------- */
-    /* ENERGETIC MODERN PALETTE (Light Mode) */
-    /* Background: #F7FFF7 (Very Light Mint) | Foreground: #556270 (Dark Slate Gray) */
-    /* Primary (Action): #FF6B6B (Bright Coral) | Secondary (Brand): #4ECDC4 (Vibrant Aqua) */
+    /* NATURAL CONTRAST PALETTE (Light Mode) */
+    /* Primary (Action/Brand): #00ac90 (Blue Green) - 170 100% 34% */
+    /* Foreground (Text/Secondary): #3e2e25 (Warm Brown) - 24 25% 19% */
+    /* Accent (Highlight/Ring): #f9f871 (Cold Yellow) - 59 92% 71% */
+    /* Background (Base): #FFFFFF (White) - 0 0% 100% */
     /* ----------------------------------------------------- */
     
-    --background: 90 100% 98%;      /* #F7FFF7 */
-    --foreground: 214 13% 38%;      /* #556270 */
+    --background: 0 0% 100%;        /* #FFFFFF */
+    --foreground: 24 25% 19%;       /* #3e2e25 - Warm Brown */
 
-    --card: 90 100% 98%;
-    --card-foreground: 214 13% 38%;
+    --card: 0 0% 100%;
+    --card-foreground: 24 25% 19%;
 
-    --popover: 90 100% 98%;
-    --popover-foreground: 214 13% 38%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 24 25% 19%;
 
-    --primary: 0 100% 70%;          /* #FF6B6B - Bright Coral */
+    --primary: 170 100% 34%;        /* #00ac90 - Blue Green */
     --primary-foreground: 0 0% 100%; /* White */
 
-    --secondary: 176 59% 55%;       /* #4ECDC4 - Vibrant Aqua */
+    --secondary: 24 25% 19%;        /* #3e2e25 - Warm Brown */
     --secondary-foreground: 0 0% 100%; /* White */
 
-    --muted: 90 100% 95%;           /* Lighter background for subtle elements */
-    --muted-foreground: 214 13% 60%; /* Lighter gray text */
+    --muted: 0 0% 95%;              /* Off-white for subtle elements */
+    --muted-foreground: 24 25% 40%; /* Desaturated text */
 
-    --accent: 176 59% 85%;          /* Very Light Aqua for subtle highlight */
-    --accent-foreground: 214 13% 38%;
+    --accent: 59 92% 71%;           /* #f9f871 - Cold Yellow */
+    --accent-foreground: 24 25% 19%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 13% 85%;          /* Light gray border */
-    --input: 214 13% 85%;           /* Input border */
-    --ring: 176 59% 55%;            /* Vibrant Aqua Focus Ring */
+    --border: 0 0% 90%;             /* Light gray border */
+    --input: 0 0% 90%;              /* Input border */
+    --ring: 59 92% 71%;             /* Cold Yellow Focus Ring */
 
-    --radius: 1rem; /* Increased for a playful, modern aesthetic */
+    --radius: 1rem; /* Playful radius */
 
-    --sidebar-background: 90 100% 95%;
-    --sidebar-foreground: 214 13% 38%;
-    --sidebar-primary: 0 100% 70%;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 24 25% 19%;
+    --sidebar-primary: 170 100% 34%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 90 100% 93%;
-    --sidebar-accent-foreground: 214 13% 38%;
-    --sidebar-border: 214 13% 85%;
-    --sidebar-ring: 176 59% 55%;
+    --sidebar-accent: 59 92% 85%;
+    --sidebar-accent-foreground: 24 25% 19%;
+    --sidebar-border: 0 0% 90%;
+    --sidebar-ring: 59 92% 71%;
 
-    /* Text color variables updated to match the new foreground */
-    --text-primary: 214 13% 38%;
-    --text-secondary: 214 13% 50%;
-    --text-tertiary: 214 13% 65%;
-    --text-muted: 214 13% 75%;
+    /* Text color variables based on Warm Brown foreground */
+    --text-primary: 24 25% 19%;
+    --text-secondary: 24 25% 30%;
+    --text-tertiary: 24 25% 45%;
+    --text-muted: 24 25% 60%;
     --text-inverse: 0 0% 100%;
   }
 
   .dark {
-    /* Dark mode variables remain largely untouched, only ensuring primary/secondary fallbacks are consistent */
-    --background: 222 84% 5%;
-    --foreground: 222 84% 98%;
+    /* Dark mode optimized for the new palette (Dark Brown/Black background) */
+    --background: 24 25% 8%;        /* Darker Warm Brown/Near Black */
+    --foreground: 59 92% 85%;       /* Lighter Cold Yellow for contrast */
 
-    --card: 222 84% 5%;
-    --card-foreground: 222 84% 98%;
+    --card: 24 25% 10%;
+    --card-foreground: 59 92% 85%;
 
-    --popover: 222 84% 5%;
-    --popover-foreground: 222 84% 98%;
+    --popover: 24 25% 10%;
+    --popover-foreground: 59 92% 85%;
 
-    --primary: 0 100% 70%; /* Updated to Coral */
+    --primary: 170 100% 45%;        /* Lighter Blue Green for visibility */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 176 59% 55%; /* Updated to Aqua */
+    --secondary: 24 25% 30%;        /* Slightly lighter Warm Brown accent */
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 222 84% 15%;
-    --muted-foreground: 222 84% 70%;
+    --muted: 24 25% 15%;
+    --muted-foreground: 59 92% 60%;
 
-    --accent: 222 84% 15%;
-    --accent-foreground: 222 84% 98%;
+    --accent: 170 100% 15%;         /* Darker Blue Green for subtle accent */
+    --accent-foreground: 59 92% 85%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 222 84% 20%;
-    --input: 222 84% 20%;
-    --ring: 176 59% 55%; /* Updated to Aqua */
+    --border: 24 25% 20%;
+    --input: 24 25% 20%;
+    --ring: 59 92% 71%;
 
-    --sidebar-background: 222 84% 8%;
-    --sidebar-foreground: 222 84% 98%;
-    --sidebar-primary: 0 100% 70%; /* Updated to Coral */
+    --sidebar-background: 24 25% 12%;
+    --sidebar-foreground: 59 92% 85%;
+    --sidebar-primary: 170 100% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 222 84% 12%;
-    --sidebar-accent-foreground: 222 84% 98%;
-    --sidebar-border: 222 84% 15%;
-    --sidebar-ring: 176 59% 55%; /* Updated to Aqua */
+    --sidebar-accent: 24 25% 18%;
+    --sidebar-accent-foreground: 59 92% 85%;
+    --sidebar-border: 24 25% 25%;
+    --sidebar-ring: 59 92% 71%;
 
     /* Dark mode text colors */
-    --text-primary: 222 84% 98%;
-    --text-secondary: 222 84% 80%;
-    --text-tertiary: 222 84% 65%;
-    --text-muted: 222 84% 55%;
-    --text-inverse: 222 84% 15%;
+    --text-primary: 59 92% 85%;
+    --text-secondary: 59 92% 70%;
+    --text-tertiary: 59 92% 60%;
+    --text-muted: 59 92% 50%;
+    --text-inverse: 24 25% 19%;
   }
 }
 
@@ -261,9 +264,18 @@ All colors MUST be HSL.
   .text-inverse {
     color: hsl(var(--text-inverse));
   }
+  
+  /* NEW: Blue Green and Cold Yellow Gradient */
+  .gradient-natural-contrast {
+    background: linear-gradient(135deg, hsl(170, 100%, 34%), hsl(59, 92%, 71%));
+  }
 
-  /* Red-dominant gradients have been removed as they rely on old colors. 
-     If you need gradients, you should define new ones using Coral and Aqua. */
+  .text-gradient-natural-contrast {
+    background: linear-gradient(135deg, hsl(170, 100%, 34%), hsl(59, 92%, 71%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 
   /* Montserrat-specific font weights */
   .font-thin {

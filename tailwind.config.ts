@@ -38,7 +38,7 @@ export default {
           foreground: "hsl(var(--secondary-foreground))",
         },
 
-        // STATUS COLORS (SIMPLIFIED TO RELY ON CSS VARIABLES)
+        // STATUS COLORS (RELY ON CSS VARIABLES)
         success: {
           DEFAULT: "hsl(var(--success))",
           foreground: "hsl(var(--success-foreground))",
@@ -79,8 +79,6 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-
-        // REMOVED: Custom 'text', 'red', 'orange' objects for token consistency.
       },
 
       // --- AESTHETIC CHANGES FOR "PLAYFUL MODERN" ---
@@ -97,9 +95,9 @@ export default {
         "2xl": "2.5rem",
       },
       
-      // Define a new, colorful shadow using the Secondary color (#4ECDC4)
+      // Define a new, colorful shadow using the Secondary color (#3e2e25 - Warm Brown)
       boxShadow: {
-        'playful': '0 10px 15px -3px rgba(78, 205, 196, 0.3), 0 4px 6px -2px rgba(78, 205, 196, 0.05)',
+        'playful': '0 10px 15px -3px rgba(62, 46, 37, 0.2), 0 4px 6px -2px rgba(62, 46, 37, 0.05)',
       },
       
       keyframes: {
