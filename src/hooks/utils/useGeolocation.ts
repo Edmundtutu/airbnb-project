@@ -55,13 +55,26 @@ export const useGeolocation = (): UseGeolocationReturn => {
     setLoading(true);
     setError(null);
 
+    // Try high accuracy first with shorter timeout
     navigator.geolocation.getCurrentPosition(
       handleSuccess,
-      handleError,
+      (highAccuracyError) => {
+        // If high accuracy fails, try with low accuracy as fallback
+        console.log('High accuracy failed, trying low accuracy...');
+        navigator.geolocation.getCurrentPosition(
+          handleSuccess,
+          handleError,
+          {
+            enableHighAccuracy: false,
+            timeout: 5000,
+            maximumAge: 10000, // Accept 10-second-old position
+          }
+        );
+      },
       {
         enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 60000, // 1 minute for more accurate location
+        timeout: 8000, // 8 seconds for high accuracy
+        maximumAge: 5000, // Only use 5-second-old high accuracy positions
       }
     );
   }, [handleSuccess, handleError]);
@@ -84,8 +97,8 @@ export const useGeolocation = (): UseGeolocationReturn => {
       handleError,
       {
         enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 30000, // 30 seconds for real-time tracking
+        timeout: 10000,
+        maximumAge: 5000, // Use recent positions for live tracking
       }
     );
   }, [handleSuccess, handleError]);

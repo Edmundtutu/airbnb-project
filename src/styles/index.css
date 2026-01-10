@@ -102,9 +102,11 @@ All colors MUST be HSL.
     /* Accent (Highlight/Ring): #f9f871 (Cold Yellow) - 59 92% 71% */
     /* Background (Base): #FFFFFF (White) - 0 0% 100% */
     /* ----------------------------------------------------- */
-    
-    --background: 0 0% 100%;        /* #FFFFFF */
-    --foreground: 24 25% 19%;       /* #3e2e25 - Warm Brown */
+
+    --background: 0 0% 100%;
+    /* #FFFFFF */
+    --foreground: 222 47% 11%;
+    /* #3e2e25 - Warm Brown */
 
     --card: 0 0% 100%;
     --card-foreground: 24 25% 19%;
@@ -112,26 +114,40 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 24 25% 19%;
 
-    --primary: 170 100% 34%;        /* #00ac90 - Blue Green */
-    --primary-foreground: 0 0% 100%; /* White */
+    --primary: 168 76% 36%;
+    /* #00ac90 - Blue Green */
+    --primary-foreground: 0 0% 100%;
+    /* White */
 
-    --secondary: 24 25% 19%;        /* #3e2e25 - Warm Brown */
-    --secondary-foreground: 0 0% 100%; /* White */
+    --secondary: 24 25% 19%;
+    /* #3e2e25 - Warm Brown */
+    --secondary-foreground: 0 0% 100%;
+    /* White */
+    --muted: 0 0% 95%;
+    /* Off-white for subtle elements */
+    --muted-foreground: 24 25% 40%;
+    /* Desaturated text */
 
-    --muted: 0 0% 95%;              /* Off-white for subtle elements */
-    --muted-foreground: 24 25% 40%; /* Desaturated text */
-
-    --accent: 59 92% 71%;           /* #f9f871 - Cold Yellow */
+    --accent: 59 92% 71%;
+    /* #f9f871 - Cold Yellow */
     --accent-foreground: 24 25% 19%;
 
+    /* Reading text (INK) */
+    --ink: 222 47% 11%;
+    --ink-muted: 215 20% 45%;
+    --ink-subtle: 215 15% 65%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 90%;             /* Light gray border */
-    --input: 0 0% 90%;              /* Input border */
-    --ring: 59 92% 71%;             /* Cold Yellow Focus Ring */
+    --border: 0 0% 90%;
+    /* Light gray border */
+    --input: 0 0% 90%;
+    /* Input border */
+    --ring: 59 92% 71%;
+    /* Cold Yellow Focus Ring */
 
-    --radius: 1rem; /* Playful radius */
+    --radius: 1rem;
+    /* Playful radius */
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 24 25% 19%;
@@ -152,8 +168,10 @@ All colors MUST be HSL.
 
   .dark {
     /* Dark mode optimized for the new palette (Dark Brown/Black background) */
-    --background: 24 25% 8%;        /* Darker Warm Brown/Near Black */
-    --foreground: 59 92% 85%;       /* Lighter Cold Yellow for contrast */
+    --background: 24 25% 8%;
+    /* Darker Warm Brown/Near Black */
+    --foreground: 59 92% 85%;
+    /* Lighter Cold Yellow for contrast */
 
     --card: 24 25% 10%;
     --card-foreground: 59 92% 85%;
@@ -161,16 +179,23 @@ All colors MUST be HSL.
     --popover: 24 25% 10%;
     --popover-foreground: 59 92% 85%;
 
-    --primary: 170 100% 45%;        /* Lighter Blue Green for visibility */
+    --primary: 170 100% 45%;
+    /* Lighter Blue Green for visibility */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 24 25% 30%;        /* Slightly lighter Warm Brown accent */
+    --secondary: 24 25% 30%;
+    /* Slightly lighter Warm Brown accent */
     --secondary-foreground: 0 0% 100%;
 
     --muted: 24 25% 15%;
     --muted-foreground: 59 92% 60%;
 
-    --accent: 170 100% 15%;         /* Darker Blue Green for subtle accent */
+    --ink: 210 40% 98%;
+    --ink-muted: 215 20% 70%;
+    --ink-subtle: 215 15% 55%;
+
+    --accent: 170 100% 15%;
+    /* Darker Blue Green for subtle accent */
     --accent-foreground: 59 92% 85%;
 
     --destructive: 0 84% 60%;
@@ -204,8 +229,9 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
-    font-feature-settings: "kern" 1, "liga" 1, "calt" 1; /* Better typography */
+    @apply bg-background text-ink;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+    /* Better typography */
   }
 
   /* Smooth scrolling */
@@ -219,7 +245,8 @@ All colors MUST be HSL.
   }
 
   /* Mobile touch improvements */
-  button, a {
+  button,
+  a {
     -webkit-tap-highlight-color: transparent;
   }
 
@@ -244,6 +271,7 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
+
   /* Text color utilities */
   .text-primary {
     color: hsl(var(--text-primary));
@@ -264,7 +292,7 @@ All colors MUST be HSL.
   .text-inverse {
     color: hsl(var(--text-inverse));
   }
-  
+
   /* NEW: Blue Green and Cold Yellow Gradient */
   .gradient-natural-contrast {
     background: linear-gradient(135deg, hsl(170, 100%, 34%), hsl(59, 92%, 71%));
@@ -276,32 +304,56 @@ All colors MUST be HSL.
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+  
+    .bg-accent-soft {
+    background-color: hsl(var(--accent) / 0.2);
+  }
+
+  .border-accent {
+    border-color: hsl(var(--accent));
+  }
+
+  .text-accent {
+    color: hsl(var(--accent));
+  }
+
+  .ring-accent {
+    --tw-ring-color: hsl(var(--accent));
+  }
 
   /* Montserrat-specific font weights */
   .font-thin {
     font-weight: 100;
   }
+
   .font-extralight {
     font-weight: 200;
   }
+
   .font-light {
     font-weight: 300;
   }
+
   .font-normal {
     font-weight: 400;
   }
+
   .font-medium {
     font-weight: 500;
   }
+
   .font-semibold {
     font-weight: 600;
   }
+
   .font-bold {
     font-weight: 700;
   }
+
   .font-extrabold {
     font-weight: 800;
   }
+
   .font-black {
     font-weight: 900;
   }

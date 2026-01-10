@@ -70,6 +70,13 @@ export default {
           foreground: "hsl(var(--accent-foreground))",
         },
 
+        // FUTURE USAGE FOR READING TEXT
+        ink: {
+          DEFAULT: "hsl(var(--ink))",
+          muted: "hsl(var(--ink-muted))",
+          subtle: "hsl(var(--ink-subtle))",
+        },
+
         // CARD/POPOVER COLORS (MUST REMAIN)
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -84,22 +91,22 @@ export default {
       // --- AESTHETIC CHANGES FOR "PLAYFUL MODERN" ---
       borderRadius: {
         // Base radius is now 1rem (from CSS var --radius)
-        lg: `var(--radius)`, 
+        lg: `var(--radius)`,
         // md is now 0.5rem (calc(1rem - 0.5rem))
-        md: `calc(var(--radius) - 0.5rem)`, 
+        md: `calc(var(--radius) - 0.5rem)`,
         // sm is now 0.25rem (calc(1rem - 0.75rem))
-        sm: `calc(var(--radius) - 0.75rem)`, 
-        
+        sm: `calc(var(--radius) - 0.75rem)`,
+
         // Add larger playful radius classes:
         "xl": "1.5rem",
         "2xl": "2.5rem",
       },
-      
+
       // Define a new, colorful shadow using the Secondary color (#3e2e25 - Warm Brown)
       boxShadow: {
         'playful': '0 10px 15px -3px rgba(62, 46, 37, 0.2), 0 4px 6px -2px rgba(62, 46, 37, 0.05)',
       },
-      
+
       keyframes: {
         "accordion-down": {
           from: { height: "0" },

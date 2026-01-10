@@ -207,7 +207,7 @@ const Discover: React.FC = () => {
   }
 
   if (error) {
-    return <div className="text-center text-red-500">Error loading listings.</div>;
+    return <div className="text-center text-destructive">Error loading listings.</div>;
   }
 
   return (
@@ -220,25 +220,30 @@ const Discover: React.FC = () => {
           <form onSubmit={handleSearch} className="w-full">
             <div className="flex gap-2">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-muted-foreground transition-colors" />
                 <Input
                   placeholder="Search for stays, locations, or properties..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 md:pl-12 h-10 md:h-12 text-sm md:text-base"
+                  className="pl-10 md:pl-12 h-10 md:h-12 text-sm md:text-base border-border rounded-xl shadow-sm
+                    focus:ring-2 focus:ring-primary focus:border-primary
+                    hover:border-muted-foreground/30 transition-all duration-200"
                 />
               </div>
               <Button
                 type="button"
                 variant="outline"
                 size="icon"
-                className="h-10 w-10 md:h-12 md:w-12 relative flex-shrink-0"
+                className="h-10 w-10 md:h-12 md:w-12 relative flex-shrink-0 rounded-xl border-border shadow-sm
+                  hover:border-primary hover:bg-primary/5 hover:shadow-md
+                  transition-all duration-200"
                 onClick={() => setIsFiltersOpen(!isFiltersOpen)}
               >
-                <SlidersHorizontal className="h-4 w-4 md:h-5 md:w-5" />
+                <SlidersHorizontal className={`h-4 w-4 md:h-5 md:w-5 transition-colors ${isFiltersOpen ? 'text-primary' : ''}`} />
                 {getActiveFiltersCount() > 0 && (
                   <Badge
-                    className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                    className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs
+                      bg-primary text-primary-foreground border-2 border-background"
                     variant="destructive"
                   >
                     {getActiveFiltersCount()}
@@ -253,17 +258,30 @@ const Discover: React.FC = () => {
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-sm text-muted-foreground">Filters:</span>
               {activeFilters.propertyTypes.map(type => (
-                <Badge key={type} variant="secondary">
+                <Badge 
+                  key={type} 
+                  variant="secondary"
+                  className="bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground
+                    transition-all duration-150 rounded-lg"
+                >
                   {type}
                 </Badge>
               ))}
               {activeFilters.bedrooms && (
-                <Badge variant="secondary">
+                <Badge 
+                  variant="secondary"
+                  className="bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground
+                    transition-all duration-150 rounded-lg"
+                >
                   {activeFilters.bedrooms}+ bedrooms
                 </Badge>
               )}
               {activeFilters.amenities.length > 0 && (
-                <Badge variant="secondary">
+                <Badge 
+                  variant="secondary"
+                  className="bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground
+                    transition-all duration-150 rounded-lg"
+                >
                   {activeFilters.amenities.length} amenities
                 </Badge>
               )}
@@ -271,7 +289,8 @@ const Discover: React.FC = () => {
                 variant="ghost"
                 size="sm"
                 onClick={clearAllFilters}
-                className="h-7 text-xs"
+                className="h-7 text-xs text-muted-foreground hover:text-foreground hover:bg-muted
+                  transition-all duration-150 rounded-lg"
               >
                 Clear all
               </Button>
@@ -296,19 +315,22 @@ const Discover: React.FC = () => {
           {!isLoading && (
             <>
               {listingsToDisplay.length === 0 ? (
-                <Card>
+                <Card className="border-border rounded-xl shadow-sm">
                   <CardContent className="p-6 md:p-8 text-center">
                     <div className="w-12 h-12 md:w-16 md:h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
                       <Search className="h-6 w-6 md:h-8 md:w-8 text-muted-foreground" />
                     </div>
-                    <h3 className="text-lg font-medium mb-2">No stays found</h3>
+                    <h3 className="text-lg font-medium mb-2 text-foreground">No stays found</h3>
                     <p className="text-muted-foreground mb-4 text-sm md:text-base">
                       Try adjusting your search terms or filters
                     </p>
-                    <Button onClick={() => {
-                      setSearchQuery('');
-                      clearAllFilters();
-                    }}>
+                    <Button 
+                      onClick={() => {
+                        setSearchQuery('');
+                        clearAllFilters();
+                      }}
+                      className="bg-primary text-primary-foreground hover:shadow-md transition-all duration-150 rounded-xl"
+                    >
                       Clear Search & Filters
                     </Button>
                   </CardContent>
@@ -341,6 +363,8 @@ const Discover: React.FC = () => {
                 size="sm"
                 disabled={currentPage <= 1}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
+                className="rounded-lg border-border hover:border-primary/30 hover:bg-muted
+                  transition-all duration-150"
               >
                 Previous
               </Button>
@@ -352,6 +376,8 @@ const Discover: React.FC = () => {
                 size="sm"
                 disabled={currentPage >= lastPage}
                 onClick={() => setPage((p) => p + 1)}
+                className="rounded-lg border-border hover:border-primary/30 hover:bg-muted
+                  transition-all duration-150"
               >
                 Next
               </Button>

@@ -6,7 +6,7 @@ import { getImageUrl } from '@/utils/helperfunctions';
 
 interface PropertyMarkerProps {
   property: Property;
-  onMarkerClick: (property: Property, event: any) => void;
+  onMarkerClick: (property: Property) => void;
 }
 
 const PropertyMarker: React.FC<PropertyMarkerProps> = ({ property, onMarkerClick }) => {
@@ -51,7 +51,7 @@ const PropertyMarker: React.FC<PropertyMarkerProps> = ({ property, onMarkerClick
       eventHandlers={{
         click: (e) => {
           e.originalEvent.preventDefault?.();
-          onMarkerClick(property, e);
+          onMarkerClick(property);
         },
       }}
     />

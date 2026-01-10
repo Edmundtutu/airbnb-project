@@ -55,22 +55,7 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
           {/* Logo - Always visible */}
           <Link to="/" className="text-lg sm:text-xl font-bold text-primary flex-shrink-0">
             CavaYo
-          </Link>
-
-          {/* Search Bar - Desktop and tablet */}
-          {user && (
-            <form onSubmit={handleSearch} className="hidden sm:flex flex-1 max-w-lg mx-4 lg:mx-8">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search stays, properties..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-muted/50 border-0 focus:bg-background h-9 lg:h-10"
-                />
-              </div>
-            </form>
-          )}
+          </Link>          
 
           {/* Desktop Actions */}
           {user ? (
@@ -198,21 +183,6 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
             </Button>
           )}
         </div>
-
-        {/* Mobile Search - Only when logged in */}
-        {user && (
-          <form onSubmit={handleSearch} className="sm:hidden pb-3">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search stays, properties..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-muted/50 border-0 h-9"
-              />
-            </div>
-          </form>
-        )}
 
         {/* Mobile Navigation - Only for non-logged in users */}
         {mobileMenuOpen && !user && (

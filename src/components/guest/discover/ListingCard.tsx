@@ -86,11 +86,13 @@ const ListingCard: React.FC<ListingCardProps> = ({
   const hasMultipleImages = images.length > 1;
 
   return (
-    <Card className={`group cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-[1.02] border-0 shadow-sm rounded-lg ${className ?? ''}`}>
+    <Card className={`group cursor-pointer bg-card border border-border rounded-xl shadow-sm
+      hover:shadow-md hover:-translate-y-0.5 transition-all duration-200
+      focus-within:ring-2 focus-within:ring-primary/40 ${className ?? ''}`}>
       <CardContent className="p-0 h-full flex flex-col">
         <div className="relative flex-1">
           {/* Image Container - Takes most of the card space */}
-          <div className="aspect-[4/3] bg-muted flex items-center justify-center overflow-hidden rounded-t-lg relative">
+          <div className="aspect-[4/3] bg-muted flex items-center justify-center overflow-hidden rounded-t-xl relative">
             {images.length > 0 ? (
               <>
                 <Link to={`/listing/${actualListing.id}`} className="w-full h-full">
@@ -107,7 +109,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white h-7 w-7 opacity-0 group-hover:opacity-100 transition-all duration-200"
+                      className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white h-7 w-7 opacity-0 group-hover:opacity-100 transition-all duration-200 rounded-full"
                       onClick={prevImage}
                     >
                       <ChevronLeft className="h-4 w-4" />
@@ -115,7 +117,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white h-7 w-7 opacity-0 group-hover:opacity-100 transition-all duration-200"
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white h-7 w-7 opacity-0 group-hover:opacity-100 transition-all duration-200 rounded-full"
                       onClick={nextImage}
                     >
                       <ChevronRight className="h-4 w-4" />
@@ -150,13 +152,14 @@ const ListingCard: React.FC<ListingCardProps> = ({
             <Button
               variant="ghost"
               size="icon"
-              className={`absolute top-3 right-3 bg-white/90 hover:bg-white h-8 w-8 shadow-md ${
-                isListingWishlisted(actualListing.id) ? 'text-red-500' : 'text-gray-600'
+              className={`absolute top-3 right-3 bg-white/90 hover:bg-white h-8 w-8 shadow-md rounded-full
+                transition-all duration-150 ${
+                isListingWishlisted(actualListing.id) ? 'text-red-500' : 'text-muted-foreground hover:text-foreground'
               }`}
               onClick={handleToggleWishlist}
             >
               <Heart
-                className={`h-4 w-4 ${
+                className={`h-4 w-4 transition-all ${
                   isListingWishlisted(actualListing.id) ? 'fill-current' : ''
                 }`}
               />
@@ -166,7 +169,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
           {/* Price and Rating Container */}
           <div className="absolute top-3 left-3 flex items-center space-x-2">
             {/* Price Badge */}
-            <Badge className="bg-white/90 text-foreground hover:bg-white font-semibold border-0 shadow-sm">
+            <Badge className="bg-white/90 text-foreground hover:bg-white font-semibold border border-border shadow-sm rounded-lg">
               UGX {actualListing.price_per_night.toLocaleString()}
             </Badge>
 
@@ -182,8 +185,8 @@ const ListingCard: React.FC<ListingCardProps> = ({
 
         {/* Minimal Content Area - Only essential info */}
         <div className="p-3 space-y-1">
-          <Link to={`/listing/${actualListing.id}`}>
-            <h3 className="font-semibold text-sm line-clamp-1 group-hover:text-primary transition-colors">
+          <Link to={`/listing/${actualListing.id}`} className="block">
+            <h3 className="font-semibold text-sm line-clamp-1 text-foreground group-hover:underline decoration-1 underline-offset-2 transition-all">
               {actualListing.name}
             </h3>
           </Link>
@@ -211,7 +214,8 @@ const ListingCard: React.FC<ListingCardProps> = ({
             <Button
               size="sm"
               variant="outline"
-              className="w-full h-8 text-xs"
+              className="w-full h-8 text-xs border-border text-muted-foreground hover:text-foreground
+                hover:bg-muted transition-all duration-150 rounded-lg"
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -228,6 +232,3 @@ const ListingCard: React.FC<ListingCardProps> = ({
 };
 
 export { ListingCard };
-
-// Legacy export for backward compatibility
-export { ListingCard as ProductCard };
