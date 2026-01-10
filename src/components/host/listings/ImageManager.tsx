@@ -6,6 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import uploadService from '@/services/uploadService';
+import { getImageUrl } from '@/utils/helperfunctions';
 
 interface ImageManagerProps {
   images?: string[];
@@ -200,7 +201,7 @@ const ImageManager: React.FC<ImageManagerProps> = ({
                 <div key={`${image}-${index}`} className="group relative overflow-hidden rounded-lg border">
                   <AspectRatio ratio={16 / 9}>
                     <img
-                      src={image}
+                      src={getImageUrl(image) ?? ''}
                       alt="Listing"
                       className="h-full w-full object-cover"
                       loading="lazy"

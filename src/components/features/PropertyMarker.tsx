@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { Marker } from 'react-leaflet';
 import L from 'leaflet';
 import { Property } from '@/types';
+import { getImageUrl } from '@/utils/helperfunctions';
 
 interface PropertyMarkerProps {
   property: Property;
@@ -27,7 +28,7 @@ const PropertyMarker: React.FC<PropertyMarkerProps> = ({ property, onMarkerClick
         overflow: hidden;
       ">
         ${imageUrl 
-          ? `<img src="${imageUrl}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" />`
+          ? `<img src="${getImageUrl(imageUrl) ?? ''}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" />`
           : `<div style="width: 100%; height: 100%; background: #10b981; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; border-radius: 4px;">${property.name.charAt(0)}</div>`
         }
       </div>

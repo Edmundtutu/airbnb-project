@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getImageUrl } from '@/utils/helperfunctions';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -397,7 +398,7 @@ const HostListings = () => {
                 {listings.map((listing) => {
                   const location =
                     listing.property?.address ?? listing.property?.location?.address ?? 'Address unavailable';
-                  const coverImage = listing.images?.[0];
+                  const coverImage = listing.images?.[0] ? getImageUrl(listing.images[0]) : null;
 
                   return (
                     <Card
@@ -516,7 +517,7 @@ const HostListings = () => {
                 {listings.map((listing) => {
                   const location =
                     listing.property?.address ?? listing.property?.location?.address ?? 'Address unavailable';
-                  const coverImage = listing.images?.[0];
+                  const coverImage = listing.images?.[0] ? getImageUrl(listing.images[0]) : null;
 
                   return (
                     <Card key={listing.id} className="overflow-hidden hover:shadow-lg transition-shadow border-0 shadow-sm">

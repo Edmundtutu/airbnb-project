@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { getImageUrl } from '@/utils/helperfunctions';
 import { 
   Star, 
   Heart, 
@@ -231,7 +232,7 @@ const ListingPage: React.FC = () => {
               {listing.images?.[currentImageIndex] ? (
                 <>
                   <img 
-                    src={listing.images[currentImageIndex]} 
+                    src={getImageUrl(listing.images[currentImageIndex]) ?? ''} 
                     alt={listing.name} 
                     className="w-full h-full object-cover" 
                   />
@@ -309,7 +310,7 @@ const ListingPage: React.FC = () => {
                     }`}
                     onClick={() => setCurrentImageIndex(i)}
                   >
-                    <img src={img} alt={`${listing.name} ${i + 1}`} className="w-full h-full object-cover" />
+                    <img src={getImageUrl(img) ?? ''} alt={`${listing.name} ${i + 1}`} className="w-full h-full object-cover" />
                   </div>
                 ))}
               </div>

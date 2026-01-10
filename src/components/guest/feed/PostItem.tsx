@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from '@/components/ui/carousel';
 import { Heart, MessageCircle, Share, Star, MapPin, Package, MoveHorizontal as MoreHorizontal, ChevronUp, ChevronDown, ExternalLink } from 'lucide-react';
 import { postService } from '@/services/postService';
+import { getImageUrl } from '@/utils/helperfunctions';
 import { Post } from '@/types';
 import CommentSection from './CommentSection';
 
@@ -168,7 +169,7 @@ const PostItem: React.FC<PostItemProps> = ({
                       onClick={() => setIsImageExpanded(!isImageExpanded)}
                     >
                       <img
-                        src={image.startsWith('https://') ? image : `http://localhost:8000/storage/${image}`} // TODO: change to the actual domain
+                        src={getImageUrl(image) ?? ''}
                         alt={`Post Image ${index + 1}`}
                         className="w-full h-full object-cover sm:rounded-lg border-0 sm:border"
                         loading="lazy"
@@ -230,7 +231,7 @@ const PostItem: React.FC<PostItemProps> = ({
                   <div className="w-14 h-14 sm:w-20 sm:h-20 bg-muted rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
                     {post.listing.images?.[0] ? (
                       <img
-                        src={post.listing.images[0]}
+                        src={getImageUrl(post.listing.images[0]) ?? ''}
                         alt={post.listing.name}
                         className="w-full h-full object-cover rounded-md"
                         loading="lazy"

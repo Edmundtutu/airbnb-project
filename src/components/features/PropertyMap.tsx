@@ -18,6 +18,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { getImageUrl } from '@/utils/helperfunctions';
 import { propertyService } from '@/services/propertyService';
 import type { LaravelPaginatedResponse } from '@/types';
 
@@ -509,7 +510,7 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
               <div className="w-12 h-12 rounded-lg overflow-hidden bg-muted flex-shrink-0">
                 {selectedProperty.cover_image ? (
                   <img 
-                    src={selectedProperty.cover_image} 
+                    src={getImageUrl(selectedProperty.cover_image) ?? ''} 
                     alt={selectedProperty.name}
                     className="w-full h-full object-cover"
                   />
@@ -612,7 +613,7 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
                     <div className="w-12 h-12 rounded-lg overflow-hidden bg-muted">
                       {selectedProperty.cover_image ? (
                         <img 
-                          src={selectedProperty.cover_image} 
+                          src={getImageUrl(selectedProperty.cover_image) ?? ''} 
                           alt={selectedProperty.name}
                           className="w-full h-full object-cover"
                         />
@@ -738,7 +739,7 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
                         <div className="w-8 h-8 rounded-lg overflow-hidden bg-muted flex-shrink-0">
                           {property.cover_image ? (
                             <img 
-                              src={property.cover_image} 
+                              src={getImageUrl(property.cover_image) ?? ''} 
                               alt={property.name}
                               className="w-full h-full object-cover"
                             />

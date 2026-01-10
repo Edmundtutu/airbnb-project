@@ -1,4 +1,5 @@
 import React from 'react';
+import { getImageUrl } from '@/utils/helperfunctions';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -63,7 +64,7 @@ const PropertyDetails: React.FC = () => {
         <CardContent className="flex flex-col md:flex-row items-center gap-6 p-6">
           <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted flex-shrink-0">
             {property.cover_image ? (
-              <img src={property.cover_image} alt={property.name} className="w-full h-full object-cover" />
+              <img src={getImageUrl(property.cover_image) ?? ''} alt={property.name} className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-3xl">
                 {property.name.charAt(0)}
@@ -117,7 +118,7 @@ const PropertyDetails: React.FC = () => {
                 <CardContent className="p-4 flex flex-col flex-1">
                   <div className="w-full h-40 bg-muted rounded-lg mb-3 overflow-hidden flex items-center justify-center">
                     {listing.images && listing.images.length > 0 ? (
-                      <img src={listing.images[0]} alt={listing.name} className="w-full h-full object-cover" />
+                      <img src={getImageUrl(listing.images[0]) ?? ''} alt={listing.name} className="w-full h-full object-cover" />
                     ) : (
                       <span className="text-2xl font-bold text-muted-foreground">{listing.name.charAt(0)}</span>
                     )}

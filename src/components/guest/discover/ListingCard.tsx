@@ -7,6 +7,7 @@ import { MapPin, Star, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Listing } from '@/types';
 import { useWishlist } from '@/context/WishlistContext';
 import { useToast } from '@/hooks/use-toast';
+import { getImageUrl } from '@/utils/helperfunctions';
 
 type ListingCardProps = {
   listing: Listing;
@@ -81,7 +82,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
     setCurrentImageIndex(index);
   };
 
-  const images = actualListing.images || [];
+  const images = (actualListing.images || []).map(img => getImageUrl(img)).filter((url): url is string => url !== null);
   const hasMultipleImages = images.length > 1;
 
   return (

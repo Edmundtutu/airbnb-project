@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { getImageUrl } from '@/utils/helperfunctions';
 import {
     ImageIcon,
     Loader2,
@@ -821,7 +822,7 @@ const HostCreateListing: React.FC = () => {
                                                     <div key={`${image}-${index}`} className="group relative overflow-hidden rounded-lg border">
                                                         <AspectRatio ratio={4 / 3}>
                                                             <img
-                                                                src={image}
+                                                                src={getImageUrl(image) ?? image}
                                                                 alt={`Listing photo ${index + 1}`}
                                                                 className="h-full w-full object-cover transition-transform group-hover:scale-105"
                                                             />

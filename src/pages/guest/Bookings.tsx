@@ -8,6 +8,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Calendar, MapPin, Users, Bed, Bath, X } from 'lucide-react';
 import { useBooking } from '@/context/BookingContext';
+import { getImageUrl } from '@/utils/helperfunctions';
 import { useToast } from '@/hooks/use-toast';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createBooking } from '@/services/bookingService';
@@ -136,7 +137,7 @@ const Bookings: React.FC = () => {
                     <div className="w-10 h-10 rounded-lg overflow-hidden bg-muted">
                       {propertyItems[0].property.cover_image ? (
                         <img 
-                          src={propertyItems[0].property.cover_image} 
+                          src={getImageUrl(propertyItems[0].property.cover_image) ?? ''} 
                           alt={propertyItems[0].property.name}
                           className="w-full h-full object-cover"
                         />
@@ -165,7 +166,7 @@ const Bookings: React.FC = () => {
                     <div className="w-16 h-16 sm:w-20 sm:h-20 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
                       {item.listing.images?.[0] ? (
                         <img 
-                          src={item.listing.images[0]} 
+                          src={getImageUrl(item.listing.images[0]) ?? ''} 
                           alt={item.listing.name}
                           className="w-full h-full object-cover rounded-lg"
                         />

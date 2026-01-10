@@ -18,18 +18,44 @@ class ListingFactory extends Factory
     public function definition(): array
     {
         $roomTypes = [
-            'Entire place', 'Private room', 'Shared room'
+            'Entire place',
+            'Private room',
+            'Shared room'
         ];
 
         $images = [];
         $imageCount = $this->faker->numberBetween(3, 8);
-        for ($i = 0; $i < $imageCount; $i++) {
-            $images[] = 'https://picsum.photos/seed/' . $this->faker->uuid . '/800/600';
+
+        // Absolute path to the storage folder
+        $imageFolder = storage_path('app/public/property-images');
+
+        // Get all image files in that folder
+        $availableImages = glob($imageFolder . '/*.{jpg,jpeg,png,webp}', GLOB_BRACE);
+
+        // If no images found, fallback to empty array to avoid errors
+        if (!empty($availableImages)) {
+            for ($i = 0; $i < $imageCount; $i++) {
+                // Pick random file
+                $randomImage = $this->faker->randomElement($availableImages);
+
+                // Convert absolute path to a storage-relative URL or path
+                $images[] = 'storage/property-images/' . basename($randomImage);
+            }
         }
+        
+
 
         $tags = $this->faker->randomElements([
-            'popular', 'new', 'featured', 'luxury', 'budget-friendly', 
-            'family-friendly', 'pet-friendly', 'business-travel', 'romantic', 'cozy'
+            'popular',
+            'new',
+            'featured',
+            'luxury',
+            'budget-friendly',
+            'family-friendly',
+            'pet-friendly',
+            'business-travel',
+            'romantic',
+            'cozy'
         ], $this->faker->numberBetween(1, 4));
 
         return [

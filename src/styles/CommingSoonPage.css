@@ -1,8 +1,8 @@
 /* ComingSoonPage.css - Polished Version */
 :root {
-    --primary-coral: #FF6B6B;
-    --secondary-aqua: #4ECDC4;
-    --detail-slate: #556270;
+    --primary-coral: #00ac90;
+    --secondary-aqua:#f9f871;
+    --detail-slate:  #3e2e25;
     --background-mint: #F7FFF7;
     --glass-bg: rgba(255, 255, 255, 0.92);
     --glass-border: rgba(255, 255, 255, 0.25);
@@ -327,9 +327,9 @@ body {
 }
 
 .subscribe-trigger:hover {
-    background: #e55a5a;
+    background: #80f8e4;
     transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.35);
+    box-shadow: 0 8px 25px rgba(128, 248, 228, 0.35);
 }
 
 .elegant-arrow {
@@ -408,9 +408,9 @@ body {
 }
 
 .submit-btn:hover:not(.loading) {
-    background: #e55a5a;
+    background: #80f8e4;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.35);
+    box-shadow: 0 6px 20px rgba(128, 248, 228, 0.35);
 }
 
 .submit-btn.loading {

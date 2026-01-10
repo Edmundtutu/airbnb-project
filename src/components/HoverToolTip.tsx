@@ -2,6 +2,7 @@ import React from 'react';
 import { Star, MapPin, Phone } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Property } from '@/types';
+import { getImageUrl } from '@/utils/helperfunctions';
 
 /**
  * Props for HoverTooltip
@@ -32,7 +33,7 @@ const HoverTooltip: React.FC<HoverTooltipProps> = ({ property, position, isVisib
         <div className="w-10 h-10 rounded-full overflow-hidden bg-muted flex-shrink-0">
           {property.avatar ? (
             <img 
-              src={property.avatar} 
+              src={getImageUrl(property.avatar) ?? ''} 
               alt={property.name}
               className="w-full h-full object-cover"
             />
