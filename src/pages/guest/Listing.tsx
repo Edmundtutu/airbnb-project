@@ -497,7 +497,7 @@ const ListingPage: React.FC = () => {
             </div>
 
             {/* Book Button - Sticky on Mobile */}
-            <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 lg:static lg:border-0 lg:p-0">
+            <div className="fixed bottom-16 left-0 right-0 z-[60] bg-accent border-t p-4 shadow-lg lg:static lg:border-0 lg:p-0 lg:z-auto lg:shadow-none lg:bottom-auto">
               <Button
                 size="lg"
                 className="w-full h-12 text-base font-semibold bg-gradient-to-r from-red-imperial to-red-cinnabar hover:from-red-imperial/90 hover:to-red-cinnabar/90"
@@ -600,7 +600,7 @@ const ListingPage: React.FC = () => {
           ) : (
             <div className="space-y-4">
               {reviews.slice(0, 3).map((review) => (
-                <Card key={review.id} className="border-0 shadow-none">
+                <Card key={review.id} className="bg-yellowcard border-0 shadow-none">
                   <CardContent className="p-0">
                     <div className="flex items-start gap-3 mb-3">
                       <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center flex-shrink-0">

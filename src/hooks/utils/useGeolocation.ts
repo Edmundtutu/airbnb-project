@@ -18,6 +18,16 @@ export const useGeolocation = (): UseGeolocationReturn => {
   const watchIdRef = useRef<number | null>(null);
 
   const handleSuccess = useCallback((position: GeolocationPosition) => {
+    const accuracy = position.coords.accuracy;
+    
+    // Only accept positions with good accuracy (< 100 meters)
+    // If accuracy is poor and we're still loading, it will retry
+    if (accuracy > 100) {
+      console.log(`Low accuracy (${accuracy}m), waiting for better fix...`);
+      // Don't update location with poor accuracy
+      return;
+    }
+    
     setLocation({
       lat: position.coords.latitude,
       lng: position.coords.longitude,
@@ -55,29 +65,36 @@ export const useGeolocation = (): UseGeolocationReturn => {
     setLoading(true);
     setError(null);
 
-    // Try high accuracy first with shorter timeout
+    // Try high accuracy first - NO CACHE, longer timeout for GPS lock
     navigator.geolocation.getCurrentPosition(
       handleSuccess,
       (highAccuracyError) => {
         // If high accuracy fails, try with low accuracy as fallback
         console.log('High accuracy failed, trying low accuracy...');
         navigator.geolocation.getCurrentPosition(
-          handleSuccess,
+          (position) => {
+            // For low accuracy, accept any result
+            setLocation({
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            });
+            setLoading(false);
+          },
           handleError,
           {
             enableHighAccuracy: false,
             timeout: 5000,
-            maximumAge: 10000, // Accept 10-second-old position
+            maximumAge: 0, // No cache even for fallback
           }
         );
       },
       {
         enableHighAccuracy: true,
-        timeout: 8000, // 8 seconds for high accuracy
-        maximumAge: 5000, // Only use 5-second-old high accuracy positions
+        timeout: 10000, // 10 seconds for GPS lock
+        maximumAge: 0, // Force fresh position, no cache at all
       }
     );
-  }, [handleSuccess, handleError]);
+  }, [handleSuccess, handleError, setLocation, setLoading]);
 
   const watchPosition = useCallback(() => {
     if (!navigator.geolocation) {
@@ -98,7 +115,7 @@ export const useGeolocation = (): UseGeolocationReturn => {
       {
         enableHighAccuracy: true,
         timeout: 10000,
-        maximumAge: 5000, // Use recent positions for live tracking
+        maximumAge: 0, // Force fresh positions for live tracking
       }
     );
   }, [handleSuccess, handleError]);

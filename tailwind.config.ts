@@ -70,7 +70,12 @@ export default {
           foreground: "hsl(var(--accent-foreground))",
         },
 
-        // FUTURE USAGE FOR READING TEXT
+        // FUTURE USAGE FOR READING TEXT AND MORE STYLINGS
+        yellowcard: {
+          DEFAULT: "hsl(var(--card-brand-accent))",
+          foreground: "hsl(var(--card-foreground))"
+        },
+        
         ink: {
           DEFAULT: "hsl(var(--ink))",
           muted: "hsl(var(--ink-muted))",

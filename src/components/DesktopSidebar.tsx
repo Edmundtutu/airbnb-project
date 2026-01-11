@@ -48,14 +48,14 @@ const DesktopSidebar: React.FC = () => {
   return (
     <div className="hidden lg:flex flex-col w-64 xl:w-72 h-screen bg-card border-r fixed left-0 top-0 z-30">
       {/* Logo */}
-      <div className="p-4 xl:p-6 border-b">
+      <div className="bg-accent p-4 xl:p-6 border-b">
         <Link to="/" className="text-xl xl:text-2xl font-bold text-primary">
           CavaYo
         </Link>
       </div>
 
       {/* User Profile Section - Facebook style */}
-      <div className="p-4 border-b">
+      <div className="bg-accent p-4 border-b">
         <div className="flex items-center gap-3">
           <Avatar className="h-10 w-10">
             <AvatarFallback className="bg-primary text-primary-foreground">

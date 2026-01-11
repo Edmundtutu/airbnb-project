@@ -132,6 +132,9 @@ All colors MUST be HSL.
     /* #f9f871 - Cold Yellow */
     --accent-foreground: 24 25% 19%;
 
+     /* For Yellow cards to increase intesity of brand */
+    --card-brand-accent: 59 92% 71%;
+
     /* Reading text (INK) */
     --ink: 222 47% 11%;
     --ink-muted: 215 20% 45%;
@@ -164,6 +167,8 @@ All colors MUST be HSL.
     --text-tertiary: 24 25% 45%;
     --text-muted: 24 25% 60%;
     --text-inverse: 0 0% 100%;
+
+    /* For normal styling leave white to stand out as normal */
   }
 
   .dark {

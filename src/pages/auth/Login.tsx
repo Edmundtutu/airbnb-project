@@ -41,11 +41,11 @@ const Login: React.FC = () => {
       setError(err.response?.data?.message || 'Invalid credentials');
     } finally {
       setIsLoading(false);
-    }
+    } 
   };
 
   return (
-    <Card>
+    <Card className="border-none bg-transparent">
       <CardHeader className="text-center">
         <CardTitle>Welcome Back</CardTitle>
         <CardDescription>

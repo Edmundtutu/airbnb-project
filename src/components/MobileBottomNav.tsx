@@ -56,7 +56,7 @@ const MobileBottomNav: React.FC = () => {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-sm border-t lg:hidden">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-primary/95 backdrop-blur-sm border-t lg:hidden">
       <div className="flex items-center justify-around px-2 py-2 safe-area-pb">
         {navItems.map((item) => {
           const isActive = item.href ? isActivePath(item.href) : false;
@@ -64,7 +64,7 @@ const MobileBottomNav: React.FC = () => {
           const content = (
             <>
               <div className="relative">
-                <item.icon className={`h-5 w-5 ${isActive ? 'scale-110 text-primary' : ''} ${isChatItem && item.badge ? 'animate-pulse' : ''} transition-all duration-200`} />
+                <item.icon className={`h-5 w-5 ${isActive ? 'scale-110 text-accent' : 'text-primary-foreground'} ${isChatItem && item.badge ? 'animate-pulse' : ''} transition-all duration-200`} />
                 {item.badge !== undefined && item.badge > 0 && (
                   <Badge className={`absolute -top-1.5 -right-1.5 h-4 w-4 flex items-center justify-center text-xs p-0 ${
                     isChatItem ? 'bg-blue-500 animate-bounce' : 'bg-red-500'
@@ -73,12 +73,12 @@ const MobileBottomNav: React.FC = () => {
                   </Badge>
                 )}
               </div>
-              <span className={`text-xs mt-1 truncate max-w-full ${isActive ? 'font-medium text-primary' : 'text-muted-foreground'}`}>
+              <span className={`text-xs mt-1 truncate max-w-full ${isActive ? 'font-medium text-primary' : 'text-white'}`}>
                 {item.name}
               </span>
               {/* Active indicator */}
               {isActive && (
-                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-primary rounded-full" />
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-accent rounded-full" />
               )}
             </>
           );
@@ -113,7 +113,6 @@ const MobileBottomNav: React.FC = () => {
         })}
       </div>
 
-      {/* Legacy chat rooms list dialog removed in favor of /chats route */}
     </div>
   );
 };

@@ -34,7 +34,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, rightPanel: initialRi
       <div className="min-h-screen bg-background overflow-x-hidden">
         <Navbar user={user} />
         
-        <div className="flex min-h-screen">
+        <div className="flex min-h-screen pt-14 lg:pt-16">
           {/* Desktop Sidebar - Fixed left sidebar */}
           {user && <DesktopSidebar />}
           

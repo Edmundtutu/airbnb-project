@@ -6,7 +6,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
   Search,
-  SlidersHorizontal
+  SlidersHorizontal,
+  MapPin,
+  Flame,
+  ThumbsUp,
+  ShieldCheck
 } from 'lucide-react';
 import { Listing } from '@/types';
 import { useBooking } from '@/context/BookingContext';
@@ -17,6 +21,13 @@ import { useWishlist } from '@/context/WishlistContext';
 import { ListingCard } from '@/components/guest/discover/ListingCard';
 import FiltersPanel, { FilterState, DEFAULT_FILTER_STATE } from '@/layouts/FiltersPanel';
 
+const categories = [
+  { id: 'nearby', label: 'Near By', icon: MapPin },
+  { id: 'popular', label: 'Popular', icon: Flame },
+  { id: 'recommended', label: 'Recommended', icon: ThumbsUp },
+  { id: 'verified', label: 'Verified', icon: ShieldCheck }
+];
+
 const Discover: React.FC = () => {
   const [searchParams] = useSearchParams();
   const { addItem } = useBooking();
@@ -24,9 +35,14 @@ const Discover: React.FC = () => {
   const { toast } = useToast();
 
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+  const [activeCategory, setActiveCategory] = useState<string>('');
   const [page, setPage] = useState(1);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [scrollLocked, setScrollLocked] = useState(false);
+  
+  const categoryBarRef = React.useRef<HTMLDivElement>(null);
+  const listingsContainerRef = React.useRef<HTMLDivElement>(null);
   
   // Active filters that are applied to the main listing query
   const [activeFilters, setActiveFilters] = useState<FilterState>({ ...DEFAULT_FILTER_STATE });
@@ -50,6 +66,63 @@ const Discover: React.FC = () => {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Two-layer scroll handoff system
+  useEffect(() => {
+    if (!isMobile) return;
+
+    const handleScroll = () => {
+      if (!categoryBarRef.current) return;
+
+      const categoryBarRect = categoryBarRef.current.getBoundingClientRect();
+      const navbarHeight = 56; // Height of fixed navbar
+      const tolerance = 2; // Pixel tolerance for precision
+
+      // Check if category bar has reached the sticky point (navbar bottom)
+      if (categoryBarRect.top <= (navbarHeight + tolerance) && !scrollLocked) {
+        // Lock outer scroll, enable inner scroll
+        setScrollLocked(true);
+        document.body.style.overflow = 'hidden';
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${window.scrollY}px`;
+        document.body.style.width = '100%';
+      }
+    };
+
+    const handleListingsScroll = () => {
+      if (!listingsContainerRef.current || !scrollLocked) return;
+
+      const tolerance = 5; // Pixel tolerance for scroll detection
+
+      // Check if inner scroll is at the top
+      if (listingsContainerRef.current.scrollTop <= tolerance) {
+        // Unlock outer scroll, disable inner scroll
+        const scrollY = document.body.style.top;
+        setScrollLocked(false);
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        
+        // Restore scroll position
+        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    const container = listingsContainerRef.current;
+    container?.addEventListener('scroll', handleListingsScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      container?.removeEventListener('scroll', handleListingsScroll);
+      // Cleanup on unmount
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+    };
+  }, [isMobile, scrollLocked]);
 
   // Build query params from filters - maps FilterState to backend API params
   const buildQueryParams = useCallback((filters: FilterState, pageNum: number = 1) => {
@@ -160,6 +233,11 @@ const Discover: React.FC = () => {
     setPage(1);
   };
 
+  const handleCategoryClick = (categoryId: string) => {
+    setActiveCategory(categoryId);
+    setPage(1);
+  };
+
   const handleApplyFilters = useCallback((filters: FilterState) => {
     setActiveFilters(filters);
     setPage(1);
@@ -212,10 +290,50 @@ const Discover: React.FC = () => {
 
   return (
     <div className="w-full">
+      {/* Mobile Category Bar - Fused with Navbar */}
+      <div 
+        ref={categoryBarRef}
+        className="lg:hidden sticky top-[56px] z-[60] bg-accent -mx-2 sm:-mx-4 -mt-4 mb-4"
+      >
+        <div className="flex items-center justify-evenly overflow-x-auto scrollbar-hide px-1 py-2">
+          {categories.map((category) => {
+            const Icon = category.icon;
+            const isActive = activeCategory === category.id;
+            return (
+              <button
+                key={category.id}
+                onClick={() => handleCategoryClick(category.id)}
+                className="flex flex-col items-center gap-1 flex-shrink-0"
+              >
+                <span className={`
+                  inline-flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200
+                  ${isActive 
+                    ? 'bg-primary/80 !text-accent scale-110 shadow-sm' 
+                    : 'bg-primary/80 !text-accent hover:bg-primary/90'
+                  }
+                `}>
+                  <Icon className="h-4 w-4" />
+                </span>
+                <span className={`text-[10px] font-medium ${isActive ? 'text-primary' : 'text-ink'}`}>
+                  {category.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Main Content Area */}
       <div className="lg:flex lg:gap-6">
         {/* Left: Listings */}
-        <div className={`flex-1 space-y-4 md:space-y-6 px-1 sm:px-0 ${!isMobile && isFiltersOpen ? 'lg:pr-6' : ''}`}>
+        <div 
+          ref={listingsContainerRef}
+          className={`flex-1 space-y-4 md:space-y-6 px-1 sm:px-0 ${
+            !isMobile && isFiltersOpen ? 'lg:pr-6' : ''
+          } ${
+            isMobile && scrollLocked ? 'overflow-y-auto h-[calc(100vh-56px-60px)]' : ''
+          }`}
+        >
           {/* Search Bar with Filter Button */}
           <form onSubmit={handleSearch} className="w-full">
             <div className="flex gap-2">

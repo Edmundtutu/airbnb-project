@@ -8,7 +8,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 
 const Register: React.FC = () => {
   const { register } = useAuth();
@@ -18,7 +18,7 @@ const Register: React.FC = () => {
     email: '',
     password: '',
     password_confirmation: '',
-    role: 'customer' as 'customer' | 'vendor',
+    role: 'guest' as const,
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -31,9 +31,7 @@ const Register: React.FC = () => {
     if (error) setError('');
   };
 
-  const handleRoleChange = (value: string) => {
-    setFormData(prev => ({ ...prev, role: value as 'customer' | 'vendor' }));
-  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,7 +64,7 @@ const Register: React.FC = () => {
   };
 
   return (
-    <Card>
+    <Card className="border-none bg-transparent">
       <CardHeader className="text-center">
         <CardTitle>Create Account</CardTitle>
         <CardDescription>
@@ -83,42 +81,33 @@ const Register: React.FC = () => {
 
           <div className="space-y-2">
             <Label htmlFor="name">Full Name</Label>
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="name"
-                name="name"
-                type="text"
-                placeholder="Enter your full name"
-                value={formData.name}
-                onChange={handleInputChange}
-                className="pl-10"
-                required
-              />
-            </div>
+            <Input
+              id="name"
+              name="name"
+              type="text"
+              placeholder="Enter your full name"
+              value={formData.name}
+              onChange={handleInputChange}
+              required
+            />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="Enter your email"
-                value={formData.email}
-                onChange={handleInputChange}
-                className="pl-10"
-                required
-              />
-            </div>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="Enter your email"
+              value={formData.email}
+              onChange={handleInputChange}
+              required
+            />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 id="password"
                 name="password"
@@ -126,7 +115,7 @@ const Register: React.FC = () => {
                 placeholder="Create a password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className="pl-10 pr-10"
+                className="pr-10"
                 required
               />
               <Button
@@ -148,7 +137,6 @@ const Register: React.FC = () => {
           <div className="space-y-2">
             <Label htmlFor="password_confirmation">Confirm Password</Label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 id="password_confirmation"
                 name="password_confirmation"
@@ -156,7 +144,7 @@ const Register: React.FC = () => {
                 placeholder="Confirm your password"
                 value={formData.password_confirmation}
                 onChange={handleInputChange}
-                className="pl-10 pr-10"
+                className="pr-10"
                 required
               />
               <Button
@@ -173,24 +161,6 @@ const Register: React.FC = () => {
                 )}
               </Button>
             </div>
-          </div>
-
-          <div className="space-y-3">
-            <Label>Account Type</Label>
-            <RadioGroup value={formData.role} onValueChange={(value: 'guest' | 'host') => setFormData(prev => ({ ...prev, role: value }))}>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="guest" id="guest" />
-                <Label htmlFor="guest" className="font-normal">
-                  Guest - Find and book stays
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="host" id="host" />
-                <Label htmlFor="host" className="font-normal">
-                  Host - List your property
-                </Label>
-              </div>
-            </RadioGroup>
           </div>
 
           <Button type="submit" className="w-full" disabled={isLoading}>
