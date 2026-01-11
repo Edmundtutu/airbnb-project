@@ -185,12 +185,21 @@ class ListingController extends Controller
 
         // Filter by rating if provided
         if ($request->has('rating')) {
-            $query->where('rating', $request->rating);
+            $rating = $request->input('rating');
+            if (is_numeric($rating) && $rating >= 1 && $rating <= 5) {
+                $query->where('rating', (int) $rating);
+            }
         }
 
         // Sort by field if provided
-        if ($request->has('sort') && $request->has('order')) {
-            $query->orderBy($request->sort, $request->order);
+        $allowedSortFields = ['rating', 'created_at', 'updated_at'];
+        $allowedOrders = ['asc', 'desc'];
+        
+        $sortField = $request->input('sort');
+        $sortOrder = strtolower($request->input('order', ''));
+        
+        if (in_array($sortField, $allowedSortFields, true) && in_array($sortOrder, $allowedOrders, true)) {
+            $query->orderBy($sortField, $sortOrder);
         } else {
             $query->latest();
         }
