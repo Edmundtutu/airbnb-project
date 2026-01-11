@@ -6,11 +6,11 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { getImageUrl } from '@/utils/helperfunctions';
-import { 
-  Star, 
-  Heart, 
-  Calendar as CalendarIcon, 
-  MapPin, 
+import {
+  Star,
+  Heart,
+  Calendar as CalendarIcon,
+  MapPin,
   Share,
   Users,
   Bed,
@@ -22,7 +22,8 @@ import {
   ChevronRight,
   Home,
   Shield,
-  CheckCircle
+  CheckCircle,
+  Sparkles
 } from 'lucide-react';
 import { Listing, Review } from '@/types';
 import { useQuery } from '@tanstack/react-query';
@@ -179,14 +180,14 @@ const ListingPage: React.FC = () => {
 
   const nextImage = () => {
     if (!listing?.images?.length) return;
-    setCurrentImageIndex(prev => 
+    setCurrentImageIndex(prev =>
       prev === listing.images.length - 1 ? 0 : prev + 1
     );
   };
 
   const prevImage = () => {
     if (!listing?.images?.length) return;
-    setCurrentImageIndex(prev => 
+    setCurrentImageIndex(prev =>
       prev === 0 ? listing.images.length - 1 : prev - 1
     );
   };
@@ -215,7 +216,7 @@ const ListingPage: React.FC = () => {
     );
   }
 
-  const totalPrice = checkInDate && checkOutDate 
+  const totalPrice = checkInDate && checkOutDate
     ? Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24)) * listing.price_per_night
     : 0;
 
@@ -223,7 +224,7 @@ const ListingPage: React.FC = () => {
     <div className="lg:max-w-6xl lg:mx-auto">
       {/* Mobile-optimized layout */}
       <div className="lg:grid lg:grid-cols-2 lg:gap-8 lg:space-y-0">
-        
+
         {/* Left Column: Image Gallery + Description */}
         <div className="lg:space-y-6">
           {/* Image Gallery */}
@@ -231,12 +232,12 @@ const ListingPage: React.FC = () => {
             <div className="relative aspect-[4/3] bg-muted overflow-hidden lg:rounded-lg">
               {listing.images?.[currentImageIndex] ? (
                 <>
-                  <img 
-                    src={getImageUrl(listing.images[currentImageIndex]) ?? ''} 
-                    alt={listing.name} 
-                    className="w-full h-full object-cover" 
+                  <img
+                    src={getImageUrl(listing.images[currentImageIndex]) ?? ''}
+                    alt={listing.name}
+                    className="w-full h-full object-cover"
                   />
-                  
+
                   {/* Image Navigation */}
                   {listing.images.length > 1 && (
                     <>
@@ -256,17 +257,16 @@ const ListingPage: React.FC = () => {
                       >
                         <ChevronRight className="h-4 w-4" />
                       </Button>
-                      
+
                       {/* Image Indicators */}
                       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
                         {listing.images.map((_, index) => (
                           <div
                             key={index}
-                            className={`h-1.5 w-1.5 rounded-full transition-all ${
-                              index === currentImageIndex 
-                                ? 'bg-white scale-125' 
-                                : 'bg-white/60'
-                            }`}
+                            className={`h-1.5 w-1.5 rounded-full transition-all ${index === currentImageIndex
+                              ? 'bg-white scale-125'
+                              : 'bg-white/60'
+                              }`}
                           />
                         ))}
                       </div>
@@ -276,7 +276,7 @@ const ListingPage: React.FC = () => {
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-6xl">🏠</div>
               )}
-              
+
               {/* Floating Action Buttons */}
               <div className="absolute top-4 right-4 flex gap-2">
                 <Button
@@ -285,9 +285,8 @@ const ListingPage: React.FC = () => {
                   className="bg-white/90 hover:bg-white h-8 w-8 shadow-md"
                   onClick={handleToggleWishlist}
                 >
-                  <Heart className={`h-4 w-4 ${
-                    isListingWishlisted(listing.id) ? 'fill-current text-red-500' : ''
-                  }`} />
+                  <Heart className={`h-4 w-4 ${isListingWishlisted(listing.id) ? 'fill-current text-red-500' : ''
+                    }`} />
                 </Button>
                 <Button
                   variant="ghost"
@@ -303,11 +302,10 @@ const ListingPage: React.FC = () => {
             {listing.images?.length > 1 && (
               <div className="hidden lg:grid lg:grid-cols-4 gap-2">
                 {listing.images.slice(0, 4).map((img, i) => (
-                  <div 
-                    key={i} 
-                    className={`aspect-square bg-muted rounded-lg overflow-hidden cursor-pointer border-2 ${
-                      i === currentImageIndex ? 'border-primary' : 'border-transparent'
-                    }`}
+                  <div
+                    key={i}
+                    className={`aspect-square bg-muted rounded-lg overflow-hidden cursor-pointer border-2 ${i === currentImageIndex ? 'border-primary' : 'border-transparent'
+                      }`}
                     onClick={() => setCurrentImageIndex(i)}
                   >
                     <img src={getImageUrl(img) ?? ''} alt={`${listing.name} ${i + 1}`} className="w-full h-full object-cover" />
@@ -326,7 +324,7 @@ const ListingPage: React.FC = () => {
 
         {/* Content Area - Mobile Optimized */}
         <div className="px-4 lg:px-0 lg:space-y-6">
-          
+
           {/* Header Section */}
           <div className="pt-4 lg:pt-0">
             <div className="flex items-start justify-between">
@@ -343,9 +341,9 @@ const ListingPage: React.FC = () => {
 
             {/* Rating and Reviews - Compact */}
             <div className="flex items-center gap-3 mt-3">
-              <div className="flex items-center gap-1">
-                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                <span className="font-semibold text-sm">{listing.rating}</span>
+              <div className="flex items-center gap-1 bg-accent/20 px-3 py-1.5 rounded-full">
+                <Star className="h-4 w-4 fill-accent text-accent" />
+                <span className="font-bold text-sm text-ink">{listing.rating}</span>
               </div>
               <span className="text-muted-foreground text-sm">·</span>
               <span className="text-muted-foreground text-sm underline">
@@ -386,7 +384,7 @@ const ListingPage: React.FC = () => {
             {/* Date Selection */}
             <div className="space-y-3 py-2 lg:py-0">
               <h3 className="font-semibold text-lg">Select dates and guests</h3>
-              
+
               <div className="grid grid-cols-2 gap-3">
                 <Popover>
                   <PopoverTrigger asChild>
@@ -404,7 +402,7 @@ const ListingPage: React.FC = () => {
                       selected={checkInDate}
                       onSelect={setCheckInDate}
                       modifiers={{ booked: blockedRanges }}
-                      modifiersClassNames={{ booked: 'bg-red-500/10 text-red-600 ring-1 ring-red-400/40 rounded-md' }}
+                      modifiersClassNames={{ booked: 'bg-accent/10 text-accent ring-1 ring-accent/40 rounded-md font-medium' }}
                       disabled={(date) => {
                         const day = startOfDay(date);
                         return isBefore(day, today) || isDateBlocked(day);
@@ -429,7 +427,7 @@ const ListingPage: React.FC = () => {
                       selected={checkOutDate}
                       onSelect={setCheckOutDate}
                       modifiers={{ booked: blockedRanges }}
-                      modifiersClassNames={{ booked: 'bg-red-500/10 text-red-600 ring-1 ring-red-400/40 rounded-md' }}
+                      modifiersClassNames={{ booked: 'bg-accent/10 text-accent ring-1 ring-accent/40 rounded-md font-medium' }}
                       disabled={(date) => {
                         const day = startOfDay(date);
                         if (!checkInDate) {
@@ -517,8 +515,10 @@ const ListingPage: React.FC = () => {
               <span className="text-sm">Secure booking</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm">Instant confirmation</span>
+              <div className="w-8 h-8 bg-accent/10 rounded-full flex items-center justify-center">
+                <CheckCircle className="h-4 w-4 text-accent" />
+              </div>
+              <span className="text-sm text-ink font-medium">Instant confirmation</span>
             </div>
           </div>
 
@@ -547,27 +547,34 @@ const ListingPage: React.FC = () => {
       </div>
 
       {/* Mobile Description and Amenities Section */}
-      <div className="px-4 lg:hidden">
-        <div className="py-6 border-b">
-          <h2 className="text-xl font-semibold mb-4">About this place</h2>
-          <p className="text-muted-foreground leading-relaxed">{listing.description}</p>
+      <div className="px-4 lg:hidden mt-6">
+        <div className="py-6 border-b border-border bg-card rounded-xl p-4 shadow-sm">
+          <h2 className="text-xl font-bold mb-4 text-ink flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-primary" />
+            About this place
+          </h2>
+          <p className="text-ink-muted leading-relaxed">{listing.description}</p>
         </div>
 
         {/* Amenities */}
         {listing.amenities && listing.amenities.length > 0 && (
-          <div className="py-6 border-b">
-            <h2 className="text-xl font-semibold mb-4">What this place offers</h2>
+          <div className="py-6 border-b border-border bg-card rounded-xl p-4 shadow-sm mt-4">
+            <h2 className="text-xl font-bold mb-4 text-ink flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" />
+              What this place offers
+            </h2>
             <div className="grid grid-cols-1 gap-3">
               {listing.amenities.slice(0, 8).map((amenity, index) => (
-                <div key={index} className="flex items-center gap-3">
-                  <div className="w-5 h-5 flex items-center justify-center text-green-600">
+                <div key={index} className="flex items-center gap-3 group">
+                  <div className="w-5 h-5 flex items-center justify-center text-primary">
                     <CheckCircle className="h-5 w-5" />
                   </div>
-                  <span className="text-sm">{amenity}</span>
+                  <span className="text-sm text-ink group-hover:text-primary transition-colors">{amenity}</span>
                 </div>
               ))}
               {listing.amenities.length > 8 && (
-                <Button variant="ghost" className="justify-start text-primary font-medium">
+                <Button variant="ghost" className="justify-start text-primary font-bold hover:text-primary/80 
+                  hover:bg-primary/5 mt-2">
                   Show all {listing.amenities.length} amenities
                 </Button>
               )}
@@ -580,9 +587,9 @@ const ListingPage: React.FC = () => {
       <div className="px-4 lg:px-0 lg:mt-8">
         <div className="py-6">
           <div className="flex items-center gap-3 mb-6">
-            <div className="flex items-center gap-1">
-              <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-              <span className="font-semibold text-lg">{listing.rating}</span>
+            <div className="flex items-center gap-1 bg-accent/20 px-4 py-2 rounded-full">
+              <Star className="h-5 w-5 fill-accent text-accent" />
+              <span className="font-bold text-lg text-ink">{listing.rating}</span>
             </div>
             <span className="text-lg font-semibold">·</span>
             <span className="text-lg font-semibold">{listing.total_reviews} reviews</span>
@@ -615,11 +622,10 @@ const ListingPage: React.FC = () => {
                             {[1, 2, 3, 4, 5].map((star) => (
                               <Star
                                 key={star}
-                                className={`h-3 w-3 ${
-                                  star <= review.rating
-                                    ? 'fill-yellow-400 text-yellow-400'
-                                    : 'text-gray-300'
-                                }`}
+                                className={`h-3 w-3 ${star <= review.rating
+                                  ? 'fill-accent text-accent'
+                                  : 'text-gray-300'
+                                  }`}
                               />
                             ))}
                           </div>
@@ -637,7 +643,7 @@ const ListingPage: React.FC = () => {
                   </CardContent>
                 </Card>
               ))}
-              
+
               {reviews.length > 3 && (
                 <Button variant="outline" className="w-full">
                   Show all {reviews.length} reviews
