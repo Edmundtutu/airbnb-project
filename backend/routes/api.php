@@ -45,6 +45,7 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('listings', ListingController::class)->only(['index', 'show']);
     Route::apiResource('listings', ListingController::class)->middleware('auth:sanctum')->except(['index', 'show']);
     Route::get('listings/{listing}/reservations', [BookingController::class, 'listingReservations']);
+    Route::get('listings/{listing}/reviews', [ListingController::class, 'listingReviews']);
 
     // Post routes
     Route::apiResource('posts', PostController::class)->only(['index', 'show']);

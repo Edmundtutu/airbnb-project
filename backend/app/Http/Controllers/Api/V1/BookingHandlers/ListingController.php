@@ -7,6 +7,7 @@ use App\Http\Filters\V1\ListingFilter;
 use App\Http\Requests\Api\V1\StoreListingRequest;
 use App\Http\Requests\Api\V1\UpdateListingRequest;
 use App\Http\Resources\Api\V1\ListingResource;
+use App\Http\Resources\Api\V1\ReviewResource;
 use App\Models\Listing;
 use App\Models\Property;
 use Illuminate\Http\Request;
@@ -176,5 +177,35 @@ class ListingController extends Controller
             ->get();
 
         return ListingResource::collection($listings);
+    }
+
+    public function listingReviews(Request $request, Listing $listing)
+    {
+        $query = $listing->reviews()->with('user');
+
+        // Filter by rating if provided
+        if ($request->has('rating')) {
+            $rating = $request->input('rating');
+            if (is_numeric($rating) && $rating >= 1 && $rating <= 5) {
+                $query->where('rating', (int) $rating);
+            }
+        }
+
+        // Sort by field if provided
+        $allowedSortFields = ['rating', 'created_at', 'updated_at'];
+        $allowedOrders = ['asc', 'desc'];
+        
+        $sortField = $request->input('sort');
+        $sortOrder = strtolower($request->input('order', ''));
+        
+        if (in_array($sortField, $allowedSortFields, true) && in_array($sortOrder, $allowedOrders, true)) {
+            $query->orderBy($sortField, $sortOrder);
+        } else {
+            $query->latest();
+        }
+
+        $reviews = $query->paginate();
+
+        return ReviewResource::collection($reviews);
     }
 }
