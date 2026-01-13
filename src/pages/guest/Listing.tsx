@@ -23,7 +23,8 @@ import {
   Home,
   Shield,
   CheckCircle,
-  Sparkles
+  Sparkles,
+  ArrowLeft
 } from 'lucide-react';
 import { Listing, Review } from '@/types';
 import { useQuery } from '@tanstack/react-query';
@@ -222,6 +223,18 @@ const ListingPage: React.FC = () => {
 
   return (
     <div className="lg:max-w-6xl lg:mx-auto">
+      {/* Floating Back Button - Mobile Only */}
+      <div className="lg:hidden fixed top-4 left-4 z-[1000]">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => window.history.back()}
+          className="h-10 w-10 rounded-full bg-white/90 hover:bg-white shadow-lg backdrop-blur-sm"
+        >
+          <ArrowLeft className="h-5 w-5 text-gray-900" />
+        </Button>
+      </div>
+
       {/* Mobile-optimized layout */}
       <div className="lg:grid lg:grid-cols-2 lg:gap-8 lg:space-y-0">
 
@@ -494,11 +507,11 @@ const ListingPage: React.FC = () => {
               )}
             </div>
 
-            {/* Book Button - Sticky on Mobile */}
-            <div className="fixed bottom-16 left-0 right-0 z-[60] bg-accent border-t p-4 shadow-lg lg:static lg:border-0 lg:p-0 lg:z-auto lg:shadow-none lg:bottom-auto">
+            {/* Book Button - Fixed at Bottom on Mobile, covers bottom nav */}
+            <div className="fixed bottom-0 left-0 right-0 z-[60] bg-white/95 backdrop-blur-sm border-t p-4 shadow-2xl lg:static lg:border-0 lg:p-0 lg:z-auto lg:shadow-none lg:bottom-auto lg:bg-transparent lg:backdrop-blur-none">
               <Button
                 size="lg"
-                className="w-full h-12 text-base font-semibold bg-gradient-to-r from-red-imperial to-red-cinnabar hover:from-red-imperial/90 hover:to-red-cinnabar/90"
+                className="w-full h-14 text-base font-bold bg-gradient-to-r from-red-imperial to-red-cinnabar hover:from-red-imperial/90 hover:to-red-cinnabar/90 shadow-xl"
                 onClick={handleBookNow}
                 disabled={!checkInDate || !checkOutDate}
               >
@@ -511,7 +524,7 @@ const ListingPage: React.FC = () => {
           {/* Trust Badges */}
           <div className="hidden lg:flex lg:items-center lg:gap-6 lg:py-4 lg:border-t lg:border-b">
             <div className="flex items-center gap-2">
-              <Shield className="h-4 w-4 text-muted-foreground" />
+              <Shield className="h-4 w-4 text-accent" />
               <span className="text-sm">Secure booking</span>
             </div>
             <div className="flex items-center gap-2">
@@ -596,7 +609,7 @@ const ListingPage: React.FC = () => {
           </div>
 
           {reviews.length === 0 ? (
-            <Card>
+            <Card className='bg-yellowcard'>
               <CardContent className="p-6 text-center">
                 <h3 className="text-lg font-medium mb-2">No reviews yet</h3>
                 <p className="text-muted-foreground">
@@ -607,7 +620,7 @@ const ListingPage: React.FC = () => {
           ) : (
             <div className="space-y-4">
               {reviews.slice(0, 3).map((review) => (
-                <Card key={review.id} className="bg-yellowcard border-0 shadow-none">
+                <Card key={review.id} className="bg-background border-0 shadow-none">
                   <CardContent className="p-0">
                     <div className="flex items-start gap-3 mb-3">
                       <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center flex-shrink-0">

@@ -20,14 +20,9 @@ export const useGeolocation = (): UseGeolocationReturn => {
   const handleSuccess = useCallback((position: GeolocationPosition) => {
     const accuracy = position.coords.accuracy;
     
-    // Only accept positions with good accuracy (< 100 meters)
-    // If accuracy is poor and we're still loading, it will retry
-    if (accuracy > 100) {
-      console.log(`Low accuracy (${accuracy}m), waiting for better fix...`);
-      // Don't update location with poor accuracy
-      return;
-    }
-    
+    // Accept any valid location - accuracy filtering was too strict
+    // Many devices (especially on WiFi or indoors) have accuracy > 100m
+    // It's better to show an approximate location than no location at all
     setLocation({
       lat: position.coords.latitude,
       lng: position.coords.longitude,
@@ -70,16 +65,9 @@ export const useGeolocation = (): UseGeolocationReturn => {
       handleSuccess,
       (highAccuracyError) => {
         // If high accuracy fails, try with low accuracy as fallback
-        console.log('High accuracy failed, trying low accuracy...');
+        // Use the same handleSuccess handler for consistency
         navigator.geolocation.getCurrentPosition(
-          (position) => {
-            // For low accuracy, accept any result
-            setLocation({
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
-            });
-            setLoading(false);
-          },
+          handleSuccess,
           handleError,
           {
             enableHighAccuracy: false,
@@ -94,7 +82,7 @@ export const useGeolocation = (): UseGeolocationReturn => {
         maximumAge: 0, // Force fresh position, no cache at all
       }
     );
-  }, [handleSuccess, handleError, setLocation, setLoading]);
+  }, [handleSuccess, handleError]);
 
   const watchPosition = useCallback(() => {
     if (!navigator.geolocation) {

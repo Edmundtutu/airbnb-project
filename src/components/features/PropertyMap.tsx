@@ -135,11 +135,8 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
   const [dragStartHeight, setDragStartHeight] = useState(40);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  // Default center (Your current location)
-  const defaultCenter: [number, number] = [-1.268122, 29.985997];
-  const mapCenter: [number, number] = userLocation 
-    ? [userLocation.lat, userLocation.lng] 
-    : defaultCenter;
+  // Location is required - map will not render until userLocation is available
+  // This ensures MapContainer centers correctly on first render, eliminating race conditions
 
   // Backend-powered fetching (preferred). Falls back to client filtering if properties prop provided and fetch disabled.
   const shouldFetch = fetchFromBackend;
@@ -476,11 +473,10 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
             <div className="h-full flex items-center justify-center bg-gray-100">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
-          ) : (
+          ) : userLocation ? (
             <MapContainer
-              key={`${mapCenter[0]}-${mapCenter[1]}`}
-              center={mapCenter}
-              zoom={userLocation ? 14 : 12}
+              center={[userLocation.lat, userLocation.lng]}
+              zoom={14}
               style={{ height: '100%', width: '100%', zIndex: 1 }}
               scrollWheelZoom={true}
               dragging={true}
@@ -492,15 +488,13 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
               />
               
               {/* User location marker */}
-              {userLocation && (
-                <Marker position={[userLocation.lat, userLocation.lng]}>
-                  <Popup>
-                    <div className="text-center">
-                      <p className="text-sm font-medium">Your location</p>
-                    </div>
-                  </Popup>
-                </Marker>
-              )}
+              <Marker position={[userLocation.lat, userLocation.lng]}>
+                <Popup>
+                  <div className="text-center">
+                    <p className="text-sm font-medium">Your location</p>
+                  </div>
+                </Popup>
+              </Marker>
               
               {/* Property markers */}
               {displayedProperties.map((property) => (
@@ -516,6 +510,10 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
                 <LocationTagger onLocationTag={onLocationTag} />
               )}
             </MapContainer>
+          ) : (
+            <div className="h-full flex items-center justify-center bg-gray-100">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
           )}
         </div>
 
@@ -938,11 +936,10 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
                 <div className="h-full flex items-center justify-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                 </div>
-              ) : (
+              ) : userLocation ? (
                 <MapContainer
-                  key={`${mapCenter[0]}-${mapCenter[1]}`}
-                  center={mapCenter}
-                  zoom={userLocation ? 14 : 12}
+                  center={[userLocation.lat, userLocation.lng]}
+                  zoom={14}
                   style={{ height: '100%', width: '100%', zIndex: 1 }}
                   className="rounded-none"
                   scrollWheelZoom={true}
@@ -955,15 +952,13 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
                   />
                   
                   {/* User location marker */}
-                  {userLocation && (
-                    <Marker position={[userLocation.lat, userLocation.lng]}>
-                      <Popup>
-                        <div className="text-center">
-                          <p className="text-sm font-medium">Your location</p>
-                        </div>
-                      </Popup>
-                    </Marker>
-                  )}
+                  <Marker position={[userLocation.lat, userLocation.lng]}>
+                    <Popup>
+                      <div className="text-center">
+                        <p className="text-sm font-medium">Your location</p>
+                      </div>
+                    </Popup>
+                  </Marker>
                   
                   {/* Property markers */}
                   {displayedProperties.map((property) => (
@@ -979,6 +974,10 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
                     <LocationTagger onLocationTag={onLocationTag} />
                   )}
                 </MapContainer>
+              ) : (
+                <div className="h-full flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
               )}
             </CardContent>
           </Card>
