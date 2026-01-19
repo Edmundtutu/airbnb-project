@@ -35,6 +35,8 @@ import HostAnalytics from '@/pages/host/Analytics';
 import HostProfile from '@/pages/host/Profile';
 import ChatsListPage from '@/pages/chats/ChatsListPage';
 import ChatRoomPage from '@/pages/chats/ChatRoomPage';
+import NotificationsPage from '@/pages/NotificationsPage';
+import SettingsPage from '@/pages/SettingsPage';
 
 // Route Guards
 interface ProtectedRouteProps {
@@ -183,6 +185,16 @@ const AppRoutes: React.FC = () => {
           <HostProfile />
         </ProtectedRoute>
       } />
+      <Route path="/host/notifications" element={
+        <ProtectedRoute requiredRole={['host']} layout="host">
+          <NotificationsPage />
+        </ProtectedRoute>
+      } />
+      <Route path="/host/settings" element={
+        <ProtectedRoute requiredRole={['host']} layout="host">
+          <SettingsPage />
+        </ProtectedRoute>
+      } />
 
       {/* Chat Routes (shared by host and guest) */}
       <Route
@@ -198,6 +210,26 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute layout="main">
             <ChatRoomPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Notifications Route (shared by host and guest) */}
+      <Route
+        path="/notifications"
+        element={
+          <ProtectedRoute layout="main">
+            <NotificationsPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Settings Route (shared by host and guest) */}
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute layout="main">
+            <SettingsPage />
           </ProtectedRoute>
         }
       />

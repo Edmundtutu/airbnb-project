@@ -1,6 +1,7 @@
 import { initializeApp, FirebaseApp } from 'firebase/app';
 import { getDatabase, Database } from 'firebase/database';
 import { getAuth, Auth, signInWithCustomToken } from 'firebase/auth';
+import { getMessaging, Messaging, getToken, onMessage } from 'firebase/messaging';
 
 interface FirebaseConfig {
   apiKey: string;
@@ -39,6 +40,7 @@ const validateConfig = (): boolean => {
 let app: FirebaseApp | null = null;
 let database: Database | null = null;
 let auth: Auth | null = null;
+let messaging: Messaging | null = null;
 
 /**
  * Initialize Firebase
@@ -106,4 +108,144 @@ export const authenticateWithFirebase = async (customToken: string): Promise<voi
   }
 };
 
-export { app, database, auth };
+/**
+ * Get Firebase Messaging instance
+ */
+export const getFirebaseMessaging = (): Messaging | null => {
+  // Messaging requires a browser environment
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  if (!messaging) {
+    const init = initializeFirebase();
+    if (init?.app) {
+      try {
+        messaging = getMessaging(init.app);
+      } catch (error) {
+        console.warn('Firebase Messaging not supported:', error);
+        return null;
+      }
+    }
+  }
+  return messaging;
+};
+
+/**
+ * Store Firebase config in IndexedDB for service worker access
+ */
+const storeConfigForServiceWorker = async (): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('firebase-config', 1);
+    
+    request.onerror = () => reject(request.error);
+    
+    request.onsuccess = () => {
+      const db = request.result;
+      const transaction = db.transaction(['config'], 'readwrite');
+      const store = transaction.objectStore('config');
+      
+      store.put({
+        key: 'firebaseConfig',
+        value: firebaseConfig,
+      });
+      
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => reject(transaction.error);
+    };
+    
+    request.onupgradeneeded = (event) => {
+      const db = (event.target as IDBOpenDBRequest).result;
+      if (!db.objectStoreNames.contains('config')) {
+        db.createObjectStore('config', { keyPath: 'key' });
+      }
+    };
+  });
+};
+
+/**
+ * Request FCM permission and get token
+ */
+export const requestFCMToken = async (): Promise<string | null> => {
+  try {
+    // Check if notifications are supported
+    if (!('Notification' in window)) {
+      console.warn('This browser does not support notifications');
+      return null;
+    }
+
+    // Request permission
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      console.warn('Notification permission denied');
+      return null;
+    }
+
+    // Initialize Firebase if needed
+    const init = initializeFirebase();
+    if (!init) {
+      console.warn('Firebase not initialized');
+      return null;
+    }
+
+    // Store config for service worker
+    await storeConfigForServiceWorker();
+
+    // Register service worker
+    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+      scope: '/',
+    });
+    
+    console.log('✅ Service worker registered:', registration.scope);
+
+    // Get messaging instance
+    const messagingInstance = getFirebaseMessaging();
+    if (!messagingInstance) {
+      console.warn('Firebase Messaging not available');
+      return null;
+    }
+
+    // Get VAPID key from environment
+    const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY;
+    if (!vapidKey) {
+      console.warn('VITE_FIREBASE_VAPID_KEY not configured');
+      return null;
+    }
+
+    // Get FCM token
+    const token = await getToken(messagingInstance, {
+      vapidKey,
+      serviceWorkerRegistration: registration,
+    });
+
+    if (token) {
+      console.log('✅ FCM token obtained');
+      return token;
+    } else {
+      console.warn('No FCM token available');
+      return null;
+    }
+  } catch (error) {
+    console.error('❌ Error getting FCM token:', error);
+    return null;
+  }
+};
+
+/**
+ * Listen for foreground messages
+ */
+export const onFCMMessage = (callback: (payload: unknown) => void): (() => void) | null => {
+  const messagingInstance = getFirebaseMessaging();
+  if (!messagingInstance) {
+    return null;
+  }
+
+  const unsubscribe = onMessage(messagingInstance, (payload) => {
+    console.log('📬 Foreground message received:', payload);
+    callback(payload);
+  });
+
+  return unsubscribe;
+};
+
+export { app, database, auth, messaging };

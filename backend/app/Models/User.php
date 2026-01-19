@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -158,5 +159,39 @@ class User extends Authenticatable
     public function kycSubmissions(): HasMany
     {
         return $this->hasMany(KYCSubmission::class, 'user_id');
+    }
+
+    /**
+     * Get the user's device tokens for push notifications.
+     */
+    public function deviceTokens(): HasMany
+    {
+        return $this->hasMany(DeviceToken::class);
+    }
+
+    /**
+     * Get active device tokens only.
+     */
+    public function activeDeviceTokens(): HasMany
+    {
+        return $this->deviceTokens()->where('is_active', true);
+    }
+
+    /**
+     * Get the user's notification preferences.
+     */
+    public function notificationPreferences(): HasOne
+    {
+        return $this->hasOne(NotificationPreference::class);
+    }
+
+    /**
+     * Get or create notification preferences with defaults.
+     */
+    public function getNotificationPreferences(): NotificationPreference
+    {
+        return $this->notificationPreferences ?? $this->notificationPreferences()->create(
+            NotificationPreference::defaults()
+        );
     }
 }

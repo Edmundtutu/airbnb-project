@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '../context/AuthContext';
 import { BookingProvider } from '../context/BookingContext';
 import { WishlistProvider } from '../context/WishlistContext';
+import { NotificationProvider } from '../context/NotificationContext';
 import { Toaster } from '../components/ui/toaster';
 import ErrorBoundary from '../components/ErrorBoundary';
 import AppRoutes from '../routes/AppRoutes';
@@ -24,18 +25,20 @@ function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <ChatRoomsProvider>
-            <BookingProvider>
-              <WishlistProvider>
-                <Router>
-                  <div className="App min-h-screen bg-background">
-                    <AppRoutes />
-                    <Toaster />
-                  </div>
-                </Router>
-              </WishlistProvider>
-            </BookingProvider>
-          </ChatRoomsProvider>
+          <NotificationProvider>
+            <ChatRoomsProvider>
+              <BookingProvider>
+                <WishlistProvider>
+                  <Router>
+                    <div className="App min-h-screen bg-background">
+                      <AppRoutes />
+                      <Toaster />
+                    </div>
+                  </Router>
+                </WishlistProvider>
+              </BookingProvider>
+            </ChatRoomsProvider>
+          </NotificationProvider>
         </AuthProvider>
       </QueryClientProvider>
     </ErrorBoundary>

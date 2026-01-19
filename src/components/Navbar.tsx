@@ -20,6 +20,7 @@ import { User as UserType } from '@/types';
 import { useAuth } from '@/context/AuthContext';
 import { useBooking } from '@/context/BookingContext';
 import { useChatRooms } from '@/context/ChatRoomsContext';
+import { useNotifications } from '@/context/NotificationContext';
 import { ChatRoomsList } from '@/components/chat/ChatRoomsList';
 import { NotificationList } from '@/components/shared/NotificationList';
 import ErrorBoundary from '@/components/ErrorBoundary';
@@ -32,7 +33,8 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const { getItemCount } = useBooking();
-  const { rooms, totalUnreadCount } = useChatRooms();
+  const { rooms, totalUnreadCount: chatUnreadCount } = useChatRooms();
+  const { unreadCount: notificationUnreadCount } = useNotifications();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -41,7 +43,6 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
   const [activeCategory, setActiveCategory] = useState<string>('');
 
   const bookingItemCount = getItemCount();
-  const totalUnreadNotifications = totalUnreadCount;
   const currentUserRole = user?.role === 'host' ? 'host' : 'guest';
 
   // Hide navbar on map route for mobile (immersive experience)
@@ -113,9 +114,9 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
                 onClick={() => navigate('/chats')}
               >
                 <MessageCircle className="h-5 w-5" />
-                {totalUnreadCount > 0 && (
+                {chatUnreadCount > 0 && (
                   <Badge className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center text-xs p-0 bg-blue-500">
-                    {totalUnreadCount > 9 ? '9+' : totalUnreadCount}
+                    {chatUnreadCount > 9 ? '9+' : chatUnreadCount}
                   </Badge>
                 )}
               </Button>
@@ -126,9 +127,9 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
                 onClick={() => setNotificationListOpen(true)}
               >
                 <Bell className="h-5 w-5" />
-                {totalUnreadNotifications > 0 && (
+                {notificationUnreadCount > 0 && (
                   <Badge className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center text-xs p-0 bg-red-500">
-                    {totalUnreadNotifications > 9 ? '9+' : totalUnreadNotifications}
+                    {notificationUnreadCount > 9 ? '9+' : notificationUnreadCount}
                   </Badge>
                 )}
               </Button>
@@ -183,9 +184,9 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
                 onClick={() => navigate('/chats')}
               >
                 <MessageCircle className="h-5 w-5" />
-                {totalUnreadCount > 0 && (
+                {chatUnreadCount > 0 && (
                   <Badge className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center text-xs p-0 bg-blue-500">
-                    {totalUnreadCount > 9 ? '9+' : totalUnreadCount}
+                    {chatUnreadCount > 9 ? '9+' : chatUnreadCount}
                   </Badge>
                 )}
               </Button>
@@ -197,9 +198,9 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
                 onClick={() => setNotificationListOpen(true)}
               >
                 <Bell className="h-4 w-4" />
-                {totalUnreadNotifications > 0 && (
+                {notificationUnreadCount > 0 && (
                   <Badge className="absolute -top-1 -right-1 h-3 w-3 flex items-center justify-center text-xs p-0 bg-red-500">
-                    {totalUnreadNotifications > 9 ? '9+' : totalUnreadNotifications}
+                    {notificationUnreadCount > 9 ? '9+' : notificationUnreadCount}
                   </Badge>
                 )}
               </Button>

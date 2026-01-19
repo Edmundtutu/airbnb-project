@@ -8,6 +8,7 @@ use App\Events\BookingRejected;
 use App\Events\BookingCancelled;
 use App\Events\BookingStatusChanged;
 use App\Listeners\LogBookingActivity;
+use App\Listeners\SendBookingNotifications;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -18,7 +19,7 @@ class EventServiceProvider extends ServiceProvider
      * @var array<class-string, array<int, class-string>>
      */
     protected $listen = [
-        // Booking lifecycle events are handled by subscriber
+        // Booking lifecycle events are handled by subscribers
     ];
 
     /**
@@ -28,6 +29,7 @@ class EventServiceProvider extends ServiceProvider
      */
     protected $subscribe = [
         LogBookingActivity::class,
+        SendBookingNotifications::class,
     ];
 
     /**

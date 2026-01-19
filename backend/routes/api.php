@@ -3,6 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\ChatController;
 use App\Http\Controllers\Api\V1\FirebaseAuthController;
+use App\Http\Controllers\Api\V1\NotificationController;
+use App\Http\Controllers\Api\V1\DeviceTokenController;
+use App\Http\Controllers\Api\V1\NotificationPreferenceController;
 use App\Http\Controllers\Api\V1\Uploads\UploadController;
 use App\Http\Controllers\Api\V1\PostHandlers\LikeController;
 use App\Http\Controllers\Api\V1\PostHandlers\PostController;
@@ -110,5 +113,31 @@ Route::prefix('v1')->group(function () {
         // Revoke user's Firebase tokens (for logout)
         Route::post('/firebase/auth/revoke', [FirebaseAuthController::class, 'revokeTokens'])
             ->name('firebase.auth.revoke');
+    });
+
+    // Notification Routes
+    Route::middleware('auth:sanctum')->group(function () {
+        // Notifications
+        Route::get('/notifications', [NotificationController::class, 'index']);
+        Route::get('/notifications/unread', [NotificationController::class, 'unread']);
+        Route::get('/notifications/count', [NotificationController::class, 'count']);
+        Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+        Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+        Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
+        Route::delete('/notifications/cleanup', [NotificationController::class, 'cleanup']);
+
+        // Device tokens for push notifications
+        Route::get('/device-tokens', [DeviceTokenController::class, 'index']);
+        Route::post('/device-tokens', [DeviceTokenController::class, 'store']);
+        Route::delete('/device-tokens/{token}', [DeviceTokenController::class, 'destroy'])
+            ->where('token', '.*'); // Allow special characters in token
+        Route::patch('/device-tokens/{token}/deactivate', [DeviceTokenController::class, 'deactivate'])
+            ->where('token', '.*');
+        Route::delete('/device-tokens', [DeviceTokenController::class, 'destroyAll']);
+
+        // Notification preferences
+        Route::get('/notification-preferences', [NotificationPreferenceController::class, 'show']);
+        Route::put('/notification-preferences', [NotificationPreferenceController::class, 'update']);
+        Route::post('/notification-preferences/reset', [NotificationPreferenceController::class, 'reset']);
     });
 });
