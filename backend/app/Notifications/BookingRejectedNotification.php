@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Booking;
+use Carbon\Carbon;
 use Illuminate\Notifications\Messages\MailMessage;
 
 /**
@@ -47,12 +48,17 @@ class BookingRejectedNotification extends BookingNotification
      */
     public function toMail(object $notifiable): MailMessage
     {
+        /** @var Carbon|null $checkIn */
+        $checkIn = $this->booking->check_in_date;
+        /** @var Carbon|null $checkOut */
+        $checkOut = $this->booking->check_out_date;
+
         $mail = (new MailMessage)
             ->subject("Booking Request Declined - {$this->booking->property?->name}")
             ->greeting("Hello {$notifiable->name},")
             ->line("We're sorry to inform you that your booking request was declined.")
             ->line("**Property:** {$this->booking->property?->name}")
-            ->line("**Requested Dates:** {$this->booking->check_in_date?->format('M d, Y')} - {$this->booking->check_out_date?->format('M d, Y')}");
+            ->line("**Requested Dates:** " . ($checkIn?->format('M d, Y') ?? 'N/A') . " - " . ($checkOut?->format('M d, Y') ?? 'N/A'));
 
         if ($this->reason) {
             $mail->line("**Reason:** {$this->reason}");

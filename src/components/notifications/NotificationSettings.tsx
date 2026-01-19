@@ -42,8 +42,8 @@ export const NotificationSettings: React.FC<NotificationSettingsProps> = ({ clas
   useEffect(() => {
     const loadPreferences = async () => {
       try {
-        const response = await notificationService.getPreferences();
-        setPreferences(response.data);
+        const prefs = await notificationService.getPreferences();
+        setPreferences(prefs);
       } catch (error) {
         console.error('Failed to load notification preferences:', error);
         toast({
@@ -91,8 +91,8 @@ export const NotificationSettings: React.FC<NotificationSettingsProps> = ({ clas
   const resetPreferences = async () => {
     setIsSaving(true);
     try {
-      const response = await notificationService.resetPreferences();
-      setPreferences(response.data);
+      const prefs = await notificationService.resetPreferences();
+      setPreferences(prefs);
       toast({
         title: 'Preferences Reset',
         description: 'Your notification preferences have been reset to defaults.',
@@ -284,8 +284,12 @@ export const NotificationSettings: React.FC<NotificationSettingsProps> = ({ clas
                   </div>
                   <Switch
                     id="booking-notifications"
-                    checked={preferences.booking_notifications}
-                    onCheckedChange={(checked) => updatePreference('booking_notifications', checked)}
+                    checked={preferences.booking_new_request && preferences.booking_confirmed && preferences.booking_cancelled}
+                    onCheckedChange={(checked) => {
+                      updatePreference('booking_new_request', checked);
+                      updatePreference('booking_confirmed', checked);
+                      updatePreference('booking_cancelled', checked);
+                    }}
                     disabled={isSaving}
                   />
                 </div>
@@ -299,8 +303,8 @@ export const NotificationSettings: React.FC<NotificationSettingsProps> = ({ clas
                   </div>
                   <Switch
                     id="message-notifications"
-                    checked={preferences.message_notifications}
-                    onCheckedChange={(checked) => updatePreference('message_notifications', checked)}
+                    checked={preferences.messages_enabled}
+                    onCheckedChange={(checked) => updatePreference('messages_enabled', checked)}
                     disabled={isSaving}
                   />
                 </div>
@@ -314,23 +318,23 @@ export const NotificationSettings: React.FC<NotificationSettingsProps> = ({ clas
                   </div>
                   <Switch
                     id="marketing-notifications"
-                    checked={preferences.marketing_notifications}
-                    onCheckedChange={(checked) => updatePreference('marketing_notifications', checked)}
+                    checked={preferences.promotions_enabled}
+                    onCheckedChange={(checked) => updatePreference('promotions_enabled', checked)}
                     disabled={isSaving}
                   />
                 </div>
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label htmlFor="security-notifications">Security Alerts</Label>
+                    <Label htmlFor="review-notifications">Reviews</Label>
                     <p className="text-sm text-muted-foreground">
-                      Account security and login notifications
+                      New reviews on your listings or stays
                     </p>
                   </div>
                   <Switch
-                    id="security-notifications"
-                    checked={preferences.security_notifications}
-                    onCheckedChange={(checked) => updatePreference('security_notifications', checked)}
+                    id="review-notifications"
+                    checked={preferences.reviews_enabled}
+                    onCheckedChange={(checked) => updatePreference('reviews_enabled', checked)}
                     disabled={isSaving}
                   />
                 </div>

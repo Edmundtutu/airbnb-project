@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Booking;
+use Carbon\Carbon;
 use Illuminate\Notifications\Messages\MailMessage;
 
 /**
@@ -31,9 +32,10 @@ class BookingConfirmedNotification extends BookingNotification
     public function getMessage(): string
     {
         $propertyName = $this->booking->property?->name ?? 'the property';
-        $checkIn = $this->booking->check_in_date?->format('M d');
+        /** @var Carbon|null $checkIn */
+        $checkIn = $this->booking->check_in_date;
         
-        return "Your booking at {$propertyName} has been confirmed. Check-in is on {$checkIn}.";
+        return "Your booking at {$propertyName} has been confirmed. Check-in is on " . ($checkIn?->format('M d') ?? 'N/A') . ".";
     }
 
     public function getActionUrl(): string
@@ -47,7 +49,12 @@ class BookingConfirmedNotification extends BookingNotification
     public function toMail(object $notifiable): MailMessage
     {
         $hostName = $this->booking->property?->host?->name ?? 'Your host';
-        $nights = $this->booking->check_in_date?->diffInDays($this->booking->check_out_date) ?? 0;
+        /** @var Carbon|null $checkIn */
+        $checkIn = $this->booking->check_in_date;
+        /** @var Carbon|null $checkOut */
+        $checkOut = $this->booking->check_out_date;
+        $nights = $checkIn && $checkOut ? $checkIn->diffInDays($checkOut) : 0;
+        $total = (float) ($this->booking->total ?? 0);
         
         return (new MailMessage)
             ->subject("Booking Confirmed - {$this->booking->property?->name}")
@@ -55,11 +62,11 @@ class BookingConfirmedNotification extends BookingNotification
             ->line("Your booking has been confirmed by {$hostName}.")
             ->line("---")
             ->line("**Property:** {$this->booking->property?->name}")
-            ->line("**Check-in:** {$this->booking->check_in_date?->format('l, M d, Y')}")
-            ->line("**Check-out:** {$this->booking->check_out_date?->format('l, M d, Y')}")
+            ->line("**Check-in:** " . ($checkIn?->format('l, M d, Y') ?? 'N/A'))
+            ->line("**Check-out:** " . ($checkOut?->format('l, M d, Y') ?? 'N/A'))
             ->line("**Duration:** {$nights} night(s)")
             ->line("**Guests:** {$this->booking->guest_count}")
-            ->line("**Total Paid:** UGX " . number_format($this->booking->total))
+            ->line("**Total Paid:** UGX " . number_format($total))
             ->line("---")
             ->action('View Booking Details', $this->getActionUrl())
             ->line("If you have any questions, you can message your host through the app.")

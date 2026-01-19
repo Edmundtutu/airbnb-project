@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\DeviceToken;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,6 +24,7 @@ class DeviceTokenController extends Controller
             'device_name' => 'nullable|string|max:255',
         ]);
 
+        /** @var User $user */
         $user = Auth::user();
 
         // Upsert: update if token exists, create if not
@@ -48,7 +50,9 @@ class DeviceTokenController extends Controller
      */
     public function index(): JsonResponse
     {
-        $deviceTokens = Auth::user()
+        /** @var User $user */
+        $user = Auth::user();
+        $deviceTokens = $user
             ->deviceTokens()
             ->orderBy('last_used_at', 'desc')
             ->get();
@@ -63,7 +67,9 @@ class DeviceTokenController extends Controller
      */
     public function destroy(string $token): JsonResponse
     {
-        $deleted = Auth::user()
+        /** @var User $user */
+        $user = Auth::user();
+        $deleted = $user
             ->deviceTokens()
             ->where('token', $token)
             ->delete();
@@ -84,7 +90,9 @@ class DeviceTokenController extends Controller
      */
     public function deactivate(string $token): JsonResponse
     {
-        $deviceToken = Auth::user()
+        /** @var User $user */
+        $user = Auth::user();
+        $deviceToken = $user
             ->deviceTokens()
             ->where('token', $token)
             ->first();
@@ -108,7 +116,9 @@ class DeviceTokenController extends Controller
      */
     public function destroyAll(): JsonResponse
     {
-        $deleted = Auth::user()->deviceTokens()->delete();
+        /** @var User $user */
+        $user = Auth::user();
+        $deleted = $user->deviceTokens()->delete();
 
         return response()->json([
             'message' => "Removed {$deleted} device tokens.",

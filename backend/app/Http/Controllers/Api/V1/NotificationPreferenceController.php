@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\NotificationPreference;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +17,9 @@ class NotificationPreferenceController extends Controller
      */
     public function show(): JsonResponse
     {
-        $preferences = Auth::user()->getNotificationPreferences();
+        /** @var User $user */
+        $user = Auth::user();
+        $preferences = $user->getNotificationPreferences();
 
         return response()->json([
             'preferences' => $preferences,
@@ -47,7 +50,9 @@ class NotificationPreferenceController extends Controller
             'promotions_enabled' => 'boolean',
         ]);
 
-        $preferences = Auth::user()->getNotificationPreferences();
+        /** @var User $user */
+        $user = Auth::user();
+        $preferences = $user->getNotificationPreferences();
         $preferences->update($validated);
 
         return response()->json([
@@ -61,7 +66,9 @@ class NotificationPreferenceController extends Controller
      */
     public function reset(): JsonResponse
     {
-        $preferences = Auth::user()->getNotificationPreferences();
+        /** @var User $user */
+        $user = Auth::user();
+        $preferences = $user->getNotificationPreferences();
         $preferences->update(NotificationPreference::defaults());
 
         return response()->json([

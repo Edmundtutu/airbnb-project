@@ -10,7 +10,8 @@ import { notificationService } from '@/services/notificationService';
 import { useAuth } from '@/context/AuthContext';
 import { useNotifications } from '@/context/NotificationContext';
 import { toast } from '@/hooks/use-toast';
-import type { DeviceType } from '@/types/notifications';
+
+type DeviceType = 'web' | 'ios' | 'android';
 
 interface UsePushNotificationsReturn {
   isSupported: boolean;
@@ -43,7 +44,7 @@ const getDeviceName = (): string => {
 
 export function usePushNotifications(): UsePushNotificationsReturn {
   const { isAuthenticated } = useAuth();
-  const { addNotification, fetchNotifications } = useNotifications();
+  const { refreshUnreadCount } = useNotifications();
   
   const [permission, setPermission] = useState<NotificationPermission | 'default'>('default');
   const [isRegistered, setIsRegistered] = useState(false);
@@ -75,14 +76,7 @@ export function usePushNotifications(): UsePushNotificationsReturn {
     unsubscribeRef.current = onFCMMessage((payload: unknown) => {
       const data = payload as {
         notification?: { title?: string; body?: string };
-        data?: {
-          type?: string;
-          title?: string;
-          message?: string;
-          booking_id?: string;
-          action_url?: string;
-          notification_id?: string;
-        };
+        data?: { title?: string; message?: string };
       };
 
       // Show toast for foreground notifications
@@ -95,30 +89,10 @@ export function usePushNotifications(): UsePushNotificationsReturn {
         duration: 5000,
       });
 
-      // Refresh notifications list
-      fetchNotifications(1);
-
-      // Add to local state if we have the data
-      if (data.data?.notification_id) {
-        addNotification({
-          id: data.data.notification_id,
-          type: 'App\\Notifications\\BookingNotification',
-          notifiable_type: 'App\\Models\\User',
-          notifiable_id: 0,
-          data: {
-            type: (data.data.type as 'booking_new_request' | 'booking_confirmed' | 'booking_rejected' | 'booking_cancelled') || 'booking_new_request',
-            title,
-            message: body,
-            booking_id: data.data.booking_id,
-            action_url: data.data.action_url,
-          },
-          read_at: null,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        });
-      }
+      // Refresh unread count (will also update badge)
+      refreshUnreadCount();
     });
-  }, [addNotification, fetchNotifications]);
+  }, [refreshUnreadCount]);
 
   // Request permission and register token
   const requestPermission = useCallback(async (): Promise<boolean> => {
@@ -214,8 +188,8 @@ export function usePushNotifications(): UsePushNotificationsReturn {
     if (isAuthenticated && permission === 'granted' && isSupported) {
       // Check if we have existing tokens
       notificationService.getDeviceTokens()
-        .then((response) => {
-          if (response.data.length > 0) {
+        .then((tokens) => {
+          if (tokens.length > 0) {
             setIsRegistered(true);
             setupForegroundHandler();
           }

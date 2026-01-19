@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\DatabaseNotification;
@@ -16,6 +17,7 @@ class NotificationController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
+        /** @var User $user */
         $user = Auth::user();
         $perPage = (int) $request->query('per_page', 20);
 
@@ -42,6 +44,7 @@ class NotificationController extends Controller
      */
     public function unread(Request $request): JsonResponse
     {
+        /** @var User $user */
         $user = Auth::user();
         $limit = (int) $request->query('limit', 10);
 
@@ -63,7 +66,9 @@ class NotificationController extends Controller
      */
     public function count(): JsonResponse
     {
-        $unreadCount = Auth::user()->unreadNotifications()->count();
+        /** @var User $user */
+        $user = Auth::user();
+        $unreadCount = $user->unreadNotifications()->count();
 
         return response()->json([
             'unread_count' => $unreadCount,
@@ -75,7 +80,9 @@ class NotificationController extends Controller
      */
     public function markAsRead(string $id): JsonResponse
     {
-        $notification = Auth::user()
+        /** @var User $user */
+        $user = Auth::user();
+        $notification = $user
             ->notifications()
             ->where('id', $id)
             ->first();
@@ -99,7 +106,9 @@ class NotificationController extends Controller
      */
     public function markAllAsRead(): JsonResponse
     {
-        Auth::user()->unreadNotifications->markAsRead();
+        /** @var User $user */
+        $user = Auth::user();
+        $user->unreadNotifications->markAsRead();
 
         return response()->json([
             'message' => 'All notifications marked as read.',
@@ -111,7 +120,9 @@ class NotificationController extends Controller
      */
     public function destroy(string $id): JsonResponse
     {
-        $notification = Auth::user()
+        /** @var User $user */
+        $user = Auth::user();
+        $notification = $user
             ->notifications()
             ->where('id', $id)
             ->first();
@@ -134,9 +145,11 @@ class NotificationController extends Controller
      */
     public function cleanup(Request $request): JsonResponse
     {
+        /** @var User $user */
+        $user = Auth::user();
         $days = (int) $request->query('days', 30);
         
-        $deleted = Auth::user()
+        $deleted = $user
             ->notifications()
             ->whereNotNull('read_at')
             ->where('created_at', '<', now()->subDays($days))

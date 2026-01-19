@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Booking;
+use Carbon\Carbon;
 use Illuminate\Notifications\Messages\MailMessage;
 
 /**
@@ -61,13 +62,17 @@ class BookingCancelledNotification extends BookingNotification
         $cancellerName = $isHost 
             ? ($this->booking->guest?->name ?? 'The guest')
             : ($this->booking->property?->host?->name ?? 'The host');
+        /** @var Carbon|null $checkIn */
+        $checkIn = $this->booking->check_in_date;
+        /** @var Carbon|null $checkOut */
+        $checkOut = $this->booking->check_out_date;
         
         $mail = (new MailMessage)
             ->subject("Booking Cancelled - {$this->booking->property?->name}")
             ->greeting("Hello {$notifiable->name},")
             ->line("{$cancellerName} has cancelled the booking.")
             ->line("**Property:** {$this->booking->property?->name}")
-            ->line("**Original Dates:** {$this->booking->check_in_date?->format('M d, Y')} - {$this->booking->check_out_date?->format('M d, Y')}");
+            ->line("**Original Dates:** " . ($checkIn?->format('M d, Y') ?? 'N/A') . " - " . ($checkOut?->format('M d, Y') ?? 'N/A'));
 
         if ($this->reason) {
             $mail->line("**Reason:** {$this->reason}");

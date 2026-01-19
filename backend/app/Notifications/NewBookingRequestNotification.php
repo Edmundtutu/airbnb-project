@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Booking;
+use Carbon\Carbon;
 use Illuminate\Notifications\Messages\MailMessage;
 
 /**
@@ -32,10 +33,12 @@ class NewBookingRequestNotification extends BookingNotification
     {
         $guestName = $this->booking->guest?->name ?? 'A guest';
         $propertyName = $this->booking->property?->name ?? 'your property';
-        $checkIn = $this->booking->check_in_date?->format('M d');
-        $checkOut = $this->booking->check_out_date?->format('M d');
+        /** @var Carbon|null $checkIn */
+        $checkIn = $this->booking->check_in_date;
+        /** @var Carbon|null $checkOut */
+        $checkOut = $this->booking->check_out_date;
         
-        return "{$guestName} has requested to book {$propertyName} from {$checkIn} to {$checkOut}.";
+        return "{$guestName} has requested to book {$propertyName} from " . ($checkIn?->format('M d') ?? 'N/A') . " to " . ($checkOut?->format('M d') ?? 'N/A') . ".";
     }
 
     public function getActionUrl(): string
@@ -49,7 +52,12 @@ class NewBookingRequestNotification extends BookingNotification
     public function toMail(object $notifiable): MailMessage
     {
         $guestName = $this->booking->guest?->name ?? 'A guest';
-        $nights = $this->booking->check_in_date?->diffInDays($this->booking->check_out_date) ?? 0;
+        /** @var Carbon|null $checkIn */
+        $checkIn = $this->booking->check_in_date;
+        /** @var Carbon|null $checkOut */
+        $checkOut = $this->booking->check_out_date;
+        $nights = $checkIn && $checkOut ? $checkIn->diffInDays($checkOut) : 0;
+        $total = (float) ($this->booking->total ?? 0);
         
         return $this->buildMailMessage()
             ->subject("New Booking Request - {$this->booking->property?->name}")
@@ -57,9 +65,9 @@ class NewBookingRequestNotification extends BookingNotification
             ->line("Great news! You have received a new booking request.")
             ->line("**Guest:** {$guestName}")
             ->line("**Property:** {$this->booking->property?->name}")
-            ->line("**Dates:** {$this->booking->check_in_date?->format('M d, Y')} - {$this->booking->check_out_date?->format('M d, Y')} ({$nights} nights)")
+            ->line("**Dates:** " . ($checkIn?->format('M d, Y') ?? 'N/A') . " - " . ($checkOut?->format('M d, Y') ?? 'N/A') . " ({$nights} nights)")
             ->line("**Guests:** {$this->booking->guest_count}")
-            ->line("**Total:** UGX " . number_format($this->booking->total))
+            ->line("**Total:** UGX " . number_format($total))
             ->action('Review & Respond', $this->getActionUrl())
             ->line('Please respond within 24 hours to maintain a good response rate.');
     }

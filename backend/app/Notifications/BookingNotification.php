@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Booking;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -78,6 +79,11 @@ abstract class BookingNotification extends Notification implements ShouldQueue
      */
     public function toArray(object $notifiable): array
     {
+        /** @var Carbon|null $checkIn */
+        $checkIn = $this->booking->check_in_date;
+        /** @var Carbon|null $checkOut */
+        $checkOut = $this->booking->check_out_date;
+
         return [
             'type' => $this->notificationType,
             'title' => $this->getTitle(),
@@ -86,8 +92,8 @@ abstract class BookingNotification extends Notification implements ShouldQueue
             'booking_id' => $this->booking->id,
             'property_id' => $this->booking->property_id,
             'property_name' => $this->booking->property?->name,
-            'check_in_date' => $this->booking->check_in_date?->toDateString(),
-            'check_out_date' => $this->booking->check_out_date?->toDateString(),
+            'check_in_date' => $checkIn?->toDateString(),
+            'check_out_date' => $checkOut?->toDateString(),
             'total' => $this->booking->total,
             'guest_count' => $this->booking->guest_count,
         ];
@@ -117,13 +123,18 @@ abstract class BookingNotification extends Notification implements ShouldQueue
      */
     protected function buildMailMessage(): MailMessage
     {
+        /** @var Carbon|null $checkIn */
+        $checkIn = $this->booking->check_in_date;
+        /** @var Carbon|null $checkOut */
+        $checkOut = $this->booking->check_out_date;
+
         return (new MailMessage)
             ->subject($this->getTitle())
             ->greeting("Hello {$this->getRecipientName()}!")
             ->line($this->getMessage())
             ->line("**Property:** {$this->booking->property?->name}")
-            ->line("**Check-in:** {$this->booking->check_in_date?->format('M d, Y')}")
-            ->line("**Check-out:** {$this->booking->check_out_date?->format('M d, Y')}")
+            ->line("**Check-in:** " . ($checkIn?->format('M d, Y') ?? 'N/A'))
+            ->line("**Check-out:** " . ($checkOut?->format('M d, Y') ?? 'N/A'))
             ->line("**Guests:** {$this->booking->guest_count}")
             ->action('View Booking', $this->getActionUrl());
     }
