@@ -17,7 +17,7 @@ const ChatRoomPage: React.FC = () => {
   const navigate = useNavigate();
   const chatMode = useResponsiveChat();
 
-  const room = rooms.find((r) => r.bookingId === String(bookingId));
+  const room = rooms.find((r) => r.bookingId === bookingId);
   const [isCreatingRoom, setIsCreatingRoom] = useState(false);
 
   // Calculate user role BEFORE using it in hooks

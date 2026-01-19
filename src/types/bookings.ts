@@ -48,8 +48,8 @@ export interface CreateOrderPayload extends CreateBookingPayload {
 }
 
 export interface BookingDetail {
-  id: number;
-  booking_id: number;
+  id: string; // ULID
+  booking_id: string; // ULID
   listing_id: string; // ULID
   nights: number;
   price_per_night: number;
@@ -60,7 +60,7 @@ export interface BookingDetail {
 }
 
 export interface ListingReservation {
-  id: number;
+  id: string; // ULID
   property_id: string;
   listing_id: string;
   check_in_date: string;
@@ -85,7 +85,7 @@ export interface HostListingReservation {
 }
 
 export interface Booking {
-  id: number;
+  id: string; // ULID
   guest_id: string; // ULID
   property_id: string; // ULID
   total: number;
@@ -103,7 +103,7 @@ export interface Booking {
 
 // Legacy interfaces for backward compatibility
 export interface OrderItem extends BookingDetail {
-  order_id: number;
+  order_id: string; // ULID
   product_id: string;
   quantity: number;
   price: number;

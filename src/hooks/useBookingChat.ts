@@ -29,7 +29,7 @@ export const useBookingChat = (booking: Booking | null) => {
   // Keep room in sync with ChatRoomsContext if it already exists there
   useEffect(() => {
     if (!booking) return;
-    const existing = rooms.find((r) => r.bookingId === String(booking.id));
+    const existing = rooms.find((r) => r.bookingId === booking.id);
     if (existing) {
       setRoom(existing);
     }
@@ -66,7 +66,7 @@ export const useBookingChat = (booking: Booking | null) => {
               };
 
         const createdRoom = await createOrGetChatRoom({
-          bookingId: String(booking.id),
+          bookingId: booking.id,
           listingId: booking.property_id,
           listingTitle: booking.property?.name || 'Property',
           listingImage: booking.property?.cover_image,
@@ -112,7 +112,7 @@ export const useBookingChat = (booking: Booking | null) => {
     if (!booking || !user || !userRole) return;
 
     // If room already exists in context, navigate immediately
-    const existingRoom = rooms.find((r) => r.bookingId === String(booking.id));
+    const existingRoom = rooms.find((r) => r.bookingId === booking.id);
     if (existingRoom) {
       navigate(`/chats/${booking.id}`);
       return;
@@ -138,7 +138,7 @@ export const useBookingChat = (booking: Booking | null) => {
             };
 
       const createdRoom = await createOrGetChatRoom({
-        bookingId: String(booking.id),
+        bookingId: booking.id,
         listingId: booking.property_id,
         listingTitle: booking.property?.name || 'Property',
         listingImage: booking.property?.cover_image,
@@ -174,7 +174,7 @@ export const useBookingChat = (booking: Booking | null) => {
   };
 
   const unreadCount =
-    booking && userRole ? getUnreadForBooking(String(booking.id)) : 0;
+    booking && userRole ? getUnreadForBooking(booking.id) : 0;
 
   return {
     room,

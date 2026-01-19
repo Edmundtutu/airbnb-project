@@ -12,6 +12,8 @@ class KYCSubmission extends Model
 {
     use HasUlids, HasFactory, SoftDeletes;
 
+    protected $table = 'kyc_submissions';
+
     protected $fillable = [
         'user_id',
         'submission_type',

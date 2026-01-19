@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\BookingHandlers;
 
+use App\Events\BookingCreated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\StoreBookingRequest;
 use App\Http\Requests\Api\V1\UpdateBookingRequest;
@@ -10,6 +11,7 @@ use App\Http\Resources\Api\V1\BookingReservationResource;
 use App\Http\Resources\Api\V1\ListingCalendarReservationResource;
 use App\Models\Booking;
 use App\Models\Listing;
+use App\Services\BookingService;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -19,6 +21,12 @@ use Illuminate\Support\Carbon;
 
 class BookingController extends Controller
 {
+    protected BookingService $bookingService;
+
+    public function __construct(BookingService $bookingService)
+    {
+        $this->bookingService = $bookingService;
+    }
 
     /**
      * Display a listing of the resource.
@@ -70,6 +78,11 @@ class BookingController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     * 
+     * Implements:
+     * - Server-side availability validation with row locking
+     * - Server-authoritative pricing computation
+     * - Transaction-safe booking creation
      */
     public function store(StoreBookingRequest $request)
     {
@@ -78,15 +91,16 @@ class BookingController extends Controller
         $validated = $request->validated();
 
         $detailPayload = collect($validated['details']);
-        $listingIds = $detailPayload->pluck('listing_id')->unique();
+        $listingIds = $detailPayload->pluck('listing_id')->unique()->values()->toArray();
         $listings = Listing::whereIn('id', $listingIds)->get()->keyBy('id');
 
-        if ($listings->count() !== $listingIds->count()) {
+        if ($listings->count() !== count($listingIds)) {
             throw ValidationException::withMessages([
                 'details' => ['One or more listings could not be found.'],
             ]);
         }
 
+        // Validate all listings belong to the specified property
         foreach ($listingIds as $listingId) {
             $listing = $listings->get($listingId);
             if ($listing->property_id !== $validated['property_id']) {
@@ -96,18 +110,27 @@ class BookingController extends Controller
             }
         }
 
-        $details = $detailPayload->map(function (array $detail) use ($listings) {
-            $listing = $listings->get($detail['listing_id']);
-            $pricePerNight = $detail['price_per_night'] ?? $listing->price_per_night;
+        // Parse dates for availability check
+        $checkIn = Carbon::parse($validated['check_in_date'])->startOfDay();
+        $checkOut = Carbon::parse($validated['check_out_date'])->startOfDay();
 
-            return [
-                'listing' => $listing,
-                'nights' => (int) $detail['nights'],
-                'price_per_night' => (float) $pricePerNight,
-            ];
-        });
+        // Server-authoritative nights calculation
+        $calculatedNights = $this->bookingService->calculateNights($checkIn, $checkOut);
 
-        $booking = DB::transaction(function () use ($validated, $details) {
+        // Compute server-authoritative pricing
+        $pricingResult = $this->bookingService->computePricing($detailPayload, $listings);
+
+        $booking = DB::transaction(function () use ($validated, $pricingResult, $checkIn, $checkOut, $calculatedNights) {
+            $listingIds = collect($pricingResult['computed_details'])->pluck('listing_id')->toArray();
+
+            // Validate availability with row-level locking to prevent race conditions
+            $this->bookingService->validateAvailabilityWithLock(
+                $listingIds,
+                $checkIn,
+                $checkOut
+            );
+
+            // Create booking with server-computed total
             $booking = Booking::create([
                 'guest_id' => Auth::id(),
                 'property_id' => $validated['property_id'],
@@ -115,28 +138,24 @@ class BookingController extends Controller
                 'check_out_date' => $validated['check_out_date'],
                 'guest_count' => $validated['guest_count'],
                 'notes' => $validated['notes'] ?? null,
-                'total' => 0,
-                'status' => 'pending',
+                'total' => $pricingResult['total'],
+                'status' => BookingService::STATUS_PENDING,
             ]);
 
-            $total = 0;
-
-            foreach ($details as $detail) {
-                $lineTotal = $detail['price_per_night'] * $detail['nights'];
-
+            // Create booking details with server-computed pricing
+            foreach ($pricingResult['computed_details'] as $detail) {
                 $booking->details()->create([
-                    'listing_id' => $detail['listing']->id,
+                    'listing_id' => $detail['listing_id'],
                     'nights' => $detail['nights'],
                     'price_per_night' => $detail['price_per_night'],
                 ]);
-
-                $total += $lineTotal;
             }
-
-            $booking->update(['total' => $total]);
 
             return $booking;
         });
+
+        // Dispatch BookingCreated event (outside transaction for reliability)
+        BookingCreated::dispatch($booking, Auth::id());
 
         return new BookingResource($booking->load('details.listing'));
     }
@@ -167,18 +186,29 @@ class BookingController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     * Guest cancellation - uses state machine guards.
      */
     public function destroy(Booking $booking)
     {
         $this->authorize('delete', $booking);
 
-        // Instead of deleting, we can cancel the booking
-        if (in_array($booking->status, ['pending', 'processing'])) {
-            $booking->update(['status' => 'cancelled']);
-            return response()->json(['message' => 'Booking cancelled successfully.']);
+        // Use state machine for guarded transition with event dispatch
+        try {
+            $this->bookingService->transitionStatus(
+                $booking,
+                BookingService::STATUS_CANCELLED,
+                Auth::id(), // triggeredBy
+                null, // reason
+                ['cancelled_by' => 'guest'] // metadata for event
+            );
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Booking cannot be cancelled.',
+                'errors' => $e->errors(),
+            ], 400);
         }
 
-        return response()->json(['message' => 'Booking cannot be cancelled.'], 400);
+        return response()->json(['message' => 'Booking cancelled successfully.']);
     }
 
     /**
@@ -196,33 +226,51 @@ class BookingController extends Controller
     }
 
     /**
-     * Confirm a Booking with availability check
+     * Confirm a Booking with availability check and state machine guard.
      */
     public function confirmBooking(Booking $booking): JsonResponse
     {
         $this->authorize('confirm', $booking);
 
-        if ($booking->status !== 'pending') {
-            return response()->json(['message' => 'Only pending bookings can be confirmed.'], 422);
+        // Use state machine for guarded transition with event dispatch
+        try {
+            $this->bookingService->transitionStatus(
+                $booking,
+                BookingService::STATUS_CONFIRMED,
+                Auth::id() // triggeredBy (host)
+            );
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Cannot confirm booking.',
+                'errors' => $e->errors(),
+            ], 422);
         }
-
-        $booking->update(['status' => 'confirmed']);
 
         return response()->json(['message' => 'Booking confirmed successfully.']);
     }
 
     /**
-     * Reject booking When not available, cancel and revert Transaction
+     * Reject booking with state machine guard.
+     * Sets status to 'rejected' (host action) rather than 'cancelled' (guest action).
      */
-    public function rejectBooking(Booking $booking): JsonResponse
+    public function rejectBooking(Request $request, Booking $booking): JsonResponse
     {
         $this->authorize('confirm', $booking);
 
-        if (! in_array($booking->status, ['pending', 'confirmed'])) {
-            return response()->json(['message' => 'Booking cannot be rejected in its current state.'], 422);
+        // Use state machine for guarded transition with event dispatch
+        try {
+            $this->bookingService->transitionStatus(
+                $booking,
+                BookingService::STATUS_REJECTED,
+                Auth::id(), // triggeredBy (host)
+                $request->input('reason') // optional rejection reason
+            );
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Cannot reject booking.',
+                'errors' => $e->errors(),
+            ], 422);
         }
-
-        $booking->update(['status' => 'cancelled']);
 
         // TODO When Transactions features are added under payment, revert the transaction here.
 

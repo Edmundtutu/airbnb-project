@@ -317,7 +317,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
                       createContext={{ 
                         propertyId: booking.property_id, 
                         listingId: booking.details?.[0]?.listing_id,
-                        bookingId: booking.id.toString()
+                        bookingId: booking.id
                       }}
                       forceExpanded={true}
                     />

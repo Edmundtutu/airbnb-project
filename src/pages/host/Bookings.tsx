@@ -33,14 +33,14 @@ const HostBookings: React.FC = () => {
   const meta = bookingsResponse?.meta;
 
   const confirmMutation = useMutation({
-    mutationFn: (bookingId: number) => confirmBooking(bookingId),
+    mutationFn: (bookingId: string) => confirmBooking(bookingId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['hostBookings'] }).catch(() => undefined);
     },
   });
 
   const rejectMutation = useMutation({
-    mutationFn: (bookingId: number) => rejectBooking(bookingId),
+    mutationFn: (bookingId: string) => rejectBooking(bookingId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['hostBookings'] }).catch(() => undefined);
     },

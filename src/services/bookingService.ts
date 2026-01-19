@@ -18,17 +18,17 @@ export const bookingService = {
     return response.data;
   },
 
-  async getBooking(bookingId: number): Promise<Booking> {
+  async getBooking(bookingId: string): Promise<Booking> {
     const response = await api.get<ApiResponse<Booking>>(`${apiVersion}/bookings/${bookingId}`);
     return response.data.data;
   },
 
-  async updateBooking(bookingId: number, data: Partial<Booking>): Promise<Booking> {
+  async updateBooking(bookingId: string, data: Partial<Booking>): Promise<Booking> {
     const response = await api.put<ApiResponse<Booking>>(`${apiVersion}/bookings/${bookingId}`, data);
     return response.data.data;
   },
 
-  async cancelBooking(bookingId: number): Promise<{ message: string }> {
+  async cancelBooking(bookingId: string): Promise<{ message: string }> {
     const response = await api.delete(`${apiVersion}/bookings/${bookingId}`);
     return response.data;
   },
@@ -45,7 +45,7 @@ export const bookingService = {
   },
 
   async requestBooking(bookingData: {
-    listing_id: number;
+    listing_id: string; // ULID
     check_in: string;
     check_out: string;
     guests: number;
@@ -62,7 +62,7 @@ export const bookingService = {
   // Host-specific booking operations  
   async getHostBookings(params?: {
     status?: string;
-    property_id?: number;
+    property_id?: string; // ULID
     upcoming?: boolean;
     past?: boolean;
     page?: number;
@@ -86,40 +86,64 @@ export const bookingService = {
     return response.data.data;
   },
 
-  async confirmBooking(bookingId: number): Promise<{ message: string }> {
+  async confirmBooking(bookingId: string): Promise<{ message: string }> {
     const response = await api.patch(`${apiVersion}/host/bookings/${bookingId}/confirm`);
     return response.data;
   },
 
-  async rejectBooking(bookingId: number, reason?: string): Promise<{ message: string }> {
+  async rejectBooking(bookingId: string, reason?: string): Promise<{ message: string }> {
     const response = await api.patch(`${apiVersion}/host/bookings/${bookingId}/reject`, { reason });
     return response.data;
   },
 
-  async acceptBooking(bookingId: number): Promise<{ message: string }> {
-    const response = await api.patch(`${apiVersion}/host/bookings/${bookingId}/accept`);
-    return response.data;
+  // ============================================================
+  // STUBBED METHODS - Backend routes not yet implemented
+  // These are placeholders for future functionality.
+  // DO NOT USE in production until backend support is added.
+  // ============================================================
+
+  /**
+   * @deprecated STUB - Backend route not implemented
+   * @todo Implement POST /host/bookings/{bookingId}/accept route
+   */
+  async acceptBooking(bookingId: string): Promise<{ message: string }> {
+    console.warn('[bookingService.acceptBooking] STUB: Backend route not implemented');
+    throw new Error('acceptBooking is not yet supported by the backend');
   },
 
-  // Booking status updates
-  async markAsCheckedIn(bookingId: number): Promise<Booking> {
-    const response = await api.patch<ApiResponse<Booking>>(`${apiVersion}/bookings/${bookingId}/check-in`);
-    return response.data.data;
+  /**
+   * @deprecated STUB - Backend route not implemented
+   * @todo Implement PATCH /bookings/{bookingId}/check-in route
+   */
+  async markAsCheckedIn(bookingId: string): Promise<Booking> {
+    console.warn('[bookingService.markAsCheckedIn] STUB: Backend route not implemented');
+    throw new Error('markAsCheckedIn is not yet supported by the backend');
   },
 
-  async markAsCheckedOut(bookingId: number): Promise<Booking> {
-    const response = await api.patch<ApiResponse<Booking>>(`${apiVersion}/bookings/${bookingId}/check-out`);
-    return response.data.data;
+  /**
+   * @deprecated STUB - Backend route not implemented
+   * @todo Implement PATCH /bookings/{bookingId}/check-out route
+   */
+  async markAsCheckedOut(bookingId: string): Promise<Booking> {
+    console.warn('[bookingService.markAsCheckedOut] STUB: Backend route not implemented');
+    throw new Error('markAsCheckedOut is not yet supported by the backend');
   },
 
-  async markAsCompleted(bookingId: number): Promise<Booking> {
-    const response = await api.patch<ApiResponse<Booking>>(`${apiVersion}/bookings/${bookingId}/complete`);
-    return response.data.data;
+  /**
+   * @deprecated STUB - Backend route not implemented
+   * @todo Implement PATCH /bookings/{bookingId}/complete route
+   */
+  async markAsCompleted(bookingId: string): Promise<Booking> {
+    console.warn('[bookingService.markAsCompleted] STUB: Backend route not implemented');
+    throw new Error('markAsCompleted is not yet supported by the backend');
   },
 
-  // Booking analytics
+  /**
+   * @deprecated STUB - Backend route not implemented
+   * @todo Implement GET /host/bookings/stats route
+   */
   async getBookingStats(params?: {
-    property_id?: number;
+    property_id?: string;
     start_date?: string;
     end_date?: string;
   }): Promise<{
@@ -128,25 +152,32 @@ export const bookingService = {
     occupancy_rate: number;
     average_rating: number;
   }> {
-    const response = await api.get(`${apiVersion}/host/bookings/stats`, { params });
-    return response.data;
+    console.warn('[bookingService.getBookingStats] STUB: Backend route not implemented');
+    throw new Error('getBookingStats is not yet supported by the backend');
   },
 
-  // Payment-related operations
-  async processPayment(bookingId: number, paymentData: {
+  /**
+   * @deprecated STUB - Backend route not implemented
+   * @todo Implement POST /bookings/{bookingId}/payment route
+   */
+  async processPayment(bookingId: string, paymentData: {
     payment_method: string;
     amount: number;
   }): Promise<{ payment_status: string; transaction_id: string }> {
-    const response = await api.post(`${apiVersion}/bookings/${bookingId}/payment`, paymentData);
-    return response.data;
+    console.warn('[bookingService.processPayment] STUB: Backend route not implemented');
+    throw new Error('processPayment is not yet supported by the backend');
   },
 
-  async refundBooking(bookingId: number, refundData: {
+  /**
+   * @deprecated STUB - Backend route not implemented
+   * @todo Implement POST /bookings/{bookingId}/refund route
+   */
+  async refundBooking(bookingId: string, refundData: {
     amount: number;
     reason: string;
   }): Promise<{ refund_status: string; refund_id: string }> {
-    const response = await api.post(`${apiVersion}/bookings/${bookingId}/refund`, refundData);
-    return response.data;
+    console.warn('[bookingService.refundBooking] STUB: Backend route not implemented');
+    throw new Error('refundBooking is not yet supported by the backend');
   },
 };
 

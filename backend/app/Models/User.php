@@ -157,6 +157,6 @@ class User extends Authenticatable
 
     public function kycSubmissions(): HasMany
     {
-        return $this->hasMany(KYCSubmission::class);
+        return $this->hasMany(KYCSubmission::class, 'user_id');
     }
 }
