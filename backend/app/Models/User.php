@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -35,6 +36,10 @@ class User extends Authenticatable
         'address',
         'lat',
         'lng',
+        'onboarding_state_id',
+        'flagged_at',
+        'restricted_at',
+        'restriction_reason',
     ];
 
     /**
@@ -59,6 +64,8 @@ class User extends Authenticatable
             'password' => 'hashed',
             'lat' => 'decimal:7',
             'lng' => 'decimal:7',
+            'flagged_at' => 'datetime',
+            'restricted_at' => 'datetime',
         ];
     }
 
@@ -136,5 +143,20 @@ class User extends Authenticatable
     public function isCustomer():bool
     {
         return $this->role == 'guest';
+    }
+
+    public function onboardingState(): BelongsTo
+    {
+        return $this->belongsTo(VendorOnboardingState::class, 'onboarding_state_id');
+    }
+
+    public function flags(): HasMany
+    {
+        return $this->hasMany(UserFlag::class);
+    }
+
+    public function kycSubmissions(): HasMany
+    {
+        return $this->hasMany(KYCSubmission::class);
     }
 }

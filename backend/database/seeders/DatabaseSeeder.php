@@ -21,6 +21,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Seed admin roles and permissions first
+        $this->call([
+            AdminRoleSeeder::class,
+            AdminPermissionSeeder::class,
+        ]);
+
         $this->command->info('🌱 Seeding realistic Airbnb-style rental platform data...');
 
         // === PHASE 1: Create Core Users ===

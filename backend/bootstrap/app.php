@@ -11,6 +11,12 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         channels: __DIR__.'/../routes/channels.php',
         health: '/up',
+        then: function () {
+            Route::middleware('web')
+                ->prefix('admin')
+                ->name('admin.')
+                ->group(base_path('routes/admin.php'));
+        },
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->api(prepend: [
@@ -19,6 +25,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
+            'admin.auth' => \App\Http\Middleware\EnsureAdminIsAuthenticated::class,
+            'admin.permission' => \App\Http\Middleware\EnsureAdminHasPermission::class,
+            'admin.role' => \App\Http\Middleware\EnsureAdminHasRole::class,
         ]);
 
         //
