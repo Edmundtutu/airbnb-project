@@ -18,6 +18,8 @@ import {
     Star,
     MapPin,
     CheckCircle2,
+    ChevronLeft,
+    ChevronRight,
     XCircle
 } from 'lucide-react';
 import { listingService } from '@/services/listingService';
@@ -332,35 +334,50 @@ const HostCreateListing: React.FC = () => {
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                     <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-                        <TabsList className="grid w-full grid-cols-4">
-                            <TabsTrigger value="basics" className="flex items-center gap-2">
+                        <TabsList className="grid w-full grid-cols-4 bg-muted/50 p-1 rounded-xl">
+                            <TabsTrigger
+                                value="basics"
+                                className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                            >
                                 <Home className="h-4 w-4" />
                                 Basics
                             </TabsTrigger>
-                            <TabsTrigger value="details" className="flex items-center gap-2">
+                            <TabsTrigger
+                                value="details"
+                                className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                            >
                                 <Star className="h-4 w-4" />
                                 Details
                             </TabsTrigger>
-                            <TabsTrigger value="media" className="flex items-center gap-2">
+                            <TabsTrigger
+                                value="media"
+                                className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                            >
                                 <ImageIcon className="h-4 w-4" />
                                 Photos
                             </TabsTrigger>
-                            <TabsTrigger value="settings" className="flex items-center gap-2">
+                            <TabsTrigger
+                                value="settings"
+                                className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                            >
                                 <CheckCircle2 className="h-4 w-4" />
                                 Settings
                             </TabsTrigger>
                         </TabsList>
 
-                        {/* Basics Tab */}
+                        {/* Basics Tab - Enhanced */}
                         <TabsContent value="basics" className="space-y-6">
-                            <Card>
-                                <CardHeader>
+                            <Card className="border-2">
+                                <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent border-b">
                                     <CardTitle className="flex items-center gap-2">
-                                        <Home className="h-5 w-5" />
+                                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                                            <Home className="h-5 w-5 text-primary" />
+                                        </div>
                                         Property Information
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="grid gap-6 md:grid-cols-2">
+                                    {/* Listing Name - Side by side with Property on large screens */}
                                     <FormField
                                         control={form.control}
                                         name="name"
@@ -371,6 +388,7 @@ const HostCreateListing: React.FC = () => {
                                                     <Input
                                                         placeholder="Cozy beachfront apartment with stunning views"
                                                         {...field}
+                                                        className="focus:border-primary focus:ring-2 focus:ring-primary/20"
                                                     />
                                                 </FormControl>
                                                 <FormDescription>
@@ -381,6 +399,7 @@ const HostCreateListing: React.FC = () => {
                                         )}
                                     />
 
+                                    {/* Property Selection - Side by side with Name on large screens */}
                                     <FormField
                                         control={form.control}
                                         name="property_id"
@@ -389,7 +408,7 @@ const HostCreateListing: React.FC = () => {
                                                 <FormLabel>Select property</FormLabel>
                                                 <Select onValueChange={field.onChange} value={field.value} disabled={propertyEmptyState}>
                                                     <FormControl>
-                                                        <SelectTrigger>
+                                                        <SelectTrigger className="focus:ring-2 focus:ring-primary/20 focus:border-primary">
                                                             <SelectValue placeholder={isLoadingProperties ? 'Loading properties...' : 'Choose your property'} />
                                                         </SelectTrigger>
                                                     </FormControl>
@@ -409,6 +428,7 @@ const HostCreateListing: React.FC = () => {
                                         )}
                                     />
 
+                                    {/* Category Selection - RESTORED AND ENHANCED (Full width) */}
                                     <div className="md:col-span-2">
                                         <FormField
                                             control={form.control}
@@ -420,17 +440,21 @@ const HostCreateListing: React.FC = () => {
                                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                                             {CATEGORIES.map((category) => {
                                                                 const Icon = category.icon;
+                                                                const isSelected = field.value === category.value;
                                                                 return (
                                                                     <button
                                                                         type="button"
                                                                         key={category.value}
                                                                         onClick={() => field.onChange(category.value)}
-                                                                        className={`flex flex-col items-center gap-3 p-4 rounded-lg border-2 transition-all ${field.value === category.value
-                                                                                ? 'border-primary bg-primary/5'
-                                                                                : 'border-muted hover:border-muted-foreground/50'
+                                                                        className={`flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all hover:shadow-md ${isSelected
+                                                                            ? 'border-primary bg-primary/10 shadow-sm'
+                                                                            : 'border-muted hover:border-muted-foreground/50'
                                                                             }`}
                                                                     >
-                                                                        <Icon className="h-6 w-6" />
+                                                                        <div className={`h-12 w-12 rounded-full flex items-center justify-center transition-colors ${isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                                                                            }`}>
+                                                                            <Icon className="h-6 w-6" />
+                                                                        </div>
                                                                         <span className="font-medium">{category.label}</span>
                                                                     </button>
                                                                 );
@@ -443,37 +467,45 @@ const HostCreateListing: React.FC = () => {
                                         />
                                     </div>
 
+                                    {/* Price per night - ENHANCED with larger range */}
                                     <FormField
                                         control={form.control}
                                         name="price_per_night"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel className="flex items-center gap-2">
-                                                    <Coins className="h-4 w-4" />
+                                                    <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
+                                                        <Coins className="h-4 w-4 text-primary" />
+                                                    </div>
                                                     Price per night
                                                 </FormLabel>
                                                 <FormControl>
                                                     <div className="space-y-4">
-                                                        <div className="flex items-center gap-4">
-                                                            <Input
-                                                                type="number"
-                                                                min={10}
-                                                                className="w-32"
-                                                                {...field}
-                                                            />
-                                                            <span className="text-muted-foreground">UGX</span>
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="relative flex-1">
+                                                                <Input
+                                                                    type="number"
+                                                                    min={20000}
+                                                                    className="pl-12 focus:border-primary focus:ring-2 focus:ring-primary/20"
+                                                                    {...field}
+                                                                />
+                                                                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 h-6 w-8 rounded-md bg-primary/10 flex items-center justify-center">
+                                                                    <span className="text-xs font-semibold text-primary">UGX</span>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                         <Slider
                                                             value={[field.value]}
                                                             onValueChange={handlePriceChange}
-                                                            max={1000}
-                                                            step={10}
-                                                            className="w-full"
+                                                            min={20000}
+                                                            max={2000000}
+                                                            step={10000}
+                                                            className="w-full [&>span:first-child]:bg-primary"
                                                         />
-                                                        <div className="flex justify-between text-sm text-muted-foreground">
-                                                            <span>UGX 10</span>
-                                                            <span>UGX 500</span>
-                                                            <span>UGX 1000+</span>
+                                                        <div className="flex justify-between text-sm text-muted-foreground px-1">
+                                                            <span>UGX 20,000</span>
+                                                            <span>UGX 1,000,000</span>
+                                                            <span>UGX 2M+</span>
                                                         </div>
                                                     </div>
                                                 </FormControl>
@@ -482,130 +514,165 @@ const HostCreateListing: React.FC = () => {
                                         )}
                                     />
 
-                                    <FormField
-                                        control={form.control}
-                                        name="max_guests"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel className="flex items-center gap-2">
-                                                    <Users className="h-4 w-4" />
-                                                    Maximum guests
-                                                </FormLabel>
-                                                <FormControl>
-                                                    <div className="flex items-center gap-4">
-                                                        <Button
-                                                            type="button"
-                                                            variant="outline"
-                                                            size="icon"
-                                                            onClick={() => field.onChange(Math.max(1, field.value - 1))}
-                                                        >
-                                                            -
-                                                        </Button>
-                                                        <span className="w-8 text-center font-medium">{field.value}</span>
-                                                        <Button
-                                                            type="button"
-                                                            variant="outline"
-                                                            size="icon"
-                                                            onClick={() => field.onChange(field.value + 1)}
-                                                        >
-                                                            +
-                                                        </Button>
-                                                    </div>
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
+                                    {/* Number Controls Section with DISTINCTIVE LAYERING */}
+                                    <div className="space-y-6 p-4 rounded-lg bg-gradient-to-br from-primary/5 to-transparent border">
+                                        <h3 className="font-semibold text-sm text-primary flex items-center gap-2">
+                                            <Users className="h-4 w-4" />
+                                            Capacity & Details
+                                        </h3>
 
-                                    <FormField
-                                        control={form.control}
-                                        name="bedrooms"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel className="flex items-center gap-2">
-                                                    <BedDouble className="h-4 w-4" />
-                                                    Bedrooms
-                                                </FormLabel>
-                                                <FormControl>
-                                                    <div className="flex items-center gap-4">
-                                                        <Button
-                                                            type="button"
-                                                            variant="outline"
-                                                            size="icon"
-                                                            onClick={() => field.onChange(Math.max(0, field.value - 1))}
-                                                        >
-                                                            -
-                                                        </Button>
-                                                        <span className="w-8 text-center font-medium">{field.value}</span>
-                                                        <Button
-                                                            type="button"
-                                                            variant="outline"
-                                                            size="icon"
-                                                            onClick={() => field.onChange(field.value + 1)}
-                                                        >
-                                                            +
-                                                        </Button>
-                                                    </div>
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
+                                        <div className="grid grid-cols-3 gap-4">
+                                            {/* Max Guests - DISTINCT CARD */}
+                                            <FormField
+                                                control={form.control}
+                                                name="max_guests"
+                                                render={({ field }) => (
+                                                    <FormItem className="space-y-2">
+                                                        <FormLabel className="text-xs font-medium text-muted-foreground">Guests</FormLabel>
+                                                        <FormControl>
+                                                            <div className="flex flex-col items-center gap-2">
+                                                                <div className="flex items-center gap-2 w-full">
+                                                                    <Button
+                                                                        type="button"
+                                                                        variant="outline"
+                                                                        size="icon"
+                                                                        className="h-7 w-7 rounded-md hover:border-primary hover:bg-primary/5 hover:text-primary"
+                                                                        onClick={() => field.onChange(Math.max(1, field.value - 1))}
+                                                                    >
+                                                                        -
+                                                                    </Button>
+                                                                    <div className="flex-1 text-center py-1 bg-background rounded-md border">
+                                                                        <span className="font-bold text-lg text-primary">{field.value}</span>
+                                                                    </div>
+                                                                    <Button
+                                                                        type="button"
+                                                                        variant="outline"
+                                                                        size="icon"
+                                                                        className="h-7 w-7 rounded-md hover:border-primary hover:bg-primary/5 hover:text-primary"
+                                                                        onClick={() => field.onChange(field.value + 1)}
+                                                                    >
+                                                                        +
+                                                                    </Button>
+                                                                </div>
+                                                                <span className="text-xs text-muted-foreground">max capacity</span>
+                                                            </div>
+                                                        </FormControl>
+                                                    </FormItem>
+                                                )}
+                                            />
 
-                                    <FormField
-                                        control={form.control}
-                                        name="bathrooms"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel className="flex items-center gap-2">
-                                                    <Bath className="h-4 w-4" />
-                                                    Bathrooms
-                                                </FormLabel>
-                                                <FormControl>
-                                                    <div className="flex items-center gap-4">
-                                                        <Button
-                                                            type="button"
-                                                            variant="outline"
-                                                            size="icon"
-                                                            onClick={() => field.onChange(Math.max(0, field.value - 0.5))}
-                                                        >
-                                                            -
-                                                        </Button>
-                                                        <span className="w-12 text-center font-medium">{field.value}</span>
-                                                        <Button
-                                                            type="button"
-                                                            variant="outline"
-                                                            size="icon"
-                                                            onClick={() => field.onChange(field.value + 0.5)}
-                                                        >
-                                                            +
-                                                        </Button>
-                                                    </div>
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
+                                            {/* Bedrooms - DISTINCT CARD */}
+                                            <FormField
+                                                control={form.control}
+                                                name="bedrooms"
+                                                render={({ field }) => (
+                                                    <FormItem className="space-y-2">
+                                                        <FormLabel className="text-xs font-medium text-muted-foreground">Bedrooms</FormLabel>
+                                                        <FormControl>
+                                                            <div className="flex flex-col items-center gap-2">
+                                                                <div className="flex items-center gap-2 w-full">
+                                                                    <Button
+                                                                        type="button"
+                                                                        variant="outline"
+                                                                        size="icon"
+                                                                        className="h-7 w-7 rounded-md hover:border-primary hover:bg-primary/5 hover:text-primary"
+                                                                        onClick={() => field.onChange(Math.max(0, field.value - 1))}
+                                                                    >
+                                                                        -
+                                                                    </Button>
+                                                                    <div className="flex-1 text-center py-1 bg-background rounded-md border">
+                                                                        <span className="font-bold text-lg text-primary">{field.value}</span>
+                                                                    </div>
+                                                                    <Button
+                                                                        type="button"
+                                                                        variant="outline"
+                                                                        size="icon"
+                                                                        className="h-7 w-7 rounded-md hover:border-primary hover:bg-primary/5 hover:text-primary"
+                                                                        onClick={() => field.onChange(field.value + 1)}
+                                                                    >
+                                                                        +
+                                                                    </Button>
+                                                                </div>
+                                                                <span className="text-xs text-muted-foreground">total rooms</span>
+                                                            </div>
+                                                        </FormControl>
+                                                    </FormItem>
+                                                )}
+                                            />
+
+                                            {/* Bathrooms - DISTINCT CARD */}
+                                            <FormField
+                                                control={form.control}
+                                                name="bathrooms"
+                                                render={({ field }) => (
+                                                    <FormItem className="space-y-2">
+                                                        <FormLabel className="text-xs font-medium text-muted-foreground">Bathrooms</FormLabel>
+                                                        <FormControl>
+                                                            <div className="flex flex-col items-center gap-2">
+                                                                <div className="flex items-center gap-2 w-full">
+                                                                    <Button
+                                                                        type="button"
+                                                                        variant="outline"
+                                                                        size="icon"
+                                                                        className="h-7 w-7 rounded-md hover:border-primary hover:bg-primary/5 hover:text-primary"
+                                                                        onClick={() => field.onChange(Math.max(0, field.value - 0.5))}
+                                                                    >
+                                                                        -
+                                                                    </Button>
+                                                                    <div className="flex-1 text-center py-1 bg-background rounded-md border">
+                                                                        <span className="font-bold text-lg text-primary">{field.value}</span>
+                                                                    </div>
+                                                                    <Button
+                                                                        type="button"
+                                                                        variant="outline"
+                                                                        size="icon"
+                                                                        className="h-7 w-7 rounded-md hover:border-primary hover:bg-primary/5 hover:text-primary"
+                                                                        onClick={() => field.onChange(field.value + 0.5)}
+                                                                    >
+                                                                        +
+                                                                    </Button>
+                                                                </div>
+                                                                <span className="text-xs text-muted-foreground">total baths</span>
+                                                            </div>
+                                                        </FormControl>
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+                                    </div>
                                 </CardContent>
                             </Card>
 
-                            <div className="flex justify-between">
-                                <Button type="button" variant="outline" onClick={() => navigate(-1)}>
+                            <div className="flex justify-between items-center">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => navigate(-1)}
+                                    className="hover:border-primary hover:bg-primary/5"
+                                >
+                                    <ChevronLeft className="mr-2 h-4 w-4" />
                                     Cancel
                                 </Button>
-                                <Button type="button" onClick={() => setActiveTab('details')}>
+                                <Button
+                                    type="button"
+                                    onClick={() => setActiveTab('details')}
+                                    className="bg-primary hover:bg-primary/90"
+                                >
                                     Continue to Details
+                                    <ChevronRight className="ml-2 h-4 w-4" />
                                 </Button>
                             </div>
                         </TabsContent>
 
-                        {/* Details Tab */}
+                        {/* Details Tab - Enhanced */}
                         <TabsContent value="details" className="space-y-6">
-                            <Card>
-                                <CardHeader>
+                            <Card className="border-2">
+                                <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent border-b">
                                     <CardTitle>Description & Features</CardTitle>
                                 </CardHeader>
-                                <CardContent className="space-y-6">
+                                <CardContent className="space-y-6 pt-6">
+                                    {/* Description - Enhanced */}
+
                                     <FormField
                                         control={form.control}
                                         name="description"
@@ -617,16 +684,19 @@ const HostCreateListing: React.FC = () => {
                                                         rows={6}
                                                         placeholder="Describe what makes your space special. Highlight unique features, nearby attractions, and the overall experience guests can expect..."
                                                         {...field}
+                                                        className="focus:border-primary focus:ring-primary/20"
                                                     />
                                                 </FormControl>
                                                 <FormDescription>
-                                                    {field.value?.length || 0}/500 characters
+                                                    <span className={field.value?.length > 450 ? "text-accent" : ""}>
+                                                        {field.value?.length || 0}/500 characters
+                                                    </span>
                                                 </FormDescription>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
                                     />
-
+                                    {/* Amenities - Enhanced */}
                                     <FormField
                                         control={form.control}
                                         name="amenities"
@@ -638,17 +708,23 @@ const HostCreateListing: React.FC = () => {
                                                 </FormDescription>
                                                 <FormControl>
                                                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                                                        {AMENITY_OPTIONS.map((amenity) => (
-                                                            <Badge
-                                                                key={amenity}
-                                                                variant={selectedAmenities.includes(amenity) ? "default" : "outline"}
-                                                                className="cursor-pointer py-2 px-3 text-sm"
-                                                                onClick={() => toggleArrayItem(selectedAmenities, amenity, 'amenities')}
-                                                            >
-                                                                {selectedAmenities.includes(amenity) && <CheckCircle2 className="h-3 w-3 mr-1" />}
-                                                                {amenity}
-                                                            </Badge>
-                                                        ))}
+                                                        {AMENITY_OPTIONS.map((amenity) => {
+                                                            const isSelected = selectedAmenities.includes(amenity);
+                                                            return (
+                                                                <Badge
+                                                                    key={amenity}
+                                                                    variant={isSelected ? "default" : "outline"}
+                                                                    className={`cursor-pointer py-2 px-3 text-sm transition-all hover:scale-105 ${isSelected
+                                                                        ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                                                                        : 'hover:border-primary hover:bg-primary/5'
+                                                                        }`}
+                                                                    onClick={() => toggleArrayItem(selectedAmenities, amenity, 'amenities')}
+                                                                >
+                                                                    {isSelected && <CheckCircle2 className="h-3 w-3 mr-1" />}
+                                                                    {amenity}
+                                                                </Badge>
+                                                            );
+                                                        })}
                                                     </div>
                                                 </FormControl>
                                                 <FormMessage />
@@ -656,6 +732,7 @@ const HostCreateListing: React.FC = () => {
                                         )}
                                     />
 
+                                    {/* House Rules - Enhanced */}
                                     <FormField
                                         control={form.control}
                                         name="house_rules"
@@ -667,24 +744,27 @@ const HostCreateListing: React.FC = () => {
                                                 </FormDescription>
                                                 <FormControl>
                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                                        {HOUSE_RULE_OPTIONS.map((rule) => (
-                                                            <div
-                                                                key={rule}
-                                                                className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${selectedHouseRules.includes(rule)
-                                                                        ? 'border-primary bg-primary/5'
-                                                                        : 'border-muted hover:border-muted-foreground/50'
-                                                                    }`}
-                                                                onClick={() => toggleArrayItem(selectedHouseRules, rule, 'house_rules')}
-                                                            >
-                                                                <div className={`h-4 w-4 rounded border flex items-center justify-center ${selectedHouseRules.includes(rule)
+                                                        {HOUSE_RULE_OPTIONS.map((rule) => {
+                                                            const isSelected = selectedHouseRules.includes(rule);
+                                                            return (
+                                                                <div
+                                                                    key={rule}
+                                                                    className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all hover:shadow-sm ${isSelected
+                                                                        ? 'border-primary bg-primary/5 shadow-sm'
+                                                                        : 'border-muted hover:border-primary/50 hover:bg-primary/5'
+                                                                        }`}
+                                                                    onClick={() => toggleArrayItem(selectedHouseRules, rule, 'house_rules')}
+                                                                >
+                                                                    <div className={`h-5 w-5 rounded border flex items-center justify-center transition-colors ${isSelected
                                                                         ? 'bg-primary border-primary text-primary-foreground'
-                                                                        : 'border-muted-foreground'
-                                                                    }`}>
-                                                                    {selectedHouseRules.includes(rule) && <CheckCircle2 className="h-3 w-3" />}
+                                                                        : 'border-muted-foreground group-hover:border-primary'
+                                                                        }`}>
+                                                                        {isSelected && <CheckCircle2 className="h-3 w-3" />}
+                                                                    </div>
+                                                                    <span className="text-sm">{rule}</span>
                                                                 </div>
-                                                                <span className="text-sm">{rule}</span>
-                                                            </div>
-                                                        ))}
+                                                            );
+                                                        })}
                                                     </div>
                                                 </FormControl>
                                                 <FormMessage />
@@ -692,6 +772,7 @@ const HostCreateListing: React.FC = () => {
                                         )}
                                     />
 
+                                    {/* Tags - Enhanced */}
                                     <FormField
                                         control={form.control}
                                         name="tags"
@@ -703,16 +784,22 @@ const HostCreateListing: React.FC = () => {
                                                 </FormDescription>
                                                 <FormControl>
                                                     <div className="flex flex-wrap gap-2">
-                                                        {TAG_OPTIONS.map((tag) => (
-                                                            <Badge
-                                                                key={tag}
-                                                                variant={selectedTags.includes(tag) ? "secondary" : "outline"}
-                                                                className="cursor-pointer py-1 px-2"
-                                                                onClick={() => toggleArrayItem(selectedTags, tag, 'tags')}
-                                                            >
-                                                                {tag}
-                                                            </Badge>
-                                                        ))}
+                                                        {TAG_OPTIONS.map((tag) => {
+                                                            const isSelected = selectedTags.includes(tag);
+                                                            return (
+                                                                <Badge
+                                                                    key={tag}
+                                                                    variant={isSelected ? "secondary" : "outline"}
+                                                                    className={`cursor-pointer py-1 px-3 transition-all hover:scale-105 ${isSelected
+                                                                        ? 'bg-accent text-accent-foreground hover:bg-accent/90'
+                                                                        : 'hover:border-primary hover:bg-primary/5'
+                                                                        }`}
+                                                                    onClick={() => toggleArrayItem(selectedTags, tag, 'tags')}
+                                                                >
+                                                                    {tag}
+                                                                </Badge>
+                                                            );
+                                                        })}
                                                     </div>
                                                 </FormControl>
                                                 <FormMessage />
@@ -722,39 +809,44 @@ const HostCreateListing: React.FC = () => {
                                 </CardContent>
                             </Card>
 
-                            <div className="flex justify-between">
-                                <Button type="button" variant="outline" onClick={() => setActiveTab('basics')}>
+                            <div className="flex justify-between items-center">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => setActiveTab('basics')}
+                                    className="hover:border-primary hover:bg-primary/5"
+                                >
+                                    <ChevronLeft className="mr-2 h-4 w-4" />
                                     Back
                                 </Button>
-                                <Button type="button" onClick={() => setActiveTab('media')}>
+                                <Button
+                                    type="button"
+                                    onClick={() => setActiveTab('media')}
+                                    className="bg-primary hover:bg-primary/90"
+                                >
                                     Continue to Photos
+                                    <ChevronRight className="ml-2 h-4 w-4" />
                                 </Button>
                             </div>
                         </TabsContent>
 
-                        {/* Media Tab */}
+                        {/* Media Tab - Enhanced */}
                         <TabsContent value="media" className="space-y-6">
-                            <Card>
-                                <CardHeader>
+                            <Card className="border-2">
+                                <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent border-b">
                                     <CardTitle className="flex items-center gap-2">
-                                        <ImageIcon className="h-5 w-5" />
+                                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                                            <ImageIcon className="h-5 w-5 text-primary" />
+                                        </div>
                                         Photos
                                     </CardTitle>
                                 </CardHeader>
-                                <CardContent className="space-y-6">
-                                    <input
-                                        ref={fileInputRef}
-                                        type="file"
-                                        accept="image/png,image/jpeg,image/webp"
-                                        multiple
-                                        className="hidden"
-                                        onChange={handleFileChange}
-                                    />
-
+                                <CardContent className="space-y-6 pt-6">
+                                    {/* Drag & drop area - Enhanced */}
                                     <div
                                         className={`rounded-xl border-2 border-dashed p-8 text-center transition-all ${isDragActive
-                                                ? 'border-primary bg-primary/10 scale-[1.02]'
-                                                : 'border-muted-foreground/30 hover:border-muted-foreground/50'
+                                            ? 'border-primary bg-primary/10 scale-[1.02] shadow-lg'
+                                            : 'border-muted-foreground/30 hover:border-primary/50 hover:bg-primary/5'
                                             } ${uploadingImages ? 'opacity-70 pointer-events-none' : ''}`}
                                         onDragEnter={handleDragOver}
                                         onDragOver={handleDragOver}
@@ -762,7 +854,25 @@ const HostCreateListing: React.FC = () => {
                                         onDrop={handleDrop}
                                         role="presentation"
                                     >
-                                        <div className="flex flex-col items-center gap-4 max-w-md mx-auto">
+                                        <div
+                                            className="flex flex-col items-center gap-4 max-w-md mx-auto cursor-pointer"
+                                            onClick={(e) => {
+                                                const target = e.target as HTMLElement;
+                                                // don't open file picker when clicking interactive children (buttons/inputs/links)
+                                                if (target.closest('button') || target.closest('input') || target.closest('a')) return;
+                                                if (uploadingImages || remainingSlots <= 0) return;
+                                                handleOpenFilePicker();
+                                            }}
+                                        >
+                                            <input
+                                                ref={fileInputRef}
+                                                type="file"
+                                                accept="image/*"
+                                                multiple
+                                                onChange={handleFileChange}
+                                                // visually hidden but accessible
+                                                className="sr-only"
+                                            />
                                             <div className="rounded-full bg-primary/10 p-4">
                                                 <ImageIcon className="h-8 w-8 text-primary" />
                                             </div>
@@ -772,12 +882,12 @@ const HostCreateListing: React.FC = () => {
                                                     Drag & drop images here or click to browse. High-quality photos help guests imagine their stay.
                                                 </p>
                                             </div>
-                                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                                                <div className="flex items-center gap-1">
+                                            <div className="flex items-center gap-4 text-sm">
+                                                <div className="flex items-center gap-1 text-primary">
                                                     <CheckCircle2 className="h-4 w-4" />
                                                     <span>PNG, JPG, WEBP</span>
                                                 </div>
-                                                <div className="flex items-center gap-1">
+                                                <div className="flex items-center gap-1 text-muted-foreground">
                                                     <XCircle className="h-4 w-4" />
                                                     <span>Max {MAX_IMAGES} photos</span>
                                                 </div>
@@ -787,14 +897,14 @@ const HostCreateListing: React.FC = () => {
                                                 size="lg"
                                                 onClick={handleOpenFilePicker}
                                                 disabled={uploadingImages || remainingSlots <= 0}
-                                                className="mt-4"
+                                                className="mt-4 bg-primary hover:bg-primary/90"
                                             >
                                                 <Plus className="mr-2 h-4 w-4" />
                                                 Choose photos
                                                 {remainingSlots > 0 && ` (${remainingSlots} remaining)`}
                                             </Button>
                                             {uploadingImages && (
-                                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                <div className="flex items-center gap-2 text-sm text-primary">
                                                     <Loader2 className="h-4 w-4 animate-spin" />
                                                     Uploading your photos...
                                                 </div>
@@ -802,16 +912,20 @@ const HostCreateListing: React.FC = () => {
                                         </div>
                                     </div>
 
+                                    {/* Image grid - Enhanced */}
                                     {images.length > 0 && (
                                         <div className="space-y-4">
                                             <div className="flex items-center justify-between">
-                                                <h4 className="font-medium">Your photos ({images.length}/{MAX_IMAGES})</h4>
+                                                <h4 className="font-medium">
+                                                    Your photos <Badge variant="secondary" className="ml-2">{images.length}/{MAX_IMAGES}</Badge>
+                                                </h4>
                                                 <Button
                                                     type="button"
                                                     variant="outline"
                                                     size="sm"
                                                     onClick={handleOpenFilePicker}
                                                     disabled={uploadingImages || remainingSlots <= 0}
+                                                    className="hover:border-primary hover:bg-primary/5"
                                                 >
                                                     <Plus className="mr-2 h-4 w-4" />
                                                     Add more
@@ -819,7 +933,7 @@ const HostCreateListing: React.FC = () => {
                                             </div>
                                             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                                                 {images.map((image, index) => (
-                                                    <div key={`${image}-${index}`} className="group relative overflow-hidden rounded-lg border">
+                                                    <div key={`${image}-${index}`} className="group relative overflow-hidden rounded-xl border shadow-sm hover:shadow-md transition-shadow">
                                                         <AspectRatio ratio={4 / 3}>
                                                             <img
                                                                 src={getImageUrl(image) ?? image}
@@ -827,18 +941,19 @@ const HostCreateListing: React.FC = () => {
                                                                 className="h-full w-full object-cover transition-transform group-hover:scale-105"
                                                             />
                                                         </AspectRatio>
-                                                        <div className="absolute inset-0 bg-black/0 transition-all group-hover:bg-black/20" />
+                                                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                                                         <button
                                                             type="button"
                                                             onClick={() => handleRemoveImage(index)}
-                                                            className="absolute right-3 top-3 rounded-full bg-destructive/90 p-2 text-destructive-foreground opacity-0 transition-all hover:scale-110 group-hover:opacity-100"
+                                                            className="absolute right-3 top-3 rounded-full bg-destructive p-2 text-destructive-foreground opacity-0 transition-all hover:scale-110 group-hover:opacity-100 shadow-md"
                                                             aria-label="Remove image"
                                                         >
                                                             <Trash2 className="h-4 w-4" />
                                                         </button>
                                                         {index === 0 && (
                                                             <div className="absolute left-3 top-3">
-                                                                <Badge variant="secondary" className="bg-background/90 backdrop-blur-sm">
+                                                                <Badge className="bg-primary text-primary-foreground shadow-sm">
+                                                                    <Star className="h-3 w-3 mr-1" />
                                                                     Cover photo
                                                                 </Badge>
                                                             </div>
@@ -851,33 +966,50 @@ const HostCreateListing: React.FC = () => {
                                 </CardContent>
                             </Card>
 
-                            <div className="flex justify-between">
-                                <Button type="button" variant="outline" onClick={() => setActiveTab('details')}>
+                            <div className="flex justify-between items-center">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => setActiveTab('details')}
+                                    className="hover:border-primary hover:bg-primary/5"
+                                >
+                                    <ChevronLeft className="mr-2 h-4 w-4" />
                                     Back
                                 </Button>
-                                <Button type="button" onClick={() => setActiveTab('settings')}>
+                                <Button
+                                    type="button"
+                                    onClick={() => setActiveTab('settings')}
+                                    className="bg-primary hover:bg-primary/90"
+                                >
                                     Continue to Settings
+                                    <ChevronRight className="ml-2 h-4 w-4" />
                                 </Button>
                             </div>
                         </TabsContent>
 
-                        {/* Settings Tab */}
+                        {/* Settings Tab - Enhanced */}
                         <TabsContent value="settings" className="space-y-6">
-                            <Card>
-                                <CardHeader>
+                            <Card className="border-2">
+                                <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent border-b">
                                     <CardTitle className="flex items-center gap-2">
-                                        <CheckCircle2 className="h-5 w-5" />
+                                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                                            <CheckCircle2 className="h-5 w-5 text-primary" />
+                                        </div>
                                         Booking Settings
                                     </CardTitle>
                                 </CardHeader>
-                                <CardContent className="space-y-6">
+                                <CardContent className="space-y-6 pt-6">
+                                    {/* Instant booking switch - Enhanced */}
                                     <FormField
                                         control={form.control}
                                         name="instant_book"
                                         render={({ field }) => (
-                                            <FormItem className="flex items-center justify-between rounded-xl border p-6">
+                                            <FormItem className="flex items-center justify-between rounded-xl border p-6 hover:border-primary/50 hover:shadow-sm transition-all">
                                                 <div className="space-y-1">
-                                                    <FormLabel className="text-base">Instant booking</FormLabel>
+                                                    <FormLabel className="text-base flex items-center gap-2">
+                                                        <CheckCircle2 className="h-5 w-5 text-primary" />
+                                                        Instant booking
+                                                    </FormLabel>
                                                     <FormDescription>
                                                         Guests can book immediately without waiting for approval. Recommended for faster bookings.
                                                     </FormDescription>
@@ -886,20 +1018,24 @@ const HostCreateListing: React.FC = () => {
                                                     <Switch
                                                         checked={field.value}
                                                         onCheckedChange={field.onChange}
-                                                        className="scale-125"
+                                                        className="scale-125 data-[state=checked]:bg-primary"
                                                     />
                                                 </FormControl>
                                             </FormItem>
                                         )}
                                     />
 
+                                    {/* Publish listing switch - Enhanced */}
                                     <FormField
                                         control={form.control}
                                         name="is_active"
                                         render={({ field }) => (
-                                            <FormItem className="flex items-center justify-between rounded-xl border p-6">
+                                            <FormItem className="flex items-center justify-between rounded-xl border p-6 hover:border-primary/50 hover:shadow-sm transition-all">
                                                 <div className="space-y-1">
-                                                    <FormLabel className="text-base">Publish listing</FormLabel>
+                                                    <FormLabel className="text-base flex items-center gap-2">
+                                                        <Star className="h-5 w-5 text-primary" />
+                                                        Publish listing
+                                                    </FormLabel>
                                                     <FormDescription>
                                                         Make your listing visible to guests and available for booking.
                                                     </FormDescription>
@@ -908,7 +1044,7 @@ const HostCreateListing: React.FC = () => {
                                                     <Switch
                                                         checked={field.value}
                                                         onCheckedChange={field.onChange}
-                                                        className="scale-125"
+                                                        className="scale-125 data-[state=checked]:bg-primary"
                                                     />
                                                 </FormControl>
                                             </FormItem>
@@ -917,24 +1053,34 @@ const HostCreateListing: React.FC = () => {
                                 </CardContent>
                             </Card>
 
-                            <div className="rounded-lg bg-muted/50 p-6">
-                                <h4 className="font-semibold mb-2">Ready to publish?</h4>
-                                <p className="text-sm text-muted-foreground mb-4">
-                                    Review your information and click publish to make your listing live.
-                                </p>
+                            {/* Final action section - Enhanced */}
+                            <div className="rounded-xl border-2 p-6 bg-gradient-to-r from-primary/5 to-transparent">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                        <CheckCircle2 className="h-6 w-6 text-primary" />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-semibold">Ready to publish?</h4>
+                                        <p className="text-sm text-muted-foreground">
+                                            Review your information and click publish to make your listing live.
+                                        </p>
+                                    </div>
+                                </div>
                                 <div className="flex items-center gap-4">
                                     <Button
                                         type="button"
                                         variant="outline"
                                         onClick={() => setActiveTab('media')}
+                                        className="hover:border-primary hover:bg-primary/5"
                                     >
+                                        <ChevronLeft className="mr-2 h-4 w-4" />
                                         Back to photos
                                     </Button>
                                     <Button
                                         type="submit"
                                         size="lg"
                                         disabled={createMutation.isPending || propertyEmptyState}
-                                        className="flex-1"
+                                        className="flex-1 bg-primary hover:bg-primary/90 shadow-sm hover:shadow-md transition-shadow"
                                     >
                                         {createMutation.isPending ? (
                                             <>
@@ -942,7 +1088,10 @@ const HostCreateListing: React.FC = () => {
                                                 Publishing...
                                             </>
                                         ) : (
-                                            'Publish listing'
+                                            <>
+                                                <CheckCircle2 className="mr-2 h-4 w-4" />
+                                                Publish listing
+                                            </>
                                         )}
                                     </Button>
                                 </div>

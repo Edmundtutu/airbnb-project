@@ -26,7 +26,7 @@ class BookingConfirmedNotification extends BookingNotification
 
     public function getTitle(): string
     {
-        return 'Booking Confirmed! 🎉';
+        return 'Booking Confirmed!';
     }
 
     public function getMessage(): string
@@ -58,7 +58,7 @@ class BookingConfirmedNotification extends BookingNotification
         
         return (new MailMessage)
             ->subject("Booking Confirmed - {$this->booking->property?->name}")
-            ->greeting("Congratulations {$notifiable->name}! 🎉")
+            ->greeting("Congratulations {$notifiable->name}!")
             ->line("Your booking has been confirmed by {$hostName}.")
             ->line("---")
             ->line("**Property:** {$this->booking->property?->name}")
