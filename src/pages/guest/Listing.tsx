@@ -33,6 +33,9 @@ import { bookingService } from '@/services/bookingService';
 import { useWishlist } from '@/context/WishlistContext';
 import { useBooking } from '@/context/BookingContext';
 import { useToast } from '@/hooks/use-toast';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { TooltipArrow } from '@radix-ui/react-tooltip';
+import { useRequireAuth } from '@/utils/useRequireAuth';
 import { format, startOfDay, isBefore, isAfter, isWithinInterval, addDays } from 'date-fns';
 import type { ListingReservation } from '@/types/bookings';
 
@@ -48,6 +51,14 @@ const ListingPage: React.FC = () => {
   const { isListingWishlisted, toggleListingWishlist } = useWishlist();
   const { addItem } = useBooking();
   const { toast } = useToast();
+  const { requireAuth, isAuthenticated } = useRequireAuth();
+  const [showWishlistTooltip, setShowWishlistTooltip] = React.useState(false);
+  const [showBookTooltip, setShowBookTooltip] = React.useState(false);
+
+  const showTooltip = (setter: (v: boolean) => void) => {
+    setter(true);
+    window.setTimeout(() => setter(false), 2500);
+  };
 
   const { data: listingData, isLoading: loadingListing } = useQuery({
     enabled: !!id,
@@ -167,16 +178,22 @@ const ListingPage: React.FC = () => {
     }
 
     const nights = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
-    addItem(listing, nights, listing.property, checkInDate, checkOutDate, guests);
-    toast({
-      title: 'Added to bookings',
-      description: `${listing.name} has been added to your bookings`,
-    });
+
+    requireAuth(
+      () => {
+        addItem(listing, nights, listing.property, checkInDate, checkOutDate, guests);
+        toast({
+          title: 'Added to bookings',
+          description: `${listing.name} has been added to your bookings`,
+        });
+      },
+      { onBlocked: () => showTooltip(setShowBookTooltip) }
+    );
   };
 
   const handleToggleWishlist = () => {
     if (!listing) return;
-    toggleListingWishlist(listing);
+    requireAuth(() => toggleListingWishlist(listing), { onBlocked: () => showTooltip(setShowWishlistTooltip) });
   };
 
   const nextImage = () => {
@@ -292,19 +309,95 @@ const ListingPage: React.FC = () => {
 
               {/* Floating Action Buttons */}
               <div className="absolute top-4 right-4 flex gap-2">
+                {isAuthenticated ? (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className={`h-8 w-8 shadow-md rounded-full
+                                    transition-all duration-200 hover:scale-110 active:scale-95
+                                    backdrop-blur-sm
+                          ${isListingWishlisted(listing.id)
+                            ? 'bg-primary/20 text-primary hover:bg-primary/30 hover:text-primary border border-primary/30'
+                            : 'bg-white/90 text-muted-foreground hover:bg-primary/10 hover:text-primary border border-white/50'
+                          }`}
+                    onClick={handleToggleWishlist}
+                  >
+                    <Heart
+                      className={`h-4 w-4 transition-all ${isListingWishlisted(listing.id)
+                        ? 'fill-primary animate-pulse scale-110'
+                        : 'group-hover:stroke-primary group-hover:scale-110'
+                        }`}
+                    />
+                  </Button>
+                ) : (
+                  <Tooltip open={showWishlistTooltip} onOpenChange={setShowWishlistTooltip}>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className={`h-8 w-8 shadow-md rounded-full
+                                    transition-all duration-200 hover:scale-110 active:scale-95
+                                    backdrop-blur-sm
+                          ${isListingWishlisted(listing.id)
+                            ? 'bg-primary/20 text-primary hover:bg-primary/30 hover:text-primary border border-primary/30'
+                            : 'bg-white/90 text-muted-foreground hover:bg-primary/10 hover:text-primary border border-white/50'
+                          }`}
+                        onClick={handleToggleWishlist}
+                      >
+                        <Heart
+                          className={`h-4 w-4 transition-all ${isListingWishlisted(listing.id)
+                            ? 'fill-primary animate-pulse scale-110'
+                            : 'group-hover:stroke-primary group-hover:scale-110'
+                            }`}
+                        />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      className="bg-gradient-to-br from-emerald-500/15 to-teal-400/10 
+                              backdrop-blur-xl border border-emerald-400/30 
+                              shadow-lg shadow-emerald-500/10 
+                              text-emerald-900 font-medium
+                              px-4 py-3 rounded-lg
+                              animate-in fade-in-0 zoom-in-95
+                              data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
+                      side="top"
+                      align="center"
+                      sideOffset={6}
+                      collisionPadding={16}
+                    >
+                      {/* Radix's built-in arrow - it handles positioning automatically */}
+                      <TooltipArrow
+                        className="fill-emerald-400/30"
+                        width={12}
+                        height={6}
+                      />
+
+                      <div className="flex items-center gap-2">
+                        <div className="h-5 w-5 rounded-full bg-emerald-400/20 flex items-center justify-center">
+                          <svg
+                            className="h-3 w-3 text-emerald-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                            />
+                          </svg>
+                        </div>
+                        <span className="text-sm">You need to sign in first </span>
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="bg-white/90 hover:bg-white h-8 w-8 shadow-md"
-                  onClick={handleToggleWishlist}
-                >
-                  <Heart className={`h-4 w-4 ${isListingWishlisted(listing.id) ? 'fill-current text-red-500' : ''
-                    }`} />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="bg-white/90 hover:bg-white h-8 w-8 shadow-md"
+                  className="bg-white/90 hover:bg-white h-8 w-8 shadow-md rounded-full backdrop-blur-sm"
                 >
                   <Share className="h-4 w-4" />
                 </Button>
@@ -509,15 +602,58 @@ const ListingPage: React.FC = () => {
 
             {/* Book Button - Fixed at Bottom on Mobile, covers bottom nav */}
             <div className="fixed bottom-0 left-0 right-0 z-[60] bg-white/95 backdrop-blur-sm border-t p-4 shadow-2xl lg:static lg:border-0 lg:p-0 lg:z-auto lg:shadow-none lg:bottom-auto lg:bg-transparent lg:backdrop-blur-none">
-              <Button
-                size="lg"
-                className="w-full h-14 text-base font-bold bg-gradient-to-r from-red-imperial to-red-cinnabar hover:from-red-imperial/90 hover:to-red-cinnabar/90 shadow-xl"
-                onClick={handleBookNow}
-                disabled={!checkInDate || !checkOutDate}
-              >
-                <CalendarIcon className="h-5 w-5 mr-2" />
-                {!checkInDate || !checkOutDate ? 'Select dates to book' : 'Book Now'}
-              </Button>
+              <Tooltip open={showBookTooltip} onOpenChange={setShowBookTooltip}>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="lg"
+                    className="w-full h-14 text-base font-bold bg-gradient-to-r from-red-imperial to-red-cinnabar hover:from-red-imperial/90 hover:to-red-cinnabar/90 shadow-xl"
+                    onClick={handleBookNow}
+                    disabled={!checkInDate || !checkOutDate}
+                  >
+                    <CalendarIcon className="h-5 w-5 mr-2" />
+                    {!checkInDate || !checkOutDate ? 'Select dates to book' : 'Book Now'}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent
+                  className="bg-gradient-to-br from-emerald-500/15 to-teal-400/10 
+                            backdrop-blur-xl border border-emerald-400/30 
+                            shadow-lg shadow-emerald-500/10 
+                            text-emerald-900 font-medium
+                            px-4 py-3 rounded-lg
+                            animate-in fade-in-0 zoom-in-95
+                            data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
+                  side="top"
+                  align="center"
+                  sideOffset={6}
+                  collisionPadding={16}
+                >
+                  {/* Radix's built-in arrow - it handles positioning automatically */}
+                  <TooltipArrow
+                    className="fill-emerald-400/30"
+                    width={12}
+                    height={6}
+                  />
+
+                  <div className="flex items-center gap-2">
+                    <div className="h-5 w-5 rounded-full bg-emerald-400/20 flex items-center justify-center">
+                      <svg
+                        className="h-3 w-3 text-emerald-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                        />
+                      </svg>
+                    </div>
+                    <span className="text-sm">You need to sign in first </span>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
             </div>
           </div>
 

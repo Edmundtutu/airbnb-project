@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Listing } from '@/types';
+import { useAuth } from '@/context/AuthContext';
 
 interface WishlistContextType {
   wishlistedListings: Listing[];
@@ -11,8 +12,9 @@ interface WishlistContextType {
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
 
-export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const WishlistProvider: React.FC<{ children: React.ReactNode; allowGuestWrites?: boolean }> = ({ children, allowGuestWrites = false }) => {
   const [wishlistedListings, setWishlistedListings] = useState<Listing[]>([]);
+  const { isAuthenticated } = useAuth();
 
   // Load wishlisted listings from localStorage on mount
   useEffect(() => {
@@ -32,6 +34,11 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, [wishlistedListings]);
 
   const toggleListingWishlist = (listing: Listing) => {
+    if (!isAuthenticated && !allowGuestWrites) {
+      console.warn('Blocked toggleListingWishlist: user not authenticated and guest writes disabled');
+      return;
+    }
+
     setWishlistedListings(prev => {
       const exists = prev.find(item => item.id === listing.id);
       if (exists) {
@@ -43,6 +50,10 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
   
   const removeListingFromFavorites = (listingId: string) => {
+    if (!isAuthenticated && !allowGuestWrites) {
+      console.warn('Blocked removeListingFromFavorites: user not authenticated and guest writes disabled');
+      return;
+    }
     setWishlistedListings(prev => prev.filter(item => item.id !== listingId));
   };
 
@@ -51,6 +62,10 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const clearWishlist = () => {
+    if (!isAuthenticated && !allowGuestWrites) {
+      console.warn('Blocked clearWishlist: user not authenticated and guest writes disabled');
+      return;
+    }
     setWishlistedListings([]);
   };
 

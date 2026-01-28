@@ -7,6 +7,9 @@ import { MapPin, Star, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Listing } from '@/types';
 import { useWishlist } from '@/context/WishlistContext';
 import { useToast } from '@/hooks/use-toast';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { TooltipArrow } from '@radix-ui/react-tooltip';
+import { useRequireAuth } from '@/utils/useRequireAuth';
 import { getImageUrl } from '@/utils/helperfunctions';
 
 type ListingCardProps = {
@@ -44,26 +47,34 @@ const ListingCard: React.FC<ListingCardProps> = ({
 
   const { isListingWishlisted, toggleListingWishlist } = useWishlist();
   const { toast } = useToast();
-  
+  const { requireAuth, isAuthenticated } = useRequireAuth();
+  const [showWishlistTooltip, setShowWishlistTooltip] = useState(false);
+
+  const showTooltip = () => {
+    setShowWishlistTooltip(true);
+    window.setTimeout(() => setShowWishlistTooltip(false), 2500);
+  };
   // Carousel state
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const handleToggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const wasWishlisted = isListingWishlisted(actualListing.id);
-    toggleListingWishlist(actualListing);
-    toast({
-      title: wasWishlisted ? 'Removed from wishlist' : 'Added to wishlist',
-      description: wasWishlisted ? 'Listing removed from your wishlist' : 'Listing added to your wishlist',
-    });
+    requireAuth(() => {
+      const wasWishlisted = isListingWishlisted(actualListing.id);
+      toggleListingWishlist(actualListing);
+      toast({
+        title: wasWishlisted ? 'Removed from wishlist' : 'Added to wishlist',
+        description: wasWishlisted ? 'Listing removed from your wishlist' : 'Listing added to your wishlist',
+      });
+    }, { onBlocked: showTooltip });
   };
 
   // Carousel navigation
   const nextImage = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setCurrentImageIndex((prev) => 
+    setCurrentImageIndex((prev) =>
       prev === (actualListing.images?.length || 1) - 1 ? 0 : prev + 1
     );
   };
@@ -71,7 +82,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
   const prevImage = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setCurrentImageIndex((prev) => 
+    setCurrentImageIndex((prev) =>
       prev === 0 ? (actualListing.images?.length || 1) - 1 : prev - 1
     );
   };
@@ -108,7 +119,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </Link>
-                
+
                 {/* Brand Status Badges */}
                 {isVerified && (
                   <div className="absolute top-2 left-2 z-10">
@@ -119,7 +130,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
                     </Badge>
                   </div>
                 )}
-                
+
                 {isPopular && (
                   <div className="absolute top-2 right-2 z-10">
                     <Badge className="bg-gradient-to-r from-primary/90 to-primary text-primary-foreground 
@@ -130,7 +141,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
                     </Badge>
                   </div>
                 )}
-                
+
                 {/* Carousel Navigation Arrows with brand colors */}
                 {hasMultipleImages && (
                   <>
@@ -175,11 +186,10 @@ const ListingCard: React.FC<ListingCardProps> = ({
                 <button
                   key={index}
                   onClick={(e) => goToImage(e, index)}
-                  className={`h-1.5 w-1.5 rounded-full transition-all duration-200 ${
-                    index === currentImageIndex 
-                      ? 'bg-primary shadow-[0_0_4px_hsl(var(--primary))] scale-125' 
-                      : 'bg-white/80 hover:bg-primary/80 hover:scale-110'
-                  }`}
+                  className={`h-1.5 w-1.5 rounded-full transition-all duration-200 ${index === currentImageIndex
+                    ? 'bg-primary shadow-[0_0_4px_hsl(var(--primary))] scale-125'
+                    : 'bg-white/80 hover:bg-primary/80 hover:scale-110'
+                    }`}
                 />
               ))}
             </div>
@@ -187,26 +197,90 @@ const ListingCard: React.FC<ListingCardProps> = ({
 
           {/* Wishlist Button with enhanced brand interaction */}
           {actualShowWishlistButton && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className={`absolute top-3 right-3 h-8 w-8 shadow-md rounded-full
-                transition-all duration-200 hover:scale-110 active:scale-95
-                ${
-                  isListingWishlisted(actualListing.id) 
-                    ? 'bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary' 
-                    : 'bg-white/90 text-muted-foreground hover:bg-primary/10 hover:text-primary'
-                }`}
-              onClick={handleToggleWishlist}
-            >
-              <Heart
-                className={`h-4 w-4 transition-all ${
-                  isListingWishlisted(actualListing.id) 
-                    ? 'fill-primary animate-pulse' 
-                    : 'group-hover:stroke-primary'
-                }`}
-              />
-            </Button>
+            isAuthenticated ? (
+              <Button
+                variant="ghost"
+                size="icon"
+                className={`absolute top-3 right-3 h-9 w-9 shadow-md rounded-full
+                  transition-all duration-200 hover:scale-110 active:scale-95
+                  backdrop-blur-sm
+                    ${isListingWishlisted(actualListing.id)
+                      ? 'bg-primary/20 text-primary hover:bg-primary/30 hover:text-primary border border-primary/30'
+                      : 'bg-white/90 text-muted-foreground hover:bg-primary/10 hover:text-primary border border-white/50'
+                    }`}
+                onClick={handleToggleWishlist}
+              >
+                <Heart
+                  className={`h-4 w-4 transition-all ${isListingWishlisted(actualListing.id)
+                      ? 'fill-primary animate-pulse scale-110'
+                      : 'group-hover:stroke-primary group-hover:scale-110'
+                    }`}
+                />
+              </Button>
+            ) : (
+              <Tooltip open={showWishlistTooltip} onOpenChange={setShowWishlistTooltip}>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className={`absolute top-3 right-3 h-9 w-9 shadow-md rounded-full
+                    transition-all duration-200 hover:scale-110 active:scale-95
+                    backdrop-blur-sm
+                      ${isListingWishlisted(actualListing.id)
+                        ? 'bg-primary/20 text-primary hover:bg-primary/30 hover:text-primary border border-primary/30'
+                        : 'bg-white/90 text-muted-foreground hover:bg-primary/10 hover:text-primary border border-white/50'
+                      }`}
+                    onClick={handleToggleWishlist}
+                  >
+                    <Heart
+                      className={`h-4 w-4 transition-all ${isListingWishlisted(actualListing.id)
+                          ? 'fill-primary animate-pulse scale-110'
+                          : 'group-hover:stroke-primary group-hover:scale-110'
+                        }`}
+                    />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent
+                  className="bg-gradient-to-br from-emerald-500/15 to-teal-400/10 
+                              backdrop-blur-xl border border-emerald-400/30 
+                              shadow-lg shadow-emerald-500/10 
+                              text-emerald-900 font-medium
+                              px-4 py-3 rounded-lg
+                              animate-in fade-in-0 zoom-in-95
+                              data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
+                  side="top"
+                  align="center"
+                  sideOffset={6}
+                  collisionPadding={16}
+                >
+                  {/* Radix's built-in arrow - it handles positioning automatically */}
+                  <TooltipArrow
+                    className="fill-emerald-400/30"
+                    width={12}
+                    height={6}
+                  />
+
+                  <div className="flex items-center gap-2">
+                    <div className="h-5 w-5 rounded-full bg-emerald-400/20 flex items-center justify-center">
+                      <svg
+                        className="h-3 w-3 text-emerald-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                        />
+                      </svg>
+                    </div>
+                    <span className="text-sm">You need to sign in first </span>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            )
           )}
 
           {/* Price and Rating Container with brand emphasis */}
@@ -262,7 +336,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
             <div className="flex items-center gap-1 pt-1">
               <div className="flex -space-x-1">
                 {actualListing.amenities.slice(0, 3).map((amenity, index) => (
-                  <div 
+                  <div
                     key={index}
                     className="h-5 w-5 rounded-full bg-primary/10 border border-primary/20 
                       flex items-center justify-center text-[8px] font-bold text-primary"

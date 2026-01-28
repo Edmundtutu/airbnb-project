@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { Listing, Property } from '@/types';
+import { useAuth } from '@/context/AuthContext';
 
 export interface BookingAddOn {
   id: string;
@@ -183,11 +184,13 @@ export const useCart = useBooking;
 
 const BOOKING_STORAGE_KEY = 'airbnb-booking';
 
-export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const BookingProvider: React.FC<{ children: React.ReactNode; allowGuestWrites?: boolean }> = ({ children, allowGuestWrites = false }) => {
   const [state, dispatch] = useReducer(bookingReducer, {
     items: [],
     isLoading: true,
   });
+
+  const { isAuthenticated } = useAuth();
 
   // Load booking from localStorage on mount
   useEffect(() => {
@@ -231,6 +234,10 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, [state.items, state.isLoading]);
 
   const addItem = (listing: Listing, nights: number, property: Property, checkInDate: Date, checkOutDate: Date, guests: number) => {
+    if (!isAuthenticated && !allowGuestWrites) {
+      console.warn('Blocked addItem: user not authenticated and guest writes disabled');
+      return;
+    }
     const bookingItem: BookingItem = {
       id: `${listing.id}-${Date.now()}`,
       listing,
@@ -246,10 +253,19 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const removeItem = (itemId: string) => {
+    if (!isAuthenticated && !allowGuestWrites) {
+      console.warn('Blocked removeItem: user not authenticated and guest writes disabled');
+      return;
+    }
     dispatch({ type: 'REMOVE_ITEM', payload: itemId });
   };
 
   const updateNights = (itemId: string, nights: number) => {
+    if (!isAuthenticated && !allowGuestWrites) {
+      console.warn('Blocked updateNights: user not authenticated and guest writes disabled');
+      return;
+    }
+
     if (nights <= 0) {
       removeItem(itemId);
     } else {
@@ -258,10 +274,18 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const clearBooking = () => {
+    if (!isAuthenticated && !allowGuestWrites) {
+      console.warn('Blocked clearBooking: user not authenticated and guest writes disabled');
+      return;
+    }
     dispatch({ type: 'CLEAR_BOOKING' });
   };
 
   const clearPropertyItems = (propertyId: string) => {
+    if (!isAuthenticated && !allowGuestWrites) {
+      console.warn('Blocked clearPropertyItems: user not authenticated and guest writes disabled');
+      return;
+    }
     dispatch({ type: 'CLEAR_PROPERTY_ITEMS', payload: propertyId });
   };
 
@@ -333,14 +357,27 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       discountValue,
       addedAt: new Date(),
     };
+    if (!isAuthenticated && !allowGuestWrites) {
+      console.warn('Blocked addAddOn: user not authenticated and guest writes disabled');
+      return;
+    }
     dispatch({ type: 'ADD_ADDON', payload: { itemId, addOn } });
   };
 
   const removeAddOn: BookingContextType['removeAddOn'] = (itemId, addOnId) => {
+    if (!isAuthenticated && !allowGuestWrites) {
+      console.warn('Blocked removeAddOn: user not authenticated and guest writes disabled');
+      return;
+    }
     dispatch({ type: 'REMOVE_ADDON', payload: { itemId, addOnId } });
   };
 
   const updateAddOnNights: BookingContextType['updateAddOnNights'] = (itemId, addOnId, nights) => {
+    if (!isAuthenticated && !allowGuestWrites) {
+      console.warn('Blocked updateAddOnNights: user not authenticated and guest writes disabled');
+      return;
+    }
+
     if (nights <= 0) {
       dispatch({ type: 'REMOVE_ADDON', payload: { itemId, addOnId } });
     } else {

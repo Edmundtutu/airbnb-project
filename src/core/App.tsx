@@ -10,6 +10,7 @@ import ErrorBoundary from '../components/ErrorBoundary';
 import AppRoutes from '../routes/AppRoutes';
 import '../styles/index.css';
 import { ChatRoomsProvider } from '@/context/ChatRoomsContext';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,13 +28,15 @@ function App() {
         <AuthProvider>
           <NotificationProvider>
             <ChatRoomsProvider>
-              <BookingProvider>
-                <WishlistProvider>
+              <BookingProvider allowGuestWrites={false}>
+                <WishlistProvider allowGuestWrites={false}>
                   <Router>
-                    <div className="App min-h-screen bg-background">
-                      <AppRoutes />
-                      <Toaster />
-                    </div>
+                      <TooltipProvider delayDuration={0}>
+                        <div className="App min-h-screen bg-background">
+                          <AppRoutes />
+                          <Toaster />
+                        </div>
+                      </TooltipProvider>
                   </Router>
                 </WishlistProvider>
               </BookingProvider>
