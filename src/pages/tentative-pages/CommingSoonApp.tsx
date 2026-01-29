@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Facebook, Twitter, Instagram, Home, MapPin, Building, Check, Mail, Phone, MessageSquare, MessageCircle } from 'lucide-react';
-import '../styles/CommingSoonPage.css';
+import { Link } from 'react-router-dom';
+import '../../styles/CommingSoonPage.css';
 import { SubscriberService } from '@/services/subsriberService';
 
 const ComingSoonPage = () => {
@@ -220,19 +221,19 @@ const ComingSoonPage = () => {
             {/* Features section outside the pill card */}
             <div className="features-section">
                 <div className="features-container">
-                    <div className="feature-item">
+                    <Link to="/explore/discovery" className="feature-item">
                         <div className="feature-icon">
                             <Home size={32} />
                         </div>
-                        <span>Premium Rentals</span>
-                    </div>
-                    <div className="feature-item">
+                        <span>Premium Stays</span>
+                    </Link>
+                    <Link to="/explore/map" className="feature-item">
                         <div className="feature-icon">
                             <MapPin size={32} />
                         </div>
                         <span>Prime Locations</span>
-                    </div>
-                    <div className="feature-item">
+                    </Link>
+                    <Link to="/explore/properties" className="feature-item">
                         <div className="feature-icon">
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -241,7 +242,7 @@ const ComingSoonPage = () => {
                             </svg>
                         </div>
                         <span>Exclusive Residences</span>
-                    </div>
+                    </Link>
                 </div>
             </div>
 

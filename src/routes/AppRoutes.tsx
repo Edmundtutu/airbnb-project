@@ -38,6 +38,21 @@ import ChatRoomPage from '@/pages/chats/ChatRoomPage';
 import NotificationsPage from '@/pages/NotificationsPage';
 import SettingsPage from '@/pages/SettingsPage';
 
+
+// Tentative to production pages
+import ExploerDiscover from '@/pages/tentative-pages/Discover';
+import ExploreMap from '@/pages/tentative-pages/Map';
+import ExploreProperties from '@/pages/tentative-pages/Properties';
+import ExplorePropertyDetails from '@/pages/tentative-pages/nested/PropertyDetails';
+import ExploreListing from '@/pages/tentative-pages/nested/Listing';
+import RegisterHost from '@/pages/tentative-pages/pre-onboard/RegisterHost';
+import PreOnboardingCreateListing from '@/pages/tentative-pages/pre-onboard/CreateListing';
+
+// Coming Soon Page
+import CommingSoonPage from '@/pages/tentative-pages/CommingSoonApp';
+
+
+
 // Route Guards
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -107,9 +122,11 @@ const AppRoutes: React.FC = () => {
 
       {/* Public Routes - Allow guests */}
       <Route path="/" element={
-        <MainLayout>
-          <Discover />
-        </MainLayout>
+        import.meta.env.VITE_SHOW_COMMING_SOON === "true" ? <CommingSoonPage /> : (
+          <MainLayout>
+            <Discover />
+          </MainLayout>
+        )
       } />
       <Route path="/feed" element={
         <MainLayout rightPanel={
@@ -236,6 +253,23 @@ const AppRoutes: React.FC = () => {
 
       {/* Property Details Route */}
       <Route path="/properties/:propertyId" element={<PropertyDetails />} />
+
+
+      {/* Tentative to production routes */}
+      <Route 
+        path="/explore/discovery" 
+        element={
+          <PublicRoute>
+            <ExploerDiscover />
+          </PublicRoute>
+        } 
+      />
+      <Route path="/explore/map" element={<ExploreMap />} />
+      <Route path="/explore/properties" element={<ExploreProperties />} />
+      <Route path="/explore/properties/:propertyId" element={<ExplorePropertyDetails />} />
+      <Route path="/explore/listing/:id" element={<ExploreListing />} />
+      <Route path="/pre-onboard/register-host" element={<RegisterHost />} />
+      <Route path="/pre-onboard/create-listing" element={<PreOnboardingCreateListing />} />
 
       {/* Catch all route */}
       <Route path="*" element={<Navigate to="/" replace />} />
