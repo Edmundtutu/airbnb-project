@@ -50,6 +50,7 @@ import PreOnboardingCreateListing from '@/pages/tentative-pages/pre-onboard/Crea
 
 // Coming Soon Page
 import CommingSoonPage from '@/pages/tentative-pages/CommingSoonApp';
+import PreOnboardingHostListings from '@/pages/tentative-pages/pre-onboard/HostListings';
 
 
 
@@ -60,10 +61,10 @@ interface ProtectedRouteProps {
   layout: 'main' | 'host';
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  children, 
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  children,
   requiredRole,
-  layout 
+  layout
 }) => {
   const { user, isLoading, isAuthenticated } = useAuth();
 
@@ -108,6 +109,14 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 const AppRoutes: React.FC = () => {
   return (
     <Routes>
+      {/* Public Routes - Allow guests */}
+      <Route path="/" element={
+        import.meta.env.VITE_SHOW_COMMING_SOON === "true" ? <CommingSoonPage /> : (
+          <MainLayout>
+            <Discover />
+          </MainLayout>
+        )
+      } />
       {/* Public Routes */}
       <Route path="/login" element={
         <PublicRoute>
@@ -120,14 +129,6 @@ const AppRoutes: React.FC = () => {
         </PublicRoute>
       } />
 
-      {/* Public Routes - Allow guests */}
-      <Route path="/" element={
-        import.meta.env.VITE_SHOW_COMMING_SOON === "true" ? <CommingSoonPage /> : (
-          <MainLayout>
-            <Discover />
-          </MainLayout>
-        )
-      } />
       <Route path="/feed" element={
         <MainLayout rightPanel={
           <Suspense fallback={<div className="animate-pulse h-32 bg-muted rounded-lg" />}>
@@ -147,7 +148,7 @@ const AppRoutes: React.FC = () => {
           <PropertyMapPage />
         </MainLayout>
       } />
-      
+
       {/* Protected Guest Routes */}
       <Route path="/bookings" element={
         <ProtectedRoute requiredRole={['guest']} layout="main">
@@ -256,21 +257,69 @@ const AppRoutes: React.FC = () => {
 
 
       {/* Tentative to production routes */}
-      <Route 
-        path="/explore/discovery" 
+      <Route
+        path="/explore/discovery"
+        element={
+          <MainLayout>
+            <ExploerDiscover />
+          </MainLayout>
+        }
+      />
+      <Route
+        path="/explore/map"
+        element={
+          <MainLayout>
+            <ExploreMap />
+          </MainLayout>
+        }
+      />
+      <Route
+        path="/explore/properties"
+        element={
+          <MainLayout>
+            <ExploreProperties />
+          </MainLayout>
+        }
+      />
+      <Route
+        path="/explore/properties/:propertyId"
+        element={
+          <MainLayout>
+            <ExplorePropertyDetails />
+          </MainLayout>
+        }
+      />
+      <Route
+        path="/explore/listing/:id"
+        element={
+          <MainLayout>
+            <ExploreListing />
+          </MainLayout>
+        }
+      />
+      <Route
+        path="/pre-onboard/register-host"
         element={
           <PublicRoute>
-            <ExploerDiscover />
-          </PublicRoute>
-        } 
+            <RegisterHost />
+          </PublicRoute>}
       />
-      <Route path="/explore/map" element={<ExploreMap />} />
-      <Route path="/explore/properties" element={<ExploreProperties />} />
-      <Route path="/explore/properties/:propertyId" element={<ExplorePropertyDetails />} />
-      <Route path="/explore/listing/:id" element={<ExploreListing />} />
-      <Route path="/pre-onboard/register-host" element={<RegisterHost />} />
-      <Route path="/pre-onboard/create-listing" element={<PreOnboardingCreateListing />} />
-
+      <Route
+        path="/pre-onboard/create-listing"
+        element={
+          <ProtectedRoute requiredRole={['host']} layout="main">
+            <PreOnboardingCreateListing />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/pre-onboard/host-listings"
+        element={
+          <ProtectedRoute requiredRole={['host']} layout="main">
+            <PreOnboardingHostListings />
+          </ProtectedRoute>
+        }
+      />
       {/* Catch all route */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

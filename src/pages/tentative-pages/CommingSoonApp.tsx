@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Facebook, Twitter, Instagram, Home, MapPin, Building, Check, Mail, Phone, MessageSquare, MessageCircle } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Home, MapPin, Building, Check, Mail, Phone, MessageSquare, MessageCircle, Lock, Megaphone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import '../../styles/CommingSoonPage.css';
 import { SubscriberService } from '@/services/subsriberService';
@@ -32,7 +32,7 @@ const ComingSoonPage = () => {
             animationFrameId = requestAnimationFrame(animateGears);
         };
 
-        animateGears();
+        animateGears(); 
 
         return () => {
             if (animationFrameId) {
@@ -67,7 +67,7 @@ const ComingSoonPage = () => {
     };
 
     return (
-        <div className="coming-soon-container">
+        <div className="coming-soon-container bg-gradient-to-br from-primary/15 to-accent/5">
             {/* Background with subtle animation */}
             <div className="background-animation">
                 <div className="floating-shape shape-1"></div>
@@ -161,12 +161,13 @@ const ComingSoonPage = () => {
 
                 {/* Content section */}
                 <div className="card-content">
-                    <h2 className="tagline">
-                        Your spot is your <span className="cava-highlight">Cava</span>.
-                    </h2>
+                    <div className="tagline-container">
+                        <h2 className="tagline">Feel at <span className="cava-highlight">Home</span></h2>
+                        <p className="tagline-subtext italic">Travel effortlessly when you prepare with us.</p>
+                    </div>
 
                     <p className="description">
-                        Discover premium short-term rentals and exclusive residences across all regions in Uganda.
+                        Discover short-term rentals at exceptional rates, reserve your stay and enjoy quality comfort.
                     </p>
 
                     {/* Subscription form */}
@@ -246,6 +247,50 @@ const ComingSoonPage = () => {
                 </div>
             </div>
 
+            {/* Engagement Section - Become a Host */}
+            <div className="engagement-section">
+                <div className="engagement-container">
+                    <div className="engagement-content">
+                        <h3 className="engagement-title">
+                            Got a beatiful <span className="cava-highlight">space</span> for short-term renting ?
+                        </h3>
+                        <p className="engagement-subtitle">
+                            Join our community of hosts and win over a discerning audience for your space
+                        </p>
+
+                        {/* Interactive button with musical hover effect */}
+                        <div className="engagement-action">
+                            <Link
+                                to="/pre-onboard/register-host"
+                                className="host-invitation-btn"
+                                onMouseEnter={(e) => {
+                                    // Add subtle animation on hover
+                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                }}
+                            >
+                                <span className="btn-text">Explore Hosting</span>
+                                <span className="btn-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                        <path d="M12 5L19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                </span>
+                            </Link>
+
+                            {/* Subtle hint text */}
+                            <p className="engagement-hint">
+                                <span className="hint-icon">♪</span>
+                                Early partners receive exclusive benefits
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
             {/* Rich footer */}
             <footer className="footer">
                 <div className="footer-content">
@@ -255,9 +300,47 @@ const ComingSoonPage = () => {
                             <span className="footer-cava">Cava</span>
                             <span className="footer-yo">Yo</span>
                         </div>
-                        <p className="footer-motto">We reserve you the Most Chill stays.</p>
+                        <p className="footer-motto">We are your go-to application for verified short-term stays in Uganda.</p>
+                        <div className="brand-for">
+                            <span className="for-label">For:</span>
+                            <ul className="brand-points">
+                                <li>Unique experiences for travelers</li>
+                                <li>Partner &amp; host support</li>
+                                <li>Convenience for hosts and guests</li>
+                            </ul>
+                        </div>
                     </div>
 
+                    {/* Quick Links */}
+                    <div className="footer-quicklinks">
+                        <h4 className="contact-heading">Quick Links</h4>
+                        <ul className="quicklinks-list">
+                            <li>
+                                <Link to="/" className="quicklink">
+                                    <Home size={16} />
+                                    <span>Home</span>
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/explore/discovery" className="quicklink">
+                                    <MapPin size={16} />
+                                    <span>Explore</span>
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/pre-onboard/register-host" className=" quicklink">
+                                    <Building size={16} />
+                                    <span>Host</span>
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/promote" className="quicklink">
+                                    <Megaphone  size={16} />
+                                    <span>Promote</span>
+                                </Link>
+                            </li>
+                        </ul>
+                    </div>
                     {/* Contact Information */}
                     <div className="footer-contact">
                         <h4 className="contact-heading">Get in Touch</h4>
@@ -270,18 +353,33 @@ const ComingSoonPage = () => {
                                 <Phone size={16} />
                                 <div className="phone-numbers">
                                     <span>+256 763 977921</span>
+                                </div>
+                            </div>
+                            <div className="contact-item">
+                                <Phone size={16} />
+                                <div className="phone-numbers">
                                     <span>+256 708 964971</span>
                                 </div>
                             </div>
+                            <a 
+                                href="https://wa.me/256763977921?text=Hi%20there%2C%20I%27d%20like%20to%20inquire%20about%20CavaYo"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="contact-item"
+                            >
+                                <MessageCircle size={16} />
+                                <span>Live Chat Support</span>
+                            </a>
                         </div>
                     </div>
+
 
                     {/* Social Links */}
                     <div className="footer-social">
                         <h4 className="social-heading">Lets Connect</h4>
                         <div className="social-links">
                             <a href="mailto:info@yocava.com"
-                                className="social-link" 
+                                className="social-link"
                                 aria-label="Email">
                                 <Mail size={18} />
                             </a>
@@ -292,15 +390,15 @@ const ComingSoonPage = () => {
                                 rel="noopener noreferrer">
                                 <MessageSquare size={18} />
                             </a>
-                            <a href="https://x.com/CavaYo256?t=tkcV6CmXPGLwcV6qUOhfbg&s=08" 
-                                className="social-link" 
+                            <a href="https://x.com/CavaYo256?t=tkcV6CmXPGLwcV6qUOhfbg&s=08"
+                                className="social-link"
                                 aria-label="Twitter"
                                 target="_blank"
                                 rel="noopener noreferrer">
                                 <Twitter size={18} />
                             </a>
-                            <a href="https://www.instagram.com/yo.cava?igsh=MXQwY3BweGd6eTBldA%3D%3D" 
-                                className="social-link" 
+                            <a href="https://www.instagram.com/yo.cava?igsh=MXQwY3BweGd6eTBldA%3D%3D"
+                                className="social-link"
                                 aria-label="Instagram"
                                 target="_blank"
                                 rel="noopener noreferrer">
@@ -308,12 +406,12 @@ const ComingSoonPage = () => {
                             </a>
                         </div>
                         <p className="social-note">Stay updated with our latest news and progress!</p>
-                        
+
                     </div>
                 </div>
 
                 <div className="footer-bottom">
-                    <p>&copy; {new Date().getFullYear()} CavaYo. All rights reserved.</p>
+                    <p>&copy; CavaYo.</p>
                 </div>
             </footer>
         </div>

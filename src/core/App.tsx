@@ -11,6 +11,7 @@ import AppRoutes from '../routes/AppRoutes';
 import '../styles/index.css';
 import { ChatRoomsProvider } from '@/context/ChatRoomsContext';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import InstallPrompt from '@/components/pwa/InstallPrompt';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -35,6 +36,7 @@ function App() {
                         <div className="App min-h-screen bg-background">
                           <AppRoutes />
                           <Toaster />
+                          <InstallPrompt />
                         </div>
                       </TooltipProvider>
                   </Router>
