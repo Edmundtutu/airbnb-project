@@ -19,9 +19,10 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
           <h1 className="text-3xl font-bold text-primary">CavaYo</h1>
           <p className="text-muted-foreground mt-2">Find your perfect stay</p>
         </div>
-        <div className="bg-yellowcard rounded-lg shadow-lg p-6 border">
+        {children}
+        {/* <div className="bg-yellowcard rounded-lg shadow-lg p-6 border">
           {children}
-        </div>
+        </div> */}
       </div>
     </div>
   );

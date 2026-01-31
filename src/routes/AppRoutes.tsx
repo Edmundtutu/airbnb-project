@@ -43,15 +43,10 @@ import SettingsPage from '@/pages/SettingsPage';
 import ExploerDiscover from '@/pages/tentative-pages/Discover';
 import ExploreMap from '@/pages/tentative-pages/Map';
 import ExploreProperties from '@/pages/tentative-pages/Properties';
-import ExplorePropertyDetails from '@/pages/tentative-pages/nested/PropertyDetails';
-import ExploreListing from '@/pages/tentative-pages/nested/Listing';
 import RegisterHost from '@/pages/tentative-pages/pre-onboard/RegisterHost';
-import PreOnboardingCreateListing from '@/pages/tentative-pages/pre-onboard/CreateListing';
-
+import PendingReview from '@/pages/tentative-pages/pre-onboard/PendingReview';
 // Coming Soon Page
 import CommingSoonPage from '@/pages/tentative-pages/CommingSoonApp';
-import PreOnboardingHostListings from '@/pages/tentative-pages/pre-onboard/HostListings';
-
 
 
 // Route Guards
@@ -82,6 +77,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   if (requiredRole && user && !requiredRole.includes(user.role)) {
     return <Navigate to="/" replace />;
+  }
+
+  // Check if host has verified property for host routes
+  if (layout === 'host' && user?.role === 'host') {
+    if (user.can_access_host_dashboard === false) {
+      return <Navigate to="/pre-onboard/pending-review" replace />;
+    }
   }
 
   const Layout = layout === 'host' ? HostLayout : MainLayout;
@@ -252,8 +254,25 @@ const AppRoutes: React.FC = () => {
         }
       />
 
+      {/* Properties Index Route */}
+      <Route 
+        path="/properties" 
+        element={
+          <MainLayout>
+            <ExploreProperties />
+          </MainLayout>
+        } 
+      />
+
       {/* Property Details Route */}
-      <Route path="/properties/:propertyId" element={<PropertyDetails />} />
+      <Route 
+        path="/properties/:propertyId" 
+        element={
+          <MainLayout>
+            <PropertyDetails />
+          </MainLayout>
+        } 
+      />
 
 
       {/* Tentative to production routes */}
@@ -282,22 +301,6 @@ const AppRoutes: React.FC = () => {
         }
       />
       <Route
-        path="/explore/properties/:propertyId"
-        element={
-          <MainLayout>
-            <ExplorePropertyDetails />
-          </MainLayout>
-        }
-      />
-      <Route
-        path="/explore/listing/:id"
-        element={
-          <MainLayout>
-            <ExploreListing />
-          </MainLayout>
-        }
-      />
-      <Route
         path="/pre-onboard/register-host"
         element={
           <PublicRoute>
@@ -305,10 +308,18 @@ const AppRoutes: React.FC = () => {
           </PublicRoute>}
       />
       <Route
+        path="/pre-onboard/pending-review"
+        element={
+          <ProtectedRoute requiredRole={['host']} layout="main">
+            <PendingReview />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/pre-onboard/create-listing"
         element={
           <ProtectedRoute requiredRole={['host']} layout="main">
-            <PreOnboardingCreateListing />
+            <HostCreateListing />
           </ProtectedRoute>
         }
       />
@@ -316,7 +327,7 @@ const AppRoutes: React.FC = () => {
         path="/pre-onboard/host-listings"
         element={
           <ProtectedRoute requiredRole={['host']} layout="main">
-            <PreOnboardingHostListings />
+            <HostListings />
           </ProtectedRoute>
         }
       />

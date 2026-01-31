@@ -27,6 +27,7 @@ export interface AuthUser {
   following: number;
   isInfluencer: boolean; // computed: followers >= INFLUENCER_THRESHOLD
   verified: boolean;
+  can_access_host_dashboard?: boolean; // for hosts: true if has verified property
   createdAt: Date;
 }
 

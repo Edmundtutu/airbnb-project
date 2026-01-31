@@ -17,14 +17,22 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => ['required', 'confirmed', Password::defaults()],
-            'role' => 'sometimes|in:customer,vendor',
+            'role' => 'sometimes|in:guest,host,customer,vendor',
         ]);
+
+        // Map legacy role values to new values for backward compatibility
+        $role = $data['role'] ?? 'guest';
+        if ($role === 'customer') {
+            $role = 'guest';
+        } elseif ($role === 'vendor') {
+            $role = 'host';
+        }
 
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'role' => $data['role'] ?? 'customer',
+            'role' => $role,
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -50,11 +58,18 @@ class AuthController extends Controller
         $user = $request->user();
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json([
+        $response = [
             'user' => $user,
             'access_token' => $token,
             'token_type' => 'Bearer',
-        ]);
+        ];
+
+        // Add host dashboard access flag for hosts
+        if ($user->isHost()) {
+            $response['can_access_host_dashboard'] = $user->canAccessHostDashboard();
+        }
+
+        return response()->json($response);
     }
 
     public function logout(Request $request)
@@ -70,6 +85,14 @@ class AuthController extends Controller
 
     public function user(Request $request)
     {
-        return response()->json($request->user());
+        $user = $request->user();
+        $response = $user->toArray();
+        
+        // Add host dashboard access flag for hosts
+        if ($user->isHost()) {
+            $response['can_access_host_dashboard'] = $user->canAccessHostDashboard();
+        }
+        
+        return response()->json($response);
     }
 }

@@ -58,7 +58,7 @@ Route::prefix('v1')->group(function () {
     // Order routes
     Route::apiResource('posts.comments', PostCommentController::class)->middleware('auth:sanctum');
 
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['auth:sanctum', \App\Http\Middleware\EnsureHostHasVerifiedProperty::class])->group(function () {
         Route::get('/host/bookings', [BookingController::class, 'hostBookings']);
         Route::patch('/host/bookings/{booking}/confirm', [BookingController::class, 'confirmBooking']);
         Route::patch('/host/bookings/{booking}/reject', [BookingController::class, 'rejectBooking']);

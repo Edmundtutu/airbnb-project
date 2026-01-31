@@ -146,6 +146,29 @@ class User extends Authenticatable
         return $this->role == 'guest';
     }
 
+    /**
+     * Check if the host has at least one verified property.
+     */
+    public function hasVerifiedProperty(): bool
+    {
+        if (!$this->isHost()) {
+            return false;
+        }
+
+        return $this->properties()
+            ->where('verified', true)
+            ->exists();
+    }
+
+    /**
+     * Check if the host can access the host dashboard.
+     * Hosts can only access the dashboard if they have at least one verified property.
+     */
+    public function canAccessHostDashboard(): bool
+    {
+        return $this->hasVerifiedProperty();
+    }
+
     public function onboardingState(): BelongsTo
     {
         return $this->belongsTo(VendorOnboardingState::class, 'onboarding_state_id');

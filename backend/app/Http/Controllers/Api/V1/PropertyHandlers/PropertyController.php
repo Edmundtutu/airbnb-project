@@ -115,6 +115,8 @@ class PropertyController extends Controller
         
         $validated = $request->validated();
         $validated['host_id'] = Auth::id();
+        // Properties start as unverified - admin will verify later
+        $validated['verified'] = false;
 
         $property = Property::create($validated);
         $property->load('host');

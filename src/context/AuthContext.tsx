@@ -71,6 +71,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const authUser: AuthUser = {
             ...user,
             isInfluencer: (user.followers || 0) >= INFLUENCER_THRESHOLD,
+            can_access_host_dashboard: (user as any).can_access_host_dashboard,
             createdAt: user.createdAt ? new Date(user.createdAt) : new Date()
           };
 
@@ -109,6 +110,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const authUser: AuthUser = {
         ...user,
         isInfluencer: user.followers >= INFLUENCER_THRESHOLD,
+        can_access_host_dashboard: (response as any).can_access_host_dashboard,
         createdAt: user.createdAt ? new Date(user.createdAt) : new Date()
       };
 
@@ -144,6 +146,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const authUser: AuthUser = {
         ...user,
         isInfluencer: user.followers >= INFLUENCER_THRESHOLD,
+        can_access_host_dashboard: (response as any).can_access_host_dashboard,
         createdAt: user.createdAt ? new Date(user.createdAt) : new Date()
       };
 
